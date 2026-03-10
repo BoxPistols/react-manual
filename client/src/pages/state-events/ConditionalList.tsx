@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function ConditionalList() {
   return (
@@ -166,6 +170,269 @@ function DataView({ status, data, errorMessage }: DataViewProps) {
             </InfoBox>
           </section>
 
+          {/* 実践的UIパターン: タブ切替 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">実践的UIパターン: タブ切り替え</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              タブ UI は条件分岐の代表的なパターンです。state でアクティブなタブを管理し、対応するコンテンツを表示します。
+            </p>
+            <CodeBlock
+              code={`import { useState } from 'react';
+
+type TabId = 'overview' | 'features' | 'pricing';
+
+interface Tab {
+  id: TabId;
+  label: string;
+}
+
+const TABS: Tab[] = [
+  { id: 'overview', label: '概要' },
+  { id: 'features', label: '機能' },
+  { id: 'pricing', label: '料金' },
+];
+
+function TabPanel() {
+  const [activeTab, setActiveTab] = useState<TabId>('overview');
+
+  // タブに対応するコンテンツを返す関数
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold">プロダクト概要</h3>
+            <p className="text-gray-600">
+              このプロダクトは、チームのコラボレーションを効率化するツールです。
+            </p>
+          </div>
+        );
+      case 'features':
+        return (
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold">主な機能</h3>
+            <ul className="space-y-2 text-gray-600">
+              <li>- リアルタイムコラボレーション</li>
+              <li>- タスク管理</li>
+              <li>- ファイル共有</li>
+            </ul>
+          </div>
+        );
+      case 'pricing':
+        return (
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold">料金プラン</h3>
+            <p className="text-gray-600">月額 ¥980 から</p>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="max-w-lg">
+      {/* タブヘッダー */}
+      <div className="flex border-b">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={\`px-4 py-2 text-sm font-medium border-b-2 transition-colors
+              \${activeTab === tab.id
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+              }\`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* タブコンテンツ */}
+      <div className="p-4">
+        {renderContent()}
+      </div>
+    </div>
+  );
+}`}
+              language="tsx"
+              title="タブ切り替え UI"
+              showLineNumbers
+            />
+          </section>
+
+          {/* 実践的UIパターン: アコーディオン */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">実践的UIパターン: アコーディオン</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              アコーディオンは「開く/閉じる」の条件分岐を配列の各項目に適用したパターンです。
+            </p>
+            <CodeBlock
+              code={`import { useState } from 'react';
+
+interface AccordionItem {
+  id: number;
+  title: string;
+  content: string;
+}
+
+const ITEMS: AccordionItem[] = [
+  { id: 1, title: '返品はできますか？', content: '商品到着後7日以内であれば返品可能です。' },
+  { id: 2, title: '送料はいくらですか？', content: '全国一律 ¥500 です。¥5,000 以上のお買い上げで送料無料。' },
+  { id: 3, title: '届くまでどれくらいかかりますか？', content: '通常2-3営業日でお届けします。' },
+];
+
+function Accordion() {
+  // null = すべて閉じている、number = 開いているアイテムの id
+  const [openId, setOpenId] = useState<number | null>(null);
+
+  const handleToggle = (id: number) => {
+    // 同じアイテムをクリックしたら閉じる、別のアイテムなら開く
+    setOpenId((prev) => (prev === id ? null : id));
+  };
+
+  return (
+    <div className="max-w-lg space-y-2">
+      {ITEMS.map((item) => {
+        const isOpen = openId === item.id;
+
+        return (
+          <div key={item.id} className="border rounded-lg overflow-hidden">
+            <button
+              onClick={() => handleToggle(item.id)}
+              className="w-full flex justify-between items-center px-4 py-3 text-left hover:bg-gray-50"
+            >
+              <span className="font-medium text-sm">{item.title}</span>
+              <span className={\`transition-transform \${isOpen ? 'rotate-180' : ''}\`}>
+                &#x25BC;
+              </span>
+            </button>
+
+            {/* isOpen のときだけコンテンツを表示 */}
+            {isOpen && (
+              <div className="px-4 pb-3 text-sm text-gray-600 border-t">
+                <p className="pt-3">{item.content}</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}`}
+              language="tsx"
+              title="アコーディオン UI"
+              showLineNumbers
+            />
+          </section>
+
+          {/* 実践的UIパターン: ステッパー */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">実践的UIパターン: ステッパー</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              ステッパーは「現在のステップに応じて表示を切り替える」パターンです。フォームのウィザードや設定画面でよく使われます。
+            </p>
+            <CodeBlock
+              code={`import { useState } from 'react';
+
+const STEPS = ['基本情報', '詳細設定', '確認'] as const;
+
+function Stepper() {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const handleNext = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1));
+  };
+
+  const handlePrev = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
+  };
+
+  return (
+    <div className="max-w-lg p-6">
+      {/* ステップインジケーター */}
+      <div className="flex items-center mb-8">
+        {STEPS.map((step, i) => (
+          <div key={step} className="flex items-center">
+            <div className={\`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold
+              \${i <= currentStep
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-500'
+              }\`}
+            >
+              {i + 1}
+            </div>
+            <span className={\`ml-2 text-sm \${i <= currentStep ? 'text-blue-600 font-medium' : 'text-gray-400'}\`}>
+              {step}
+            </span>
+            {i < STEPS.length - 1 && (
+              <div className={\`mx-4 h-0.5 w-12 \${i < currentStep ? 'bg-blue-500' : 'bg-gray-200'}\`} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* ステップごとのコンテンツ */}
+      <div className="min-h-[120px] p-4 border rounded-lg mb-4">
+        {currentStep === 0 && (
+          <div>
+            <h3 className="font-bold mb-2">基本情報を入力</h3>
+            <p className="text-sm text-gray-500">名前やメールアドレスを入力してください。</p>
+          </div>
+        )}
+        {currentStep === 1 && (
+          <div>
+            <h3 className="font-bold mb-2">詳細設定</h3>
+            <p className="text-sm text-gray-500">通知設定やプランを選択してください。</p>
+          </div>
+        )}
+        {currentStep === 2 && (
+          <div>
+            <h3 className="font-bold mb-2">内容を確認</h3>
+            <p className="text-sm text-gray-500">入力内容を確認して送信してください。</p>
+          </div>
+        )}
+      </div>
+
+      {/* ナビゲーションボタン */}
+      <div className="flex justify-between">
+        <button
+          onClick={handlePrev}
+          disabled={currentStep === 0}
+          className="px-4 py-2 text-sm border rounded-lg disabled:opacity-30"
+        >
+          戻る
+        </button>
+        <button
+          onClick={handleNext}
+          disabled={currentStep === STEPS.length - 1}
+          className="px-4 py-2 text-sm bg-blue-500 text-white rounded-lg disabled:opacity-30"
+        >
+          {currentStep === STEPS.length - 1 ? '送信' : '次へ'}
+        </button>
+      </div>
+    </div>
+  );
+}`}
+              language="tsx"
+              title="ステッパー（マルチステップ）UI"
+              showLineNumbers
+            />
+          </section>
+
+          {/* Quiz 1 */}
+          <section>
+            <Quiz
+              question="JSX の中で「count が 0 のときに何も表示しない」正しい書き方はどれですか？"
+              options={[
+                { label: '{count && <span>{count}件</span>}' },
+                { label: '{count > 0 && <span>{count}件</span>}', correct: true },
+                { label: '{count !== 0 ? <span>{count}件</span>}' },
+                { label: '{if (count > 0) <span>{count}件</span>}' },
+              ]}
+              explanation="count && <span>...</span> だと count が 0 のときに「0」が画面に表示されてしまいます。数値を条件にする場合は count > 0 && のように明示的な比較演算子を使いましょう。JSX の中では if 文は使えません。三項演算子なら使えますが、この選択肢では構文エラーになります。"
+            />
+          </section>
+
           {/* リスト表示: .map() */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">リスト表示: .map()</h2>
@@ -254,6 +521,154 @@ const menuItems = ['ホーム', '製品', '会社概要'];
                 key はコンポーネントの Props として渡されるわけではなく、React が内部で「どの要素が追加・削除・変更されたか」を特定するために使います。key が正しくないと、入力中のテキストが別の行に移動するなどの予期せぬバグが起きます。
               </p>
             </InfoBox>
+          </section>
+
+          {/* key の深掘り */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">key を変えると何が起きるか</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              key は React にとって要素の「身分証明書」です。key が変わると、React はその要素を完全に破棄して新しく作り直します。この仕組みを理解すると、key を活用したテクニックも使えるようになります。
+            </p>
+            <CodeBlock
+              code={`import { useState } from 'react';
+
+// key を使ってコンポーネントをリセットする
+
+function EditableProfile({ userId }: { userId: number }) {
+  // このコンポーネントの state はユーザーごとにリセットしたい
+  const [name, setName] = useState('');
+  const [bio, setBio] = useState('');
+
+  return (
+    <div className="space-y-2">
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="名前"
+        className="w-full px-3 py-2 border rounded-lg"
+      />
+      <textarea
+        value={bio}
+        onChange={(e) => setBio(e.target.value)}
+        placeholder="自己紹介"
+        className="w-full px-3 py-2 border rounded-lg"
+      />
+      <p className="text-xs text-gray-400">ユーザーID: {userId}</p>
+    </div>
+  );
+}
+
+function UserSwitcher() {
+  const [selectedUserId, setSelectedUserId] = useState(1);
+
+  return (
+    <div className="p-6 max-w-md space-y-4">
+      <div className="flex gap-2">
+        <button onClick={() => setSelectedUserId(1)} className="px-3 py-1 bg-blue-500 text-white rounded">
+          ユーザー1
+        </button>
+        <button onClick={() => setSelectedUserId(2)} className="px-3 py-1 bg-green-500 text-white rounded">
+          ユーザー2
+        </button>
+        <button onClick={() => setSelectedUserId(3)} className="px-3 py-1 bg-purple-500 text-white rounded">
+          ユーザー3
+        </button>
+      </div>
+
+      {/* key を userId にすることで、ユーザーが変わるたびに
+          EditableProfile の state が自動的にリセットされる */}
+      <EditableProfile key={selectedUserId} userId={selectedUserId} />
+
+      {/* key がないと、ユーザーを切り替えても前の入力値が残ってしまう！ */}
+    </div>
+  );
+}`}
+              language="tsx"
+              title="key を活用してコンポーネントの state をリセット"
+              showLineNumbers
+            />
+            <InfoBox type="warning" title="key とパフォーマンスの関係">
+              <p>
+                key が変わるとコンポーネントは完全に再作成されます。これは便利なテクニックですが、意図せず key が毎回変わるとパフォーマンスに悪影響があります。例えば <code>key={'{Math.random()}'}</code> のようにランダムな値を key に使うと、毎回すべての要素が再作成されてしまいます。key には安定した一意の値（データベースの ID など）を使いましょう。
+              </p>
+            </InfoBox>
+
+            <CodeBlock
+              code={`// index を key にした場合の問題を具体的に見てみる
+
+import { useState } from 'react';
+
+function IndexKeyProblem() {
+  const [items, setItems] = useState(['りんご', 'バナナ', 'みかん']);
+  const [newItem, setNewItem] = useState('');
+
+  // 先頭に追加すると...
+  const handleAddToTop = () => {
+    if (newItem.trim()) {
+      setItems([newItem, ...items]); // 先頭に追加
+      setNewItem('');
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-md space-y-4">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
+          placeholder="フルーツ名"
+          className="flex-1 px-3 py-2 border rounded-lg"
+        />
+        <button onClick={handleAddToTop} className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+          先頭に追加
+        </button>
+      </div>
+
+      {/* NG: index を key にすると、先頭に追加した際に
+          既存の要素の input の値がズレてしまう */}
+      <h4 className="font-bold text-red-500">NG: key={'{index}'}</h4>
+      <ul className="space-y-2">
+        {items.map((item, index) => (
+          <li key={index} className="flex gap-2 items-center">
+            <span className="text-sm">{item}</span>
+            <input className="px-2 py-1 border rounded text-sm" placeholder="メモ" />
+          </li>
+        ))}
+      </ul>
+
+      {/* OK: 値自体を key にする（実際は id が望ましい） */}
+      <h4 className="font-bold text-green-500 mt-6">OK: key={'{item}'}</h4>
+      <ul className="space-y-2">
+        {items.map((item) => (
+          <li key={item} className="flex gap-2 items-center">
+            <span className="text-sm">{item}</span>
+            <input className="px-2 py-1 border rounded text-sm" placeholder="メモ" />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}`}
+              language="tsx"
+              title="index を key にした場合の具体的な問題"
+              showLineNumbers
+            />
+          </section>
+
+          {/* Quiz 2 */}
+          <section>
+            <Quiz
+              question="リスト表示で key にインデックス（index）を使うのが問題になるのは、どのようなケースですか？"
+              options={[
+                { label: 'リストの見た目を変更するとき' },
+                { label: 'リストの項目を追加・削除・並べ替えるとき', correct: true },
+                { label: 'リストの項目が100件を超えるとき' },
+                { label: 'リストをネスト（入れ子）にするとき' },
+              ]}
+              explanation="index を key にすると、項目の追加・削除・並べ替え時に、React が要素を正しく特定できなくなります。例えば先頭に項目を追加すると、すべての index がズレるため、React は全要素が変更されたと誤認し、入力中のテキストがズレるなどのバグが発生します。静的なリストならば index でも問題ありません。"
+            />
           </section>
 
           {/* フィルタリングとソート */}
@@ -383,7 +798,7 @@ function EmptyState({ title, description, actionLabel, onAction }: EmptyStatePro
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-        <span className="text-2xl text-gray-400">📭</span>
+        <span className="text-2xl text-gray-400">&#x1F4ED;</span>
       </div>
       <h3 className="text-lg font-medium text-gray-700">{title}</h3>
       {description && (
@@ -587,6 +1002,44 @@ function DesignGallery() {
             />
           </section>
 
+          {/* CodingChallenge */}
+          <section>
+            <CodingChallenge
+              title="カテゴリフィルター付き商品リスト"
+              description="商品データの配列から、選択されたカテゴリの商品だけを表示するフィルタリングロジックを完成させてください。'all' の場合は全商品を返します。"
+              initialCode={`const products = [
+  { id: 1, name: 'ノートPC', category: 'electronics', price: 89000 },
+  { id: 2, name: 'デスクチェア', category: 'furniture', price: 45000 },
+  { id: 3, name: 'モニター', category: 'electronics', price: 32000 },
+  { id: 4, name: 'デスク', category: 'furniture', price: 28000 },
+  { id: 5, name: 'キーボード', category: 'electronics', price: 12000 },
+];
+
+const selectedCategory = 'electronics'; // 'all' | 'electronics' | 'furniture'
+
+// ここにフィルタリングのコードを書いてください
+const filteredProducts = products;`}
+              answer={`const products = [
+  { id: 1, name: 'ノートPC', category: 'electronics', price: 89000 },
+  { id: 2, name: 'デスクチェア', category: 'furniture', price: 45000 },
+  { id: 3, name: 'モニター', category: 'electronics', price: 32000 },
+  { id: 4, name: 'デスク', category: 'furniture', price: 28000 },
+  { id: 5, name: 'キーボード', category: 'electronics', price: 12000 },
+];
+
+const selectedCategory = 'electronics'; // 'all' | 'electronics' | 'furniture'
+
+const filteredProducts = selectedCategory === 'all'
+  ? products
+  : products.filter((product) => product.category === selectedCategory);`}
+              hints={[
+                'selectedCategory が "all" のときは products をそのまま返します。',
+                '.filter() メソッドを使って、product.category が selectedCategory と一致するものだけを抽出します。',
+                '三項演算子を使うとスッキリ書けます: selectedCategory === "all" ? products : products.filter(...)',
+              ]}
+            />
+          </section>
+
           {/* まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
@@ -605,11 +1058,55 @@ function DesignGallery() {
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>- .map() で配列を JSX に変換</li>
                   <li>- key にはユニークな id を使う</li>
+                  <li>- key を変えると state がリセットされる</li>
                   <li>- .filter() でフィルタリング</li>
                   <li>- 空の状態を忘れずに対応する</li>
                 </ul>
               </div>
             </div>
+          </section>
+
+          {/* ReferenceLinks */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'React 公式: Conditional Rendering',
+                  url: 'https://react.dev/learn/conditional-rendering',
+                  description: '三項演算子、&& 演算子、早期 return による条件分岐のパターンを解説',
+                },
+                {
+                  title: 'React 公式: Rendering Lists',
+                  url: 'https://react.dev/learn/rendering-lists',
+                  description: '.map() によるリスト表示と key prop の正しい使い方',
+                },
+                {
+                  title: 'React 公式: Preserving and Resetting State',
+                  url: 'https://react.dev/learn/preserving-and-resetting-state',
+                  description: 'key を使った state のリセットや、React が state を保持する仕組み',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'index を key に使うのは絶対にダメ？',
+                  answer: '絶対にダメということではありません。リストが静的で、項目の追加・削除・並べ替えが一切行われない場合は index でも問題ありません。例えばメニュー項目のような固定リストです。ただし、動的に変化するリスト（Todo リスト、検索結果など）では、必ず一意の ID を key にしましょう。迷ったら ID を使っておけば安全です。',
+                },
+                {
+                  question: '大量のリスト（1000件以上）のパフォーマンスが気になる場合は？',
+                  answer: '大量のリストを一度にレンダリングするとパフォーマンスが低下します。対策として「仮想スクロール（Virtual Scrolling）」があり、画面に見えている部分だけをレンダリングします。react-window や @tanstack/react-virtual といったライブラリが代表的です。ページネーション（ページ分割）やインフィニットスクロール（無限スクロール）も有効な手段です。',
+                },
+                {
+                  question: 'JSX の中で null と undefined の違いは？',
+                  answer: 'どちらも JSX の中で使うと「何も表示しない」という同じ結果になります。条件分岐で「何も表示しない」ことを明示したい場合は null を返すのが一般的な慣習です。一方、false や空文字列 "" も何も表示されません。ただし数値の 0 は「0」として表示されてしまうので注意が必要です。',
+                },
+              ]}
+            />
           </section>
         </div>
 

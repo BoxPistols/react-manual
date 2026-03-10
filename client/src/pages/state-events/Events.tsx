@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function Events() {
   return (
@@ -77,6 +81,101 @@ function ClickExample() {
                 <code>onClick={'{handleClick()}'}</code> と書くと、レンダリング時に関数が即座に実行されてしまいます。関数の「参照」を渡す必要があるので、括弧なしの <code>onClick={'{handleClick}'}</code> が正しい書き方です。引数を渡したい場合は <code>onClick={'() => handleClick(id)'}</code> のようにアロー関数で包みます。
               </p>
             </InfoBox>
+          </section>
+
+          {/* TypeScriptでのイベント型 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">TypeScript でのイベント型</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              TypeScript を使うと、イベントハンドラに正確な型を付けることができます。型を付けることで、<code className="text-sm bg-muted px-1.5 py-0.5 rounded">e.target</code> のプロパティに安全にアクセスでき、エディタの補完も効くようになります。
+            </p>
+            <CodeBlock
+              code={`// よく使うイベント型の一覧
+
+// マウスイベント
+const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  console.log(e.clientX, e.clientY);  // クリック座標
+  console.log(e.currentTarget);       // イベントが設定された要素（button）
+};
+
+const handleDivClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  // HTMLDivElement を指定すると div 固有のプロパティにもアクセス可
+};
+
+// フォームイベント
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+};
+
+// 入力変更イベント（要素ごとに型が異なる）
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  console.log(e.target.value);    // string
+  console.log(e.target.checked);  // boolean（checkbox の場合）
+};
+
+const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  console.log(e.target.value);
+};
+
+const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  console.log(e.target.value);
+};
+
+// キーボードイベント
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  console.log(e.key);      // 押されたキー（'Enter', 'Escape' など）
+  console.log(e.ctrlKey);  // Ctrl が押されているか
+  console.log(e.metaKey);  // Cmd（Mac）が押されているか
+  console.log(e.shiftKey); // Shift が押されているか
+};
+
+// フォーカスイベント
+const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  console.log(e.target);         // フォーカスされた要素
+  console.log(e.relatedTarget);  // フォーカスが外れた要素
+};
+
+const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  console.log('フォーカスが外れました');
+};
+
+// ドラッグイベント
+const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+  e.dataTransfer.setData('text/plain', 'ドラッグ中');
+};`}
+              language="tsx"
+              title="イベント型の一覧と使い方"
+              showLineNumbers
+            />
+            <InfoBox type="success" title="型がわからないときは？">
+              <p>
+                イベントの型がわからないときは、まずインラインで書いてみましょう。例えば <code>onChange={'{(e) => {}}'}</code> と書くと、エディタ（VS Code）が自動的に <code>e</code> の型を推論してくれます。その型をコピーして関数の引数に使えば OK です。
+              </p>
+            </InfoBox>
+
+            <CodeBlock
+              code={`// よくあるパターン: 型を省略できるケース
+
+// インラインなら型推論が効く
+<button onClick={(e) => {
+  // e は自動的に React.MouseEvent<HTMLButtonElement> と推論される
+  console.log(e.clientX);
+}}>クリック</button>
+
+// 関数を別定義するときは型が必要
+const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  console.log(e.clientX);
+};
+<button onClick={handleClick}>クリック</button>
+
+// イベントオブジェクトを使わないなら型は不要
+const handleSimpleClick = () => {
+  console.log('クリックされた');
+};
+<button onClick={handleSimpleClick}>クリック</button>`}
+              language="tsx"
+              title="型を省略できるケースとできないケース"
+            />
           </section>
 
           {/* イベントハンドラの命名規則 */}
@@ -464,6 +563,247 @@ function KeyboardEvents() {
             </InfoBox>
           </section>
 
+          {/* Quiz 1 */}
+          <section>
+            <Quiz
+              question="次のうち、onClick に正しくイベントハンドラを渡している書き方はどれですか？"
+              options={[
+                { label: 'onClick={handleClick()}' },
+                { label: 'onClick={handleClick}', correct: true },
+                { label: 'onClick="handleClick"' },
+                { label: 'onClick={handleClick(id)}' },
+              ]}
+              explanation="onClick には関数の「参照」を渡す必要があります。handleClick() と括弧付きで書くとレンダリング時に即座に実行されてしまいます。引数を渡したい場合は onClick={() => handleClick(id)} のようにアロー関数で包みます。"
+            />
+          </section>
+
+          {/* イベントバブリングとキャプチャ */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">イベントバブリングとキャプチャ</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              DOM イベントには「伝播（propagation）」の仕組みがあります。あるイベントが発生すると、その要素だけでなく親要素にも伝わっていきます。これを<strong>バブリング</strong>と呼びます。
+            </p>
+            <CodeBlock
+              code={`import { useState } from 'react';
+
+function BubblingExample() {
+  const [log, setLog] = useState<string[]>([]);
+
+  const addLog = (message: string) => {
+    setLog((prev) => [message, ...prev.slice(0, 9)]);
+  };
+
+  return (
+    <div className="p-6 max-w-md space-y-4">
+      {/* 親要素の onClick */}
+      <div
+        onClick={() => addLog('外側の div がクリックされた')}
+        className="p-6 bg-blue-100 rounded-lg"
+      >
+        <p className="text-sm mb-2">外側の div</p>
+
+        {/* 中間要素の onClick */}
+        <div
+          onClick={() => addLog('内側の div がクリックされた')}
+          className="p-4 bg-green-100 rounded-lg"
+        >
+          <p className="text-sm mb-2">内側の div</p>
+
+          {/* ボタンの onClick */}
+          <button
+            onClick={() => addLog('ボタンがクリックされた')}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg"
+          >
+            ボタン
+          </button>
+        </div>
+      </div>
+
+      {/* ボタンをクリックすると、3つ全部のハンドラが実行される！ */}
+      {/* ボタン → 内側div → 外側div の順（バブリング） */}
+
+      <div className="bg-gray-50 rounded-lg p-3">
+        <p className="text-sm font-medium mb-1">イベントログ:</p>
+        <ul className="text-xs space-y-0.5">
+          {log.map((entry, i) => (
+            <li key={i} className="text-gray-600">{entry}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}`}
+              language="tsx"
+              title="イベントバブリングの挙動"
+            />
+
+            <p className="text-muted-foreground my-4 leading-relaxed">
+              バブリングを止めたい場合は <code className="text-sm bg-muted px-1.5 py-0.5 rounded">e.stopPropagation()</code> を使います。たとえば、カード全体にクリックイベントがあるけど、内部の削除ボタンだけは別の処理をしたい場合に使います。
+            </p>
+
+            <CodeBlock
+              code={`function CardWithButton() {
+  const handleCardClick = () => {
+    console.log('カード詳細へ遷移');
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // カードの onClick が実行されるのを防ぐ
+    console.log('削除処理を実行');
+  };
+
+  return (
+    <div onClick={handleCardClick} className="p-4 border rounded-lg cursor-pointer">
+      <h3>記事タイトル</h3>
+      <p>記事の説明...</p>
+      <button
+        onClick={handleDeleteClick}
+        className="mt-2 px-3 py-1 bg-red-500 text-white rounded text-sm"
+      >
+        削除
+      </button>
+    </div>
+  );
+}
+
+// キャプチャフェーズ: バブリングの逆（親→子の順）
+// onClickCapture を使うとキャプチャフェーズでハンドラを実行できる
+// 実務で使うことはほぼないが、知っておくとデバッグに役立つ
+<div onClickCapture={() => console.log('キャプチャフェーズで実行')}>
+  <button onClick={() => console.log('バブリングフェーズで実行')}>
+    クリック
+  </button>
+</div>`}
+              language="tsx"
+              title="stopPropagation でバブリングを止める"
+            />
+
+            <InfoBox type="info" title="バブリングの流れ">
+              <div className="space-y-1">
+                <p><strong>キャプチャフェーズ</strong>: window → document → ... → 親 → ターゲット（上から下へ）</p>
+                <p><strong>バブリングフェーズ</strong>: ターゲット → 親 → ... → document → window（下から上へ）</p>
+                <p>React のイベント（onClick など）はデフォルトでバブリングフェーズです。キャプチャフェーズで処理したい場合は <code>onClickCapture</code> を使います。</p>
+              </div>
+            </InfoBox>
+          </section>
+
+          {/* デバウンスとスロットル */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">デバウンスとスロットル</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              ユーザーが高速に操作（入力やスクロールなど）するたびにイベントハンドラが大量に実行されると、パフォーマンスに悪影響を及ぼします。「デバウンス」と「スロットル」は、イベントの発火頻度を制御するテクニックです。
+            </p>
+
+            <CodeBlock
+              code={`// デバウンス（Debounce）
+// 「最後のイベントから一定時間待ってから実行する」
+// 用途: 検索入力、ウィンドウリサイズ
+
+import { useState, useEffect } from 'react';
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(timer); // 前のタイマーをキャンセル
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// 使い方: 検索フォーム
+function SearchWithDebounce() {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300); // 300ms 待つ
+
+  useEffect(() => {
+    if (debouncedQuery) {
+      console.log('API 呼び出し:', debouncedQuery);
+      // ここで実際の検索 API を呼ぶ
+    }
+  }, [debouncedQuery]);
+
+  return (
+    <input
+      type="text"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      placeholder="検索..."
+      className="w-full px-3 py-2 border rounded-lg"
+    />
+  );
+  // 「r」「re」「rea」「reac」「react」と入力しても
+  // API 呼び出しは最後の「react」の1回だけ！
+}`}
+              language="tsx"
+              title="デバウンスで検索 API の呼び出しを最適化"
+              showLineNumbers
+            />
+
+            <CodeBlock
+              code={`// スロットル（Throttle）
+// 「一定間隔ごとに最大1回だけ実行する」
+// 用途: スクロール追跡、ウィンドウリサイズ、ドラッグ操作
+
+import { useRef, useCallback } from 'react';
+
+function useThrottle(callback: (...args: unknown[]) => void, delay: number) {
+  const lastCall = useRef(0);
+
+  return useCallback((...args: unknown[]) => {
+    const now = Date.now();
+    if (now - lastCall.current >= delay) {
+      lastCall.current = now;
+      callback(...args);
+    }
+  }, [callback, delay]);
+}
+
+// 使い方: スクロール位置の追跡
+function ScrollTracker() {
+  const handleScroll = useThrottle(() => {
+    console.log('スクロール位置:', window.scrollY);
+    // アナリティクスの送信やUIの更新など
+  }, 200); // 200ms に1回だけ実行
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  return <div>スクロールしてみてください</div>;
+}`}
+              language="tsx"
+              title="スロットルでスクロールイベントを制御"
+            />
+
+            <InfoBox type="info" title="デバウンスとスロットルの使い分け">
+              <div className="space-y-1">
+                <p><strong>デバウンス</strong>: ユーザーが操作を「終えた後」に処理したいとき（検索入力、フォームバリデーション）</p>
+                <p><strong>スロットル</strong>: 操作「中」も定期的に処理したいとき（スクロール追跡、ドラッグ、リサイズ）</p>
+                <p>実務では lodash の <code>_.debounce()</code> や <code>_.throttle()</code> を使うことも多いです。</p>
+              </div>
+            </InfoBox>
+          </section>
+
+          {/* Quiz 2 */}
+          <section>
+            <Quiz
+              question="カード全体にクリックイベントがあり、内部の削除ボタンだけカードのクリックを発火させたくない場合、削除ボタンのハンドラで何を呼ぶべきですか？"
+              options={[
+                { label: 'e.preventDefault()' },
+                { label: 'e.stopPropagation()', correct: true },
+                { label: 'e.stopImmediatePropagation()' },
+                { label: 'return false' },
+              ]}
+              explanation="e.stopPropagation() はイベントが親要素に伝播（バブリング）するのを防ぎます。e.preventDefault() はブラウザのデフォルト動作（フォーム送信など）を防ぐためのもので、バブリングの制御には使いません。React では return false でイベントを止めることはできません。"
+            />
+          </section>
+
           {/* 実践例: カラーピッカー */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">実践例: インタラクティブ・カラーピッカー</h2>
@@ -629,6 +969,36 @@ function ColorPicker() {
             />
           </section>
 
+          {/* CodingChallenge */}
+          <section>
+            <CodingChallenge
+              title="クリックカウンター + キーボードショートカット"
+              description="ボタンのクリックでカウントアップし、キーボードショートカット（r キーでリセット、上矢印キーでカウントアップ、下矢印キーでカウントダウン）に対応するコンポーネントを完成させてください。onKeyDown ハンドラの中身を書いてください。"
+              initialCode={`const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  // ここにコードを書いてください
+  // 'r' キーでカウントを0にリセット
+  // 'ArrowUp' キーでカウントアップ
+  // 'ArrowDown' キーでカウントを0以上の範囲でダウン
+};`}
+              answer={`const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  if (e.key === 'r') {
+    setCount(0);
+  }
+  if (e.key === 'ArrowUp') {
+    setCount((prev) => prev + 1);
+  }
+  if (e.key === 'ArrowDown') {
+    setCount((prev) => Math.max(0, prev - 1));
+  }
+};`}
+              hints={[
+                'e.key でどのキーが押されたかを判別できます。',
+                'リセットには setCount(0) を使います。',
+                '0未満にならないようにするには Math.max(0, prev - 1) を使うと便利です。',
+              ]}
+            />
+          </section>
+
           {/* まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
@@ -640,6 +1010,7 @@ function ColorPicker() {
                   <li>- <code>onChange</code> - 値の変更（input, select）</li>
                   <li>- <code>onSubmit</code> - フォーム送信</li>
                   <li>- <code>onKeyDown</code> - キーボード押下</li>
+                  <li>- <code>onFocus</code> / <code>onBlur</code> - フォーカス</li>
                 </ul>
               </div>
               <div className="p-4 rounded-lg border border-border bg-card">
@@ -649,9 +1020,53 @@ function ColorPicker() {
                   <li>- フォーム送信は e.preventDefault() 必須</li>
                   <li>- 引数はアロー関数で渡す</li>
                   <li>- onClick={'{fn}'} であり onClick={'{fn()}'} ではない</li>
+                  <li>- バブリングは stopPropagation() で制御</li>
                 </ul>
               </div>
             </div>
+          </section>
+
+          {/* ReferenceLinks */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'React 公式: Responding to Events',
+                  url: 'https://react.dev/learn/responding-to-events',
+                  description: 'イベントハンドラの基本的な使い方、命名規則、バブリングの仕組みを解説',
+                },
+                {
+                  title: 'MDN: Event reference',
+                  url: 'https://developer.mozilla.org/ja/docs/Web/Events',
+                  description: 'ブラウザが提供するすべてのイベントのリファレンス',
+                },
+                {
+                  title: 'React 公式: SyntheticEvent',
+                  url: 'https://react.dev/reference/react-dom/components/common#react-event-object',
+                  description: 'React の合成イベントオブジェクトの詳細なリファレンス',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'onClick と addEventListener の違いは？',
+                  answer: 'React の onClick はコンポーネントのレンダリングに連動してイベントリスナーが自動管理されます。addEventListener は手動で追加・削除が必要で、管理が煩雑になりがちです。React では基本的に JSX の onClick などを使い、グローバルイベント（window の scroll や resize など）だけ useEffect 内で addEventListener を使うのが一般的です。',
+                },
+                {
+                  question: '合成イベント（SyntheticEvent）とは？',
+                  answer: 'React はブラウザのネイティブイベントをラップした「合成イベント（SyntheticEvent）」を使います。これにより、すべてのブラウザで同じ API でイベントを扱えます。e.nativeEvent で元のブラウザイベントにアクセスすることも可能ですが、通常は合成イベントだけで十分です。',
+                },
+                {
+                  question: 'イベント型が難しい場合はどうすればいい？',
+                  answer: '最初は型を省略してインラインで書き、エディタの型推論に頼りましょう。VS Code なら、onChange={(e) => {}} と書くだけで e の型が自動的に表示されます。慣れてきたら React.MouseEvent<HTMLButtonElement> のように明示的に書く練習をしましょう。型がわからなければ React.SyntheticEvent をベースの型として使うこともできます。',
+                },
+              ]}
+            />
           </section>
         </div>
 

@@ -58,6 +58,7 @@ import ArchOverview from "./pages/architecture/ArchOverview";
 import DesignSystem from "./pages/architecture/DesignSystem";
 import Maintenance from "./pages/architecture/Maintenance";
 import NotFound from "./pages/NotFound";
+import KeyboardNav from "./components/KeyboardNav";
 import { Toaster } from "sonner";
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
       <PlatformProvider>
         <div className="flex min-h-screen bg-background text-foreground font-poppins">
           <Navigation />
+          <KeyboardNav />
           <main className="flex-1 md:ml-64 w-full">
             <Switch>
               <Route path="/" component={Home} />

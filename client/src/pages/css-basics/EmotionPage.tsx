@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function EmotionPage() {
   return (
@@ -107,7 +111,130 @@ function App() {
             </InfoBox>
           </section>
 
-          {/* セクション2: css prop */}
+          {/* セクション2: css prop vs styled API 使い分けガイド */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">css prop vs styled API の使い分け</h2>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              Emotion の大きな特徴は、<strong>css prop</strong> と <strong>styled API</strong> の
+              2つのスタイリング手法を提供していることです。
+              どちらを使うべきか迷う場面が多いので、使い分けの基準を明確にしましょう。
+            </p>
+
+            <div className="overflow-x-auto mb-6">
+              <table className="w-full border-collapse border border-border rounded-lg overflow-hidden text-sm">
+                <thead>
+                  <tr className="bg-muted/50">
+                    <th className="border border-border px-4 py-3 text-left font-semibold">観点</th>
+                    <th className="border border-border px-4 py-3 text-left font-semibold">css prop</th>
+                    <th className="border border-border px-4 py-3 text-left font-semibold">styled API</th>
+                  </tr>
+                </thead>
+                <tbody className="text-foreground/80">
+                  <tr>
+                    <td className="border border-border px-4 py-2 font-medium">新コンポーネントの作成</td>
+                    <td className="border border-border px-4 py-2">不要（既存要素に直接適用）</td>
+                    <td className="border border-border px-4 py-2">必要（ラッパーコンポーネント生成）</td>
+                  </tr>
+                  <tr className="bg-muted/20">
+                    <td className="border border-border px-4 py-2 font-medium">再利用性</td>
+                    <td className="border border-border px-4 py-2">変数に抽出して再利用</td>
+                    <td className="border border-border px-4 py-2">コンポーネントとして再利用</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-border px-4 py-2 font-medium">適した場面</td>
+                    <td className="border border-border px-4 py-2">一度きりのスタイル、プロトタイプ</td>
+                    <td className="border border-border px-4 py-2">UIライブラリ、共通コンポーネント</td>
+                  </tr>
+                  <tr className="bg-muted/20">
+                    <td className="border border-border px-4 py-2 font-medium">動的スタイル</td>
+                    <td className="border border-border px-4 py-2">関数で生成、テーマコールバック</td>
+                    <td className="border border-border px-4 py-2">props で制御</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-border px-4 py-2 font-medium">コードの見通し</td>
+                    <td className="border border-border px-4 py-2">JSX に直接スタイルが見える</td>
+                    <td className="border border-border px-4 py-2">スタイルとJSXが分離</td>
+                  </tr>
+                  <tr className="bg-muted/20">
+                    <td className="border border-border px-4 py-2 font-medium">移行コスト</td>
+                    <td className="border border-border px-4 py-2">JSX pragma 設定が必要</td>
+                    <td className="border border-border px-4 py-2">styled-components とほぼ同じ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">推奨: 使い分けの基本方針</h3>
+            <div className="bg-muted/30 border border-border rounded-lg p-6 mb-4">
+              <ul className="space-y-3 text-foreground/80 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-1 font-bold">1.</span>
+                  <span><strong>ページ固有のレイアウト</strong>やその場限りのスタイルには <strong>css prop</strong> — 新しいコンポーネントを作る必要がなく、手軽</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-1 font-bold">2.</span>
+                  <span><strong>共通 UI コンポーネント</strong>（Button, Card, Badge 等）には <strong>styled</strong> — 再利用しやすく、props による動的スタイルが書きやすい</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-1 font-bold">3.</span>
+                  <span>1つのプロジェクト内で両方を混在させても問題ない — Emotion はどちらも同じスタイルシートに挿入する</span>
+                </li>
+              </ul>
+            </div>
+
+            <CodeBlock
+              language="tsx"
+              title="混在パターンの実例"
+              code={`/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
+
+// 共通コンポーネントは styled で定義
+const Button = styled.button<{ $variant: 'primary' | 'secondary' }>\`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  background: \${(p) => p.$variant === 'primary' ? '#3b82f6' : '#f1f5f9'};
+  color: \${(p) => p.$variant === 'primary' ? 'white' : '#334155'};
+\`;
+
+const Badge = styled.span\`
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  background: #eff6ff;
+  color: #3b82f6;
+\`;
+
+// ページ固有のレイアウトは css prop で直接
+function ProfilePage() {
+  return (
+    <div css={css\`
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px;
+    \`}>
+      <header css={css\`
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      \`}>
+        <h1 css={{ fontSize: '2rem', fontWeight: 800 }}>
+          プロフィール <Badge>Pro</Badge>
+        </h1>
+        <Button $variant="primary">編集</Button>
+      </header>
+      {/* ... */}
+    </div>
+  );
+}`}
+            />
+          </section>
+
+          {/* セクション3: css prop アプローチ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">css prop アプローチ</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
@@ -170,7 +297,6 @@ function Card() {
               language="tsx"
               title="css prop + オブジェクト記法"
               code={`/** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react';
 
 function Card() {
   return (
@@ -241,7 +367,7 @@ function StatusCard({ title, isActive }: { title: string; isActive: boolean }) {
             />
           </section>
 
-          {/* セクション3: styled アプローチ */}
+          {/* セクション4: styled アプローチ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">styled アプローチ</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
@@ -309,7 +435,7 @@ const Badge = styled.span({
             </InfoBox>
           </section>
 
-          {/* セクション4: スタイルの合成 */}
+          {/* セクション5: スタイルの合成 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">スタイルの合成（Composition）</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
@@ -383,17 +509,6 @@ function Button({ variant = 'primary', size = 'md', children }: ButtonProps) {
       {children}
     </button>
   );
-}
-
-// 使用例
-function App() {
-  return (
-    <div>
-      <Button variant="primary" size="lg">大きなプライマリ</Button>
-      <Button variant="outline" size="sm">小さなアウトライン</Button>
-      <Button variant="secondary">セカンダリ</Button>
-    </div>
-  );
 }`}
             />
 
@@ -406,135 +521,240 @@ function App() {
             </InfoBox>
           </section>
 
-          {/* セクション5: テーミング */}
+          {/* セクション6: Emotion + TypeScript の型安全テーマ */}
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">テーミング</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Emotion + TypeScript の型安全テーマ</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
-              Emotion にも ThemeProvider があり、styled-components と同様にテーマを管理できます。
-              さらに、css prop と組み合わせることもできます。
+              Emotion のテーマ機能は TypeScript と深く統合できます。
+              テーマの型を正しく設定すると、テーマの値を参照するときに補完とエラーチェックが効くようになります。
             </p>
 
             <CodeBlock
               language="tsx"
-              title="Emotion のテーミング"
-              code={`/** @jsxImportSource @emotion/react */
-import { css, ThemeProvider, useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
-import { useState } from 'react';
-
-// テーマの型定義
-interface AppTheme {
-  colors: {
-    primary: string;
-    background: string;
-    surface: string;
-    text: string;
-    textMuted: string;
-    border: string;
-  };
-  spacing: (factor: number) => string;
-  radius: {
-    sm: string;
-    md: string;
-    lg: string;
-  };
-}
-
-// Emotion のテーマ型を拡張
-declare module '@emotion/react' {
-  export interface Theme extends AppTheme {}
-}
-
-// テーマ定義
-const lightTheme: AppTheme = {
+              title="型安全なテーマの定義"
+              code={`// src/theme.ts — テーマ定義
+export const lightTheme = {
   colors: {
     primary: '#3b82f6',
+    primaryHover: '#2563eb',
+    secondary: '#8b5cf6',
     background: '#f8fafc',
     surface: '#ffffff',
     text: '#1e293b',
     textMuted: '#64748b',
     border: '#e2e8f0',
+    success: '#10b981',
+    warning: '#f59e0b',
+    danger: '#ef4444',
   },
-  spacing: (factor: number) => \`\${factor * 8}px\`,
-  radius: { sm: '4px', md: '8px', lg: '12px' },
-};
+  spacing: (factor: number) => \`\${factor * 4}px\`,
+  radius: {
+    sm: '4px',
+    md: '8px',
+    lg: '12px',
+    full: '9999px',
+  },
+  shadow: {
+    sm: '0 1px 3px rgba(0, 0, 0, 0.06)',
+    md: '0 4px 12px rgba(0, 0, 0, 0.08)',
+    lg: '0 12px 32px rgba(0, 0, 0, 0.12)',
+  },
+  typography: {
+    fontFamily: "'Inter', -apple-system, sans-serif",
+    fontSize: {
+      xs: '0.75rem',
+      sm: '0.875rem',
+      base: '1rem',
+      lg: '1.125rem',
+      xl: '1.25rem',
+      '2xl': '1.5rem',
+    },
+  },
+} as const;
 
-const darkTheme: AppTheme = {
+export const darkTheme: typeof lightTheme = {
   ...lightTheme,
   colors: {
+    ...lightTheme.colors,
     primary: '#60a5fa',
+    primaryHover: '#93bbfd',
     background: '#0f172a',
     surface: '#1e293b',
     text: '#f1f5f9',
     textMuted: '#94a3b8',
     border: '#334155',
   },
+  shadow: {
+    sm: '0 1px 3px rgba(0, 0, 0, 0.3)',
+    md: '0 4px 12px rgba(0, 0, 0, 0.4)',
+    lg: '0 12px 32px rgba(0, 0, 0, 0.5)',
+  },
 };
 
-// styled で使う場合
+export type AppTheme = typeof lightTheme;`}
+            />
+
+            <div className="mt-4" />
+
+            <CodeBlock
+              language="typescript"
+              title="src/emotion.d.ts — Emotion の Theme 型を拡張"
+              code={`// この型定義が TypeScript の補完を有効にする鍵
+import type { AppTheme } from './theme';
+
+declare module '@emotion/react' {
+  export interface Theme extends AppTheme {}
+}
+
+// これで props.theme のすべてのプロパティに型補完が効く:
+// props.theme.colors.primary  → string ✓
+// props.theme.colors.foo      → TypeScript エラー ✗
+// props.theme.spacing(3)      → "12px" ✓
+// props.theme.radius.lg       → "12px" ✓`}
+            />
+
+            <div className="mt-4" />
+
+            <CodeBlock
+              language="tsx"
+              title="型安全なテーマの使用"
+              code={`/** @jsxImportSource @emotion/react */
+import { css, ThemeProvider, useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
+import { lightTheme, darkTheme } from './theme';
+import { useState } from 'react';
+
+// styled で使う場合 — props.theme に型補完が効く
 const Card = styled.div\`
-  background: \${(props) => props.theme.colors.surface};
-  color: \${(props) => props.theme.colors.text};
-  border: 1px solid \${(props) => props.theme.colors.border};
-  border-radius: \${(props) => props.theme.radius.lg};
-  padding: \${(props) => props.theme.spacing(3)};
+  background: \${(p) => p.theme.colors.surface};
+  color: \${(p) => p.theme.colors.text};
+  border: 1px solid \${(p) => p.theme.colors.border};
+  border-radius: \${(p) => p.theme.radius.lg};
+  padding: \${(p) => p.theme.spacing(6)};
+  box-shadow: \${(p) => p.theme.shadow.md};
+  font-family: \${(p) => p.theme.typography.fontFamily};
 \`;
 
-// css prop で使う場合（useTheme フック）
-function ThemedContent() {
-  const theme = useTheme();
-
+// css prop + テーマコールバック — useTheme() が不要
+function Alert({ type, children }: { type: 'success' | 'warning' | 'danger'; children: React.ReactNode }) {
   return (
     <div
-      css={css\`
-        background: \${theme.colors.surface};
-        padding: \${theme.spacing(3)};
-        border-radius: \${theme.radius.lg};
-      \`}
+      css={(theme) => ({
+        padding: theme.spacing(4),
+        borderRadius: theme.radius.md,
+        borderLeft: \`4px solid \${theme.colors[type]}\`,
+        background: theme.colors.surface,
+        fontSize: theme.typography.fontSize.sm,
+      })}
     >
-      <p css={{ color: theme.colors.text }}>テーマから色を取得</p>
-      <p css={{ color: theme.colors.textMuted }}>ミュートテキスト</p>
+      {children}
     </div>
   );
 }
 
-// css prop + theme コールバック（useTheme 不要）
-function ThemedButton() {
+// useTheme フックでテーマにアクセス
+function ThemeInfo() {
+  const theme = useTheme();
   return (
-    <button
-      css={(theme) => ({
-        padding: theme.spacing(1.5) + ' ' + theme.spacing(3),
-        background: theme.colors.primary,
-        color: 'white',
-        border: 'none',
-        borderRadius: theme.radius.md,
-        fontWeight: 600,
-        cursor: 'pointer',
-      })}
-    >
-      テーマボタン
-    </button>
+    <p css={{ color: theme.colors.textMuted, fontSize: theme.typography.fontSize.xs }}>
+      現在のプライマリカラー: {theme.colors.primary}
+    </p>
   );
 }
 
 // アプリ
 function App() {
   const [isDark, setIsDark] = useState(false);
-
   return (
     <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
       <Card>
-        <ThemedContent />
-        <ThemedButton />
+        <Alert type="success">テーマが正しく適用されています</Alert>
+        <ThemeInfo />
         <button onClick={() => setIsDark(!isDark)}>テーマ切替</button>
       </Card>
     </ThemeProvider>
   );
 }`}
             />
+
+            <InfoBox type="info" title="spacing 関数パターン">
+              <p>
+                <code className="bg-muted px-1 rounded">spacing(factor: number)</code> のように関数でスペーシングを定義すると、
+                <code className="bg-muted px-1 rounded">spacing(1)</code> = 4px、<code className="bg-muted px-1 rounded">spacing(2)</code> = 8px...
+                のように一貫したスケールで値を使えます。
+                MUI のテーマでもこのパターンが採用されています。
+              </p>
+            </InfoBox>
           </section>
 
-          {/* セクション6: styled-components との比較 */}
+          {/* セクション7: @emotion/babel-plugin */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">@emotion/babel-plugin の最適化</h2>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">@emotion/babel-plugin</code> はオプションですが、
+              導入すると開発体験とパフォーマンスの両面でメリットがあります。
+            </p>
+
+            <CodeBlock
+              language="bash"
+              title="インストール"
+              code={`npm install -D @emotion/babel-plugin`}
+            />
+
+            <div className="mt-4" />
+
+            <div className="bg-muted/30 border border-border rounded-lg p-6 mb-4">
+              <h3 className="font-semibold text-foreground mb-3">プラグインが行う最適化</h3>
+              <div className="space-y-3 text-foreground/80 text-sm">
+                <div>
+                  <strong className="text-foreground">1. ソースマッピング</strong>
+                  <p className="ml-4 mt-1">開発者ツールで、生成されたクラス名がどのコンポーネント・ファイルに由来するかを確認できるようになります。</p>
+                </div>
+                <div>
+                  <strong className="text-foreground">2. ラベル付け</strong>
+                  <p className="ml-4 mt-1">生成されるクラス名に変数名やコンポーネント名が含まれ、デバッグしやすくなります（例: <code className="bg-muted px-1 rounded">css-cardStyle-1a2b3c</code>）。</p>
+                </div>
+                <div>
+                  <strong className="text-foreground">3. CSS の最適化</strong>
+                  <p className="ml-4 mt-1">不要な空白や改行を除去し、CSS 文字列を圧縮します。</p>
+                </div>
+                <div>
+                  <strong className="text-foreground">4. 静的スタイルの事前評価</strong>
+                  <p className="ml-4 mt-1">props に依存しない静的なスタイルをビルド時に事前計算し、ランタイムのオーバーヘッドを削減します。</p>
+                </div>
+              </div>
+            </div>
+
+            <CodeBlock
+              language="typescript"
+              title="vite.config.ts での設定"
+              code={`import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [
+    react({
+      jsxImportSource: '@emotion/react',
+      babel: {
+        plugins: [
+          [
+            '@emotion/babel-plugin',
+            {
+              sourceMap: true,        // ソースマッピング（開発時に有用）
+              autoLabel: 'dev-only',  // ラベルは開発時のみ付与
+              labelFormat: '[dirname]--[filename]--[local]',
+              // → 例: components--Card--cardStyle
+            },
+          ],
+        ],
+      },
+    }),
+  ],
+});`}
+            />
+          </section>
+
+          {/* セクション8: styled-components との比較 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">styled-components との比較</h2>
 
@@ -559,16 +779,6 @@ function App() {
                     <td className="border border-border px-4 py-2">完全対応（主要機能）</td>
                   </tr>
                   <tr>
-                    <td className="border border-border px-4 py-2 font-medium">オブジェクト記法</td>
-                    <td className="border border-border px-4 py-2">対応</td>
-                    <td className="border border-border px-4 py-2">対応</td>
-                  </tr>
-                  <tr className="bg-muted/20">
-                    <td className="border border-border px-4 py-2 font-medium">テンプレートリテラル</td>
-                    <td className="border border-border px-4 py-2">対応</td>
-                    <td className="border border-border px-4 py-2">対応</td>
-                  </tr>
-                  <tr>
                     <td className="border border-border px-4 py-2 font-medium">スタイルの合成</td>
                     <td className="border border-border px-4 py-2">拡張のみ</td>
                     <td className="border border-border px-4 py-2">配列で合成可能</td>
@@ -577,16 +787,6 @@ function App() {
                     <td className="border border-border px-4 py-2 font-medium">バンドルサイズ</td>
                     <td className="border border-border px-4 py-2">約 12.7 kB</td>
                     <td className="border border-border px-4 py-2">約 11.2 kB</td>
-                  </tr>
-                  <tr>
-                    <td className="border border-border px-4 py-2 font-medium">パフォーマンス</td>
-                    <td className="border border-border px-4 py-2">良好</td>
-                    <td className="border border-border px-4 py-2">やや良好（ベンチマーク上）</td>
-                  </tr>
-                  <tr className="bg-muted/20">
-                    <td className="border border-border px-4 py-2 font-medium">コミュニティ</td>
-                    <td className="border border-border px-4 py-2">非常に大きい</td>
-                    <td className="border border-border px-4 py-2">大きい</td>
                   </tr>
                   <tr>
                     <td className="border border-border px-4 py-2 font-medium">MUI との関係</td>
@@ -601,134 +801,13 @@ function App() {
                 </tbody>
               </table>
             </div>
-
-            <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">同じコンポーネントを両方で書く</h3>
-            <CodeBlock
-              language="tsx"
-              title="styled-components 版"
-              code={`// styled-components
-import styled from 'styled-components';
-
-const Alert = styled.div<{ $type: 'info' | 'warning' | 'error' }>\`
-  padding: 16px;
-  border-radius: 8px;
-  border-left: 4px solid;
-  background-color: \${(props) =>
-    props.$type === 'error' ? '#fef2f2' :
-    props.$type === 'warning' ? '#fffbeb' : '#eff6ff'};
-  border-color: \${(props) =>
-    props.$type === 'error' ? '#ef4444' :
-    props.$type === 'warning' ? '#f59e0b' : '#3b82f6'};
-  color: \${(props) =>
-    props.$type === 'error' ? '#991b1b' :
-    props.$type === 'warning' ? '#92400e' : '#1e40af'};
-\`;
-
-// 使用: <Alert $type="error">エラーメッセージ</Alert>`}
-            />
-
-            <div className="mt-4" />
-
-            <CodeBlock
-              language="tsx"
-              title="Emotion css prop 版"
-              code={`// Emotion (css prop)
-/** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react';
-
-const alertColors = {
-  info: { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af' },
-  warning: { bg: '#fffbeb', border: '#f59e0b', text: '#92400e' },
-  error: { bg: '#fef2f2', border: '#ef4444', text: '#991b1b' },
-};
-
-function Alert({ type, children }: { type: 'info' | 'warning' | 'error'; children: React.ReactNode }) {
-  const colors = alertColors[type];
-
-  return (
-    <div
-      css={css\`
-        padding: 16px;
-        border-radius: 8px;
-        border-left: 4px solid \${colors.border};
-        background-color: \${colors.bg};
-        color: \${colors.text};
-      \`}
-    >
-      {children}
-    </div>
-  );
-}
-
-// 使用: <Alert type="error">エラーメッセージ</Alert>`}
-            />
           </section>
 
-          {/* セクション7: Emotion を選ぶ理由 */}
-          <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">Emotion を選ぶ場面</h2>
-
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <div className="bg-muted/30 border border-border rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-3">Emotion が向いている場合</h3>
-                <ul className="space-y-2 text-foreground/80 text-sm">
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>css prop で手軽にスタイルを当てたい</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>スタイルの合成（配列による合成）を多用する</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>MUI（Material UI）v5 を使う予定がある</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>styled と css prop を混在させたい</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>バンドルサイズを少しでも抑えたい</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="bg-muted/30 border border-border rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-3">styled-components が向いている場合</h3>
-                <ul className="space-y-2 text-foreground/80 text-sm">
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>styled API のみで統一したい</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>より大きなコミュニティ・エコシステムを求める</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>学習リソースが豊富な方が良い</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>チームに styled-components 経験者が多い</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span>JSX pragma の設定を避けたい</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          {/* セクション8: 実践例 */}
+          {/* セクション9: 実践例 レスポンシブカード */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">実践例: レスポンシブレイアウト</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
               Emotion の css prop を使って、レスポンシブなレイアウトコンポーネントを作ります。
-              実際のプロジェクトでよく使われるパターンを紹介します。
             </p>
 
             <CodeBlock
@@ -737,71 +816,15 @@ function Alert({ type, children }: { type: 'info' | 'warning' | 'error'; childre
               code={`/** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 
-// ===== ブレイクポイント定義 =====
-const breakpoints = {
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
-};
-
-// メディアクエリヘルパー
+// ブレイクポイント定義
+const breakpoints = { sm: 640, md: 768, lg: 1024, xl: 1280 };
 const mq = {
   sm: \`@media (min-width: \${breakpoints.sm}px)\`,
   md: \`@media (min-width: \${breakpoints.md}px)\`,
   lg: \`@media (min-width: \${breakpoints.lg}px)\`,
-  xl: \`@media (min-width: \${breakpoints.xl}px)\`,
 };
 
-// ===== 共通スタイル =====
-const containerStyle = css\`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px;
-
-  \${mq.md} {
-    padding: 0 24px;
-  }
-
-  \${mq.lg} {
-    padding: 0 32px;
-  }
-\`;
-
-// ===== グリッドコンポーネント =====
-interface GridProps {
-  columns?: { sm?: number; md?: number; lg?: number };
-  gap?: number;
-  children: React.ReactNode;
-}
-
-function Grid({ columns = { sm: 1, md: 2, lg: 3 }, gap = 24, children }: GridProps) {
-  return (
-    <div
-      css={css\`
-        display: grid;
-        gap: \${gap}px;
-        grid-template-columns: 1fr;
-
-        \${mq.sm} {
-          grid-template-columns: repeat(\${columns.sm || 1}, 1fr);
-        }
-
-        \${mq.md} {
-          grid-template-columns: repeat(\${columns.md || 2}, 1fr);
-        }
-
-        \${mq.lg} {
-          grid-template-columns: repeat(\${columns.lg || 3}, 1fr);
-        }
-      \`}
-    >
-      {children}
-    </div>
-  );
-}
-
-// ===== カードコンポーネント =====
+// レスポンシブカード
 const cardStyle = css\`
   background: white;
   border-radius: 12px;
@@ -817,60 +840,58 @@ const cardStyle = css\`
 
 const cardImageStyle = css\`
   width: 100%;
-  height: 200px;
+  height: 160px;
   object-fit: cover;
+
+  \${mq.md} {
+    height: 200px;
+  }
 \`;
 
 const cardBodyStyle = css\`
-  padding: 20px;
+  padding: 16px;
+
+  \${mq.md} {
+    padding: 20px;
+  }
 \`;
 
-const cardTitleStyle = css\`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 8px;
-\`;
-
-const cardDescStyle = css\`
-  font-size: 0.875rem;
-  color: #64748b;
-  line-height: 1.6;
-\`;
-
-interface PortfolioCardProps {
+interface CardProps {
   image: string;
   title: string;
   description: string;
   tags: string[];
 }
 
-function PortfolioCard({ image, title, description, tags }: PortfolioCardProps) {
+function Card({ image, title, description, tags }: CardProps) {
   return (
     <div css={cardStyle}>
       <img css={cardImageStyle} src={image} alt={title} />
       <div css={cardBodyStyle}>
-        <h3 css={cardTitleStyle}>{title}</h3>
-        <p css={cardDescStyle}>{description}</p>
-        <div
-          css={css\`
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 12px;
-          \`}
-        >
+        <h3 css={css\`
+          font-size: 1rem;
+          font-weight: 600;
+          color: #1e293b;
+          margin-bottom: 8px;
+          \${mq.md} { font-size: 1.125rem; }
+        \`}>
+          {title}
+        </h3>
+        <p css={{ fontSize: '0.875rem', color: '#64748b', lineHeight: 1.6 }}>
+          {description}
+        </p>
+        <div css={css\`display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;\`}>
           {tags.map((tag) => (
             <span
               key={tag}
-              css={css\`
-                padding: 2px 10px;
-                border-radius: 9999px;
-                font-size: 0.7rem;
-                font-weight: 500;
-                background: #eff6ff;
-                color: #3b82f6;
-              \`}
+              css={{
+                padding: '2px 10px',
+                borderRadius: 9999,
+                fontSize: '0.7rem',
+                fontWeight: 500,
+                background: '#eff6ff',
+                color: '#3b82f6',
+              }}
             >
               {tag}
             </span>
@@ -881,57 +902,30 @@ function PortfolioCard({ image, title, description, tags }: PortfolioCardProps) 
   );
 }
 
-// ===== ページコンポーネント =====
-const projects = [
-  {
-    image: '/project1.jpg',
-    title: 'ECサイトリデザイン',
-    description: 'ユーザー体験を改善するためのECサイト全体のリデザイン',
-    tags: ['UI/UX', 'Figma', 'React'],
-  },
-  {
-    image: '/project2.jpg',
-    title: 'ダッシュボード設計',
-    description: 'データ可視化ダッシュボードのUI設計と実装',
-    tags: ['Dashboard', 'D3.js', 'TypeScript'],
-  },
-  {
-    image: '/project3.jpg',
-    title: 'モバイルアプリUI',
-    description: 'フィットネスアプリのモバイルUI設計',
-    tags: ['Mobile', 'React Native', 'UI'],
-  },
-];
-
-export default function PortfolioPage() {
+// グリッドレイアウト
+function Portfolio() {
   return (
-    <div css={containerStyle}>
-      <h1
-        css={css\`
-          font-size: 2rem;
-          font-weight: 800;
-          color: #1e293b;
-          margin-bottom: 32px;
-
-          \${mq.md} {
-            font-size: 2.5rem;
-          }
-        \`}
-      >
-        ポートフォリオ
-      </h1>
-      <Grid columns={{ sm: 1, md: 2, lg: 3 }} gap={24}>
-        {projects.map((project) => (
-          <PortfolioCard key={project.title} {...project} />
-        ))}
-      </Grid>
+    <div css={css\`
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 1fr;
+      \${mq.sm} { grid-template-columns: repeat(2, 1fr); }
+      \${mq.lg} { grid-template-columns: repeat(3, 1fr); }
+    \`}>
+      <Card
+        image="/project1.jpg"
+        title="EC サイトリデザイン"
+        description="ユーザー体験を改善するためのリデザイン"
+        tags={['UI/UX', 'Figma', 'React']}
+      />
+      {/* 他のカード... */}
     </div>
   );
 }`}
             />
           </section>
 
-          {/* セクション9: まとめ */}
+          {/* セクション10: まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
 
@@ -951,7 +945,7 @@ export default function PortfolioPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-1 font-bold">4.</span>
-                  <span><strong>テンプレートリテラル</strong>と<strong>オブジェクト記法</strong>の両方が使えるため、好みに応じて選択可能</span>
+                  <span><strong>TypeScript</strong> でテーマ型を拡張すると、テーマ値の型チェック・補完が効くようになる</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-1 font-bold">5.</span>
@@ -969,6 +963,118 @@ export default function PortfolioPage() {
                 どのアプローチを選んでもスケーラブルな CSS を書くための設計指針を身につけます。
               </p>
             </InfoBox>
+          </section>
+
+          {/* 理解度チェック 1 */}
+          <section>
+            <Quiz
+              question="Emotion の css prop と styled API の使い分けとして、最も適切なのはどれですか？"
+              options={[
+                { label: 'css prop は非推奨なので、常に styled を使うべき' },
+                { label: 'styled は非推奨なので、常に css prop を使うべき' },
+                { label: 'ページ固有のスタイルは css prop、再利用する共通コンポーネントは styled が適している', correct: true },
+                { label: 'パフォーマンスの観点から、css prop のみを使うべき' },
+              ]}
+              explanation="css prop は新しいコンポーネントを作成せずに直接スタイルを適用できるため、ページ固有のレイアウトやワンオフのスタイルに適しています。styled API は再利用可能なコンポーネントを作る場面に適しています。両方を同じプロジェクト内で混在させても問題ありません。"
+            />
+          </section>
+
+          {/* 理解度チェック 2 */}
+          <section>
+            <Quiz
+              question="Emotion で TypeScript のテーマ型を設定する方法として正しいのはどれですか？"
+              options={[
+                { label: 'ThemeProvider に generics でテーマ型を渡す' },
+                { label: 'declare module "@emotion/react" で Theme インターフェースを拡張する', correct: true },
+                { label: 'css 関数の引数にテーマ型を指定する' },
+                { label: 'テーマの型は自動的に推論されるので何もしなくてよい' },
+              ]}
+              explanation={'Emotion のテーマ型を有効にするには、declare module "@emotion/react" でグローバルの Theme インターフェースを拡張する型定義ファイル（.d.ts）を作成します。これにより、props.theme やテーマコールバック関数の引数に対して、定義したテーマの型が自動的に適用されます。'}
+            />
+          </section>
+
+          {/* コーディングチャレンジ */}
+          <section>
+            <CodingChallenge
+              title="Emotion でレスポンシブカードを作成"
+              description="Emotion の css prop を使って、モバイルでは padding: 16px、768px 以上では padding: 24px になるカードスタイルを定義してください。オブジェクト記法で書いてください。"
+              initialCode={`/** @jsxImportSource @emotion/react */
+
+function ResponsiveCard({ children }) {
+  return (
+    <div css={{
+      // ここにスタイルを書く
+    }}>
+      {children}
+    </div>
+  );
+}`}
+              answer={`/** @jsxImportSource @emotion/react */
+
+function ResponsiveCard({ children }) {
+  return (
+    <div css={{
+      background: 'white',
+      borderRadius: 12,
+      padding: 16,
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+      '@media (min-width: 768px)': {
+        padding: 24,
+      },
+    }}>
+      {children}
+    </div>
+  );
+}`}
+              hints={[
+                'オブジェクト記法では数値は自動的に px になります（例: padding: 16 → padding: 16px）',
+                'メディアクエリは文字列キーで指定します: \'@media (min-width: 768px)\': { ... }',
+                'オブジェクト記法では CSS プロパティをキャメルケースで書きます（例: border-radius → borderRadius）',
+              ]}
+            />
+          </section>
+
+          {/* リファレンスリンク */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'Emotion 公式ドキュメント',
+                  url: 'https://emotion.sh/docs/introduction',
+                  description: 'css prop、styled API、テーミングなど包括的な公式ドキュメント',
+                },
+                {
+                  title: 'Emotion GitHub リポジトリ',
+                  url: 'https://github.com/emotion-js/emotion',
+                  description: 'ソースコード、Issue、リリースノートを確認できる公式リポジトリ',
+                },
+                {
+                  title: '@emotion/babel-plugin ドキュメント',
+                  url: 'https://emotion.sh/docs/@emotion/babel-plugin',
+                  description: 'Babel プラグインの設定オプションと最適化の詳細',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'Emotion の css prop を使うと既存の className は無効になりますか？',
+                  answer: 'いいえ、css prop と className は共存できます。css prop で生成されたクラス名と、既存の className が両方とも要素に適用されます。例えば Tailwind CSS のクラスと Emotion のスタイルを同じ要素に使うことも技術的には可能です。',
+                },
+                {
+                  question: 'MUI v5 で Emotion の知識は必須ですか？',
+                  answer: 'MUI v5 は Emotion をスタイリングエンジンとして内蔵していますが、MUI の sx prop や styled() ユーティリティ経由で使うため、Emotion を直接意識する場面は少ないです。ただし、MUI のテーマをカスタマイズする際やカスタムコンポーネントを作る際には、Emotion の仕組みを理解していると役立ちます。',
+                },
+                {
+                  question: 'Emotion のスタイルはキャッシュされますか？',
+                  answer: 'はい、Emotion は生成したスタイルを内部でキャッシュします。同じスタイル定義が複数回評価されても、一度計算した CSS は再利用されるため、同じスタイルの <style> タグが重複して生成されることはありません。@emotion/cache パッケージでキャッシュの挙動をカスタマイズすることも可能です。',
+                },
+              ]}
+            />
           </section>
         </div>
 

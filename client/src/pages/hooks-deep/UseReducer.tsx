@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function UseReducer() {
   return (
@@ -162,7 +166,49 @@ function Counter() {
             </div>
           </section>
 
-          {/* セクション 3: useState との比較 */}
+          {/* セクション 3: Flux アーキテクチャとの関連 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Flux アーキテクチャとの関連</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              useReducer の設計は、Facebook（現 Meta）が提唱した <strong>Flux アーキテクチャ</strong>をベースにしています。
+              Flux は「データの流れを一方向にする」ことで、アプリの状態管理を予測しやすくするパターンです。
+              Redux もこの Flux の考え方をベースにした状態管理ライブラリです。
+            </p>
+            <CodeBlock
+              language="text"
+              title="Flux の一方向データフロー"
+              code={`ユーザー操作
+    ↓
+ Action（何が起きたかを記述）
+    ↓
+ Dispatcher（Action を Reducer に送る）
+    ↓
+ Reducer（Action に基づいて State を更新）
+    ↓
+ 新しい State
+    ↓
+ View（UI を更新）
+    ↓
+ ユーザー操作...（繰り返し）`}
+            />
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              useReducer はこの Flux パターンを React の Hook として実装したものです。
+              <code className="text-sm bg-muted px-1.5 py-0.5 rounded">dispatch</code> が Dispatcher の役割を果たし、
+              Reducer 関数が Store の更新ロジックを担当します。
+            </p>
+            <div className="mb-6">
+              <InfoBox type="info" title="Redux との違い">
+                <p>
+                  Redux はグローバルに 1 つの Store を持ち、ミドルウェアや DevTools などの豊富なエコシステムがあります。
+                  useReducer はコンポーネントローカルな状態管理に適しています。
+                  useReducer + useContext を組み合わせると Redux に近い構成が作れますが、
+                  大規模アプリでは Redux Toolkit や Zustand のほうが機能面で優れています。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 4: useState との比較 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">useState と useReducer の使い分け</h2>
             <div className="overflow-x-auto mb-6">
@@ -214,7 +260,116 @@ function Counter() {
             </div>
           </section>
 
-          {/* セクション 4: Todo アプリ */}
+          {/* セクション 5: Reducer の TypeScript 型付け */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Reducer の TypeScript 型付け</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              useReducer は TypeScript との相性が非常に優れています。
+              Action をユニオン型（Discriminated Union）で定義すると、switch 文の中で
+              TypeScript が自動的に型を絞り込み、タイプミスやペイロードの漏れを防いでくれます。
+            </p>
+            <CodeBlock
+              language="tsx"
+              title="TypeScript による厳密な型付け"
+              showLineNumbers
+              code={`// State の型
+interface FormState {
+  name: string;
+  email: string;
+  age: number;
+  errors: Record<string, string>;
+  isSubmitting: boolean;
+}
+
+// Action の型: Discriminated Union（判別可能なユニオン型）
+type FormAction =
+  | { type: 'SET_FIELD'; field: keyof FormState; value: string | number }
+  | { type: 'SET_ERROR'; field: string; message: string }
+  | { type: 'CLEAR_ERRORS' }
+  | { type: 'SUBMIT_START' }
+  | { type: 'SUBMIT_SUCCESS' }
+  | { type: 'SUBMIT_ERROR'; error: string };
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case 'SET_FIELD':
+      // TypeScript は action.field と action.value の型を知っている
+      return { ...state, [action.field]: action.value };
+
+    case 'SET_ERROR':
+      return {
+        ...state,
+        errors: { ...state.errors, [action.field]: action.message },
+      };
+
+    case 'CLEAR_ERRORS':
+      // このケースでは payload がないことを TypeScript が保証
+      return { ...state, errors: {} };
+
+    case 'SUBMIT_START':
+      return { ...state, isSubmitting: true };
+
+    case 'SUBMIT_SUCCESS':
+      return { ...state, isSubmitting: false };
+
+    case 'SUBMIT_ERROR':
+      // action.error が string 型であることが保証される
+      return {
+        ...state,
+        isSubmitting: false,
+        errors: { submit: action.error },
+      };
+
+    // すべての case を処理しないと TypeScript がエラーを出す
+    // （exhaustive check）
+    default:
+      return state;
+  }
+}`}
+            />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="success" title="Discriminated Union の強力さ">
+                <p>
+                  Action の <code>type</code> プロパティによって TypeScript が型を自動的に絞り込むため、
+                  <code>case 'SET_FIELD':</code> の中では <code>action.field</code> と <code>action.value</code> が利用可能だとわかります。
+                  <code>case 'CLEAR_ERRORS':</code> では payload プロパティにアクセスしようとするとコンパイルエラーになります。
+                  これにより、Action のミスマッチをコンパイル時に検出できます。
+                </p>
+              </InfoBox>
+            </div>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">網羅性チェック（Exhaustive Check）</h3>
+            <CodeBlock
+              language="tsx"
+              title="すべてのアクションを処理しているか検証する"
+              code={`// never 型を使った網羅性チェック
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value };
+    case 'SET_ERROR':
+      return { ...state, errors: { ...state.errors, [action.field]: action.message } };
+    case 'CLEAR_ERRORS':
+      return { ...state, errors: {} };
+    case 'SUBMIT_START':
+      return { ...state, isSubmitting: true };
+    case 'SUBMIT_SUCCESS':
+      return { ...state, isSubmitting: false };
+    case 'SUBMIT_ERROR':
+      return { ...state, isSubmitting: false, errors: { submit: action.error } };
+    default: {
+      // 新しい Action を追加して case を書き忘れると
+      // ここで TypeScript がコンパイルエラーを出す
+      const _exhaustive: never = action;
+      return state;
+    }
+  }
+}`}
+            />
+          </section>
+
+          {/* セクション 6: Todo アプリ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">実践: useReducer で Todo アプリを作る</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -427,7 +582,138 @@ function TodoApp() {
             />
           </section>
 
-          {/* セクション 5: useReducer + useContext */}
+          {/* セクション 7: immer ライブラリ */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">immer でイミュータブルな更新を簡潔に書く</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              Reducer ではイミュータブル（不変）な更新が必須です。つまり、state を直接変更するのではなく、
+              新しいオブジェクトを作って返す必要があります。しかし、ネストが深いオブジェクトを
+              スプレッド構文で更新するのは冗長で読みにくくなります。
+            </p>
+
+            <CodeBlock
+              language="tsx"
+              title="NG: ネストが深いと冗長になる"
+              code={`// スプレッド構文による更新（正しいが冗長）
+case 'UPDATE_ADDRESS':
+  return {
+    ...state,
+    user: {
+      ...state.user,
+      address: {
+        ...state.user.address,
+        city: action.payload.city,
+      },
+    },
+  };`}
+            />
+
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              <strong>immer</strong> ライブラリを使うと、あたかもオブジェクトを直接変更するかのようなコードを書きつつ、
+              内部的にはイミュータブルな更新が行われます。
+            </p>
+
+            <CodeBlock
+              language="tsx"
+              title="immer を使ったシンプルな Reducer"
+              showLineNumbers
+              code={`import { useReducer } from 'react';
+import { produce } from 'immer';
+
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface CartState {
+  items: CartItem[];
+  coupon: string | null;
+}
+
+type CartAction =
+  | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
+  | { type: 'REMOVE_ITEM'; payload: number }
+  | { type: 'UPDATE_QUANTITY'; payload: { id: number; quantity: number } }
+  | { type: 'APPLY_COUPON'; payload: string }
+  | { type: 'CLEAR_CART' };
+
+// produce を使うと、draft を「直接変更」するコードが書ける
+// 実際には immer が内部で新しいオブジェクトを生成してくれる
+const cartReducer = produce(
+  (draft: CartState, action: CartAction) => {
+    switch (action.type) {
+      case 'ADD_ITEM': {
+        const existing = draft.items.find(
+          (item) => item.id === action.payload.id
+        );
+        if (existing) {
+          // 直接変更できる！（内部でイミュータブルに処理される）
+          existing.quantity += 1;
+        } else {
+          draft.items.push({ ...action.payload, quantity: 1 });
+        }
+        break;
+      }
+
+      case 'REMOVE_ITEM': {
+        const index = draft.items.findIndex(
+          (item) => item.id === action.payload
+        );
+        if (index !== -1) {
+          draft.items.splice(index, 1); // 直接 splice できる！
+        }
+        break;
+      }
+
+      case 'UPDATE_QUANTITY': {
+        const item = draft.items.find(
+          (item) => item.id === action.payload.id
+        );
+        if (item) {
+          item.quantity = action.payload.quantity;
+        }
+        break;
+      }
+
+      case 'APPLY_COUPON':
+        draft.coupon = action.payload;
+        break;
+
+      case 'CLEAR_CART':
+        draft.items = [];
+        draft.coupon = null;
+        break;
+    }
+  }
+);
+
+// 使い方
+function ShoppingCart() {
+  const [state, dispatch] = useReducer(cartReducer, {
+    items: [],
+    coupon: null,
+  });
+
+  // ...
+}`}
+            />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="success" title="immer を使うメリット">
+                <p>
+                  immer は Redux Toolkit にも組み込まれている人気ライブラリです。
+                  <code>npm install immer</code> でインストールできます。
+                  特にネストが深い state を扱う場合に効果的で、
+                  コード量が大幅に減り、可読性が向上します。
+                  パフォーマンスへの影響も軽微です。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 8: useReducer + useContext */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">応用: useReducer + useContext</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -512,7 +798,7 @@ function TodoCount() {
             </div>
           </section>
 
-          {/* セクション 6: パターンとベストプラクティス */}
+          {/* セクション 9: パターンとベストプラクティス */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">Reducer のベストプラクティス</h2>
 
@@ -564,7 +850,129 @@ function goodReducer(state: State, action: Action) {
             </div>
           </section>
 
-          {/* セクション 7: まとめ */}
+          {/* Quiz 1 */}
+          <section>
+            <Quiz
+              question="useReducer の Reducer 関数で正しくないものはどれですか？"
+              options={[
+                { label: '新しい state オブジェクトを return する' },
+                { label: 'action.type を switch 文で分岐する' },
+                { label: 'Reducer の中で fetch を呼んで API リクエストを送る', correct: true },
+                { label: 'スプレッド構文でイミュータブルに state を更新する' },
+              ]}
+              explanation="Reducer は純粋関数でなければなりません。API リクエストや localStorage への書き込みなどの副作用は、Reducer ではなくイベントハンドラーや useEffect で実行します。Reducer は state の計算のみに集中させましょう。"
+            />
+          </section>
+
+          {/* Quiz 2 */}
+          <section>
+            <Quiz
+              question="useState と useReducer のどちらを選ぶべきですか？「3つの state が常にセットで更新される」場合の推奨は？"
+              options={[
+                { label: 'useState を 3 つ使う' },
+                { label: 'useState で 1 つのオブジェクトにまとめる' },
+                { label: 'useReducer を使って 1 つの state にまとめ、Action で更新する', correct: true },
+                { label: 'useRef を使って値を管理する' },
+              ]}
+              explanation="複数の state が常にセットで更新される場合は、useReducer で 1 つの state にまとめるのが最適です。Action によって「何が起きたか」を明示的に表現でき、すべての更新ロジックが Reducer に集約されるため、バグが起きにくく、デバッグもしやすくなります。"
+            />
+          </section>
+
+          {/* CodingChallenge */}
+          <section>
+            <CodingChallenge
+              title="ショッピングカートの useReducer 実装"
+              description="useReducer を使ってショッピングカートを実装してください。State は items（配列）を持ち、Action は 'add'（商品追加）、'remove'（商品削除）、'updateQuantity'（数量変更）の 3 種類です。add では同じ商品が既にあれば数量を +1、なければ新規追加してください。"
+              initialCode={`interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface CartState {
+  items: CartItem[];
+}
+
+type CartAction =
+  | { type: 'add'; payload: { id: number; name: string; price: number } }
+  | { type: 'remove'; payload: number }
+  | { type: 'updateQuantity'; payload: { id: number; quantity: number } };
+
+function cartReducer(state: CartState, action: CartAction): CartState {
+  switch (action.type) {
+    case 'add':
+      // ここに実装
+    case 'remove':
+      // ここに実装
+    case 'updateQuantity':
+      // ここに実装
+    default:
+      return state;
+  }
+}`}
+              answer={`interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface CartState {
+  items: CartItem[];
+}
+
+type CartAction =
+  | { type: 'add'; payload: { id: number; name: string; price: number } }
+  | { type: 'remove'; payload: number }
+  | { type: 'updateQuantity'; payload: { id: number; quantity: number } };
+
+function cartReducer(state: CartState, action: CartAction): CartState {
+  switch (action.type) {
+    case 'add': {
+      const existing = state.items.find((item) => item.id === action.payload.id);
+      if (existing) {
+        return {
+          ...state,
+          items: state.items.map((item) =>
+            item.id === action.payload.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          ),
+        };
+      }
+      return {
+        ...state,
+        items: [...state.items, { ...action.payload, quantity: 1 }],
+      };
+    }
+    case 'remove':
+      return {
+        ...state,
+        items: state.items.filter((item) => item.id !== action.payload),
+      };
+    case 'updateQuantity':
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item.id === action.payload.id
+            ? { ...item, quantity: action.payload.quantity }
+            : item
+        ),
+      };
+    default:
+      return state;
+  }
+}`}
+              hints={[
+                'add の場合、まず find で既存アイテムを探し、見つかれば map で quantity を +1、見つからなければ配列に追加します。',
+                'remove は filter でアイテムを除外します。',
+                'updateQuantity は map で該当アイテムの quantity を更新します。',
+              ]}
+            />
+          </section>
+
+          {/* セクション 10: まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
             <div className="bg-muted/30 rounded-xl p-6 space-y-3">
@@ -578,13 +986,64 @@ function goodReducer(state: State, action: Action) {
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-primary font-bold text-lg">3</span>
-                <p className="text-muted-foreground"><strong>TypeScript との相性が良い</strong>。Action のユニオン型により、switch 文の網羅性チェックが効く</p>
+                <p className="text-muted-foreground"><strong>Flux アーキテクチャがベース</strong>。一方向データフローで状態変化を予測しやすくする設計パターン</p>
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-primary font-bold text-lg">4</span>
+                <p className="text-muted-foreground"><strong>TypeScript との相性が良い</strong>。Action のユニオン型により、switch 文の網羅性チェックが効く</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">5</span>
+                <p className="text-muted-foreground"><strong>immer でイミュータブル更新を簡潔に</strong>。ネストが深い state も直感的に更新できる</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">6</span>
                 <p className="text-muted-foreground"><strong>useContext と組み合わせ</strong>ると、アプリ全体で共有する本格的な状態管理が構築できる</p>
               </div>
             </div>
+          </section>
+
+          {/* ReferenceLinks */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'useReducer - React 公式リファレンス',
+                  url: 'https://ja.react.dev/reference/react/useReducer',
+                  description: 'useReducer の API 仕様、使い方、注意点を網羅した公式ドキュメント',
+                },
+                {
+                  title: 'state ロジックをリデューサに抽出する - React 公式ガイド',
+                  url: 'https://ja.react.dev/learn/extracting-state-logic-into-a-reducer',
+                  description: 'useState から useReducer への移行方法を学べるチュートリアル',
+                },
+                {
+                  title: 'リデューサとコンテクストでスケールアップ - React 公式ガイド',
+                  url: 'https://ja.react.dev/learn/scaling-up-with-reducer-and-context',
+                  description: 'useReducer と useContext を組み合わせてアプリをスケールする方法',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'useReducer と Redux はどう違いますか？',
+                  answer: 'useReducer は React 組み込みの Hook で、コンポーネントローカルな状態管理に適しています。Redux はアプリ全体のグローバルな状態管理ライブラリで、ミドルウェア、DevTools、セレクタなどの豊富なエコシステムがあります。小〜中規模のアプリなら useReducer + useContext で十分ですが、大規模アプリやチーム開発では Redux Toolkit の方が生産性が高い場合があります。',
+                },
+                {
+                  question: 'Reducer で非同期処理はどうすればよいですか？',
+                  answer: 'Reducer 自体は純粋関数なので、その中で非同期処理を行うべきではありません。非同期処理はイベントハンドラーや useEffect で実行し、その結果を Action として dispatch します。例えば、API 呼び出しの開始時に dispatch({ type: "FETCH_START" })、成功時に dispatch({ type: "FETCH_SUCCESS", payload: data })、エラー時に dispatch({ type: "FETCH_ERROR", payload: error }) のように分けます。',
+                },
+                {
+                  question: 'immer は必ず使うべきですか？',
+                  answer: 'いいえ、必須ではありません。浅い state（ネストが 1-2 段）であればスプレッド構文で十分対応できます。immer が特に威力を発揮するのは、ネストが深いオブジェクトや配列の中のオブジェクトを更新する場合です。Redux Toolkit を使う場合は immer が内蔵されているため、自動的に恩恵を受けられます。',
+                },
+              ]}
+            />
           </section>
         </div>
 

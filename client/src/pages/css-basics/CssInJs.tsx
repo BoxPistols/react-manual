@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function CssInJs() {
   return (
@@ -69,6 +73,7 @@ function App() {
             <p className="text-foreground/80 mb-4 leading-relaxed">
               2014年、Facebook の Christopher Chedeau（vjeux）が「CSS の7つの問題」を提唱しました。
               これが CSS-in-JS ムーブメントのきっかけです。
+              「なぜ普通の CSS では駄目なのか」を理解するために、この歴史的背景は重要です。
             </p>
 
             <div className="bg-muted/30 border border-border rounded-lg p-6">
@@ -83,6 +88,13 @@ function App() {
                 <li><strong>分離</strong> — スタイルの分離・カプセル化が困難</li>
               </ol>
             </div>
+
+            <p className="text-foreground/80 mt-4 mb-4 leading-relaxed">
+              デザイナーにとってこの文脈は非常に重要です。
+              Figma でコンポーネント単位でデザインするように、コードでもコンポーネント単位でスタイルを管理したい
+              という欲求が CSS-in-JS を生みました。
+              「見た目の責任はコンポーネントが持つべき」という React の哲学と、CSS-in-JS は深く結びついています。
+            </p>
           </section>
 
           {/* セクション2: 比較表 */}
@@ -384,7 +396,7 @@ const StyledButton = styled.button<ButtonStyleProps>\`
 // 使用時に型チェックが効く
 <StyledButton $variant="primary" $size="md">OK</StyledButton>
 <StyledButton $variant="danger" $size="lg" $fullWidth>削除</StyledButton>
-// ❌ TypeScript エラー: "huge" は ButtonSize に存在しない
+// TypeScript エラー: "huge" は ButtonSize に存在しない
 // <StyledButton $variant="primary" $size="huge">NG</StyledButton>`}
             />
           </section>
@@ -463,7 +475,326 @@ const Box = styled.div\`
             </InfoBox>
           </section>
 
-          {/* セクション5: ライブラリ概観 */}
+          {/* セクション5: ゼロランタイム CSS-in-JS 詳解 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">ゼロランタイム CSS-in-JS の台頭</h2>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              ランタイム CSS-in-JS のパフォーマンス問題を解決するために、
+              「ビルド時にすべてのスタイルを静的 CSS に変換する」ゼロランタイムアプローチが登場しました。
+              CSS-in-JS の開発体験（DX）を維持しながら、パフォーマンスは CSS Modules 並みという「いいとこ取り」を目指します。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">vanilla-extract</h3>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              vanilla-extract は TypeScript でスタイルを書き、ビルド時に完全な CSS ファイルを生成します。
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">.css.ts</code> という独自の拡張子を使うのが特徴です。
+            </p>
+
+            <CodeBlock
+              language="typescript"
+              title="src/components/Button.css.ts（vanilla-extract）"
+              code={`import { style, styleVariants } from '@vanilla-extract/css';
+
+// ベーススタイル — TypeScript オブジェクトとして記述
+export const base = style({
+  padding: '10px 20px',
+  border: 'none',
+  borderRadius: 8,
+  fontWeight: 600,
+  cursor: 'pointer',
+  transition: 'all 0.2s ease',
+  // 擬似セレクタもオブジェクトで書ける
+  ':hover': {
+    opacity: 0.9,
+  },
+  ':focus-visible': {
+    outline: '2px solid #3b82f6',
+    outlineOffset: 2,
+  },
+});
+
+// バリアント — Record 型で型安全なスタイルマップを生成
+export const variant = styleVariants({
+  primary: {
+    backgroundColor: '#3b82f6',
+    color: 'white',
+  },
+  secondary: {
+    backgroundColor: '#f1f5f9',
+    color: '#334155',
+  },
+  danger: {
+    backgroundColor: '#ef4444',
+    color: 'white',
+  },
+});
+
+// ビルド時に以下のような CSS ファイルが生成される:
+// .base_abc123 { padding: 10px 20px; ... }
+// .variant_primary_def456 { background-color: #3b82f6; ... }
+// ランタイムの JavaScript は一切含まれない！`}
+            />
+
+            <div className="mt-4" />
+
+            <CodeBlock
+              language="tsx"
+              title="src/components/Button.tsx（vanilla-extract）"
+              code={`import { base, variant } from './Button.css';
+
+type ButtonVariant = keyof typeof variant;
+
+interface ButtonProps {
+  variant?: ButtonVariant;
+  children: React.ReactNode;
+}
+
+function Button({ variant: v = 'primary', children }: ButtonProps) {
+  return (
+    // 通常の className として使う
+    <button className={\`\${base} \${variant[v]}\`}>
+      {children}
+    </button>
+  );
+}`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">Panda CSS</h3>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              Panda CSS は「CSS-in-JS のような書き心地で Tailwind のような軽量さ」を実現する新世代ツールです。
+              静的解析によりビルド時にコードから使われているスタイルを抽出し、最適な CSS を生成します。
+            </p>
+
+            <CodeBlock
+              language="tsx"
+              title="Panda CSS の使い方"
+              code={`import { css } from '../styled-system/css';
+
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className={css({
+      background: 'white',
+      borderRadius: 'lg',      // トークンから解決
+      padding: '6',            // spacing.6 → 24px
+      boxShadow: 'md',         // shadows.md
+      transition: 'all 0.2s',
+      _hover: {                // 擬似セレクタは _ プレフィックス
+        boxShadow: 'lg',
+        transform: 'translateY(-2px)',
+      },
+    })}>
+      <h3 className={css({
+        fontSize: 'xl',
+        fontWeight: 'bold',
+        marginBottom: '2',
+      })}>
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
+
+// ビルド時に静的解析され、使われているスタイルのみが CSS として出力される`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">Linaria</h3>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              Linaria は styled-components とほぼ同じ API を提供しながら、ビルド時にすべてのスタイルを
+              静的な CSS に変換するライブラリです。既存の styled-components コードからの移行が比較的容易です。
+            </p>
+
+            <CodeBlock
+              language="tsx"
+              title="Linaria — styled-components と同じ書き心地"
+              code={`import { styled } from '@linaria/react';
+import { css } from '@linaria/core';
+
+// styled-components とほぼ同じ API
+const Button = styled.button\`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #2563eb;
+  }
+\`;
+
+// css タグリテラルでクラス名を生成
+const heading = css\`
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1e293b;
+\`;
+
+function App() {
+  return (
+    <div>
+      <h1 className={heading}>タイトル</h1>
+      <Button>クリック</Button>
+    </div>
+  );
+}
+
+// ビルド後: JavaScript には静的なクラス名の文字列のみが残る
+// スタイルは別の CSS ファイルに抽出される`}
+            />
+          </section>
+
+          {/* セクション6: パフォーマンス比較 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">パフォーマンス比較</h2>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              CSS-in-JS のパフォーマンスは、ランタイムかゼロランタイムかで大きく異なります。
+              以下は各アプローチの特性を比較した表です。
+            </p>
+
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse border border-border rounded-lg overflow-hidden text-sm">
+                <thead>
+                  <tr className="bg-muted/50">
+                    <th className="border border-border px-3 py-3 text-left font-semibold">ライブラリ</th>
+                    <th className="border border-border px-3 py-3 text-left font-semibold">種類</th>
+                    <th className="border border-border px-3 py-3 text-left font-semibold">初回レンダリング</th>
+                    <th className="border border-border px-3 py-3 text-left font-semibold">再レンダリング</th>
+                    <th className="border border-border px-3 py-3 text-left font-semibold">バンドルサイズ</th>
+                  </tr>
+                </thead>
+                <tbody className="text-foreground/80">
+                  <tr>
+                    <td className="border border-border px-3 py-2 font-medium">CSS Modules</td>
+                    <td className="border border-border px-3 py-2">ビルド時</td>
+                    <td className="border border-border px-3 py-2">高速</td>
+                    <td className="border border-border px-3 py-2">高速</td>
+                    <td className="border border-border px-3 py-2">0 kB</td>
+                  </tr>
+                  <tr className="bg-muted/20">
+                    <td className="border border-border px-3 py-2 font-medium">Tailwind CSS</td>
+                    <td className="border border-border px-3 py-2">ビルド時</td>
+                    <td className="border border-border px-3 py-2">高速</td>
+                    <td className="border border-border px-3 py-2">高速</td>
+                    <td className="border border-border px-3 py-2">0 kB</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-border px-3 py-2 font-medium">vanilla-extract</td>
+                    <td className="border border-border px-3 py-2">ゼロランタイム</td>
+                    <td className="border border-border px-3 py-2">高速</td>
+                    <td className="border border-border px-3 py-2">高速</td>
+                    <td className="border border-border px-3 py-2">約 0.5 kB</td>
+                  </tr>
+                  <tr className="bg-muted/20">
+                    <td className="border border-border px-3 py-2 font-medium">Panda CSS</td>
+                    <td className="border border-border px-3 py-2">ゼロランタイム</td>
+                    <td className="border border-border px-3 py-2">高速</td>
+                    <td className="border border-border px-3 py-2">高速</td>
+                    <td className="border border-border px-3 py-2">約 0.3 kB</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-border px-3 py-2 font-medium">Emotion</td>
+                    <td className="border border-border px-3 py-2">ランタイム</td>
+                    <td className="border border-border px-3 py-2">やや遅い</td>
+                    <td className="border border-border px-3 py-2">遅い場合あり</td>
+                    <td className="border border-border px-3 py-2">約 11.2 kB</td>
+                  </tr>
+                  <tr className="bg-muted/20">
+                    <td className="border border-border px-3 py-2 font-medium">styled-components</td>
+                    <td className="border border-border px-3 py-2">ランタイム</td>
+                    <td className="border border-border px-3 py-2">やや遅い</td>
+                    <td className="border border-border px-3 py-2">遅い場合あり</td>
+                    <td className="border border-border px-3 py-2">約 12.7 kB</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <InfoBox type="info" title="パフォーマンスの実際の影響">
+              <p>
+                多くのアプリケーションでは、ランタイム CSS-in-JS のパフォーマンス差は体感できないレベルです。
+                問題になるのは「数百行のデータテーブル」「60fps のアニメーション」「頻繁な state 更新」など、
+                大量のコンポーネントが頻繁に再レンダリングされる場面に限られます。
+                アプリの特性に合わせて選択しましょう。
+              </p>
+            </InfoBox>
+          </section>
+
+          {/* セクション7: SSR 時の課題 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">SSR 時の課題と対策</h2>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              サーバーサイドレンダリング（SSR）では、サーバーで HTML を生成してクライアントに送信します。
+              ランタイム CSS-in-JS はブラウザの <code className="bg-muted px-1.5 py-0.5 rounded text-sm">&lt;style&gt;</code> タグにスタイルを注入するため、
+              サーバー側でスタイルを抽出する追加処理が必要です。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">FOUC（Flash of Unstyled Content）</h3>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              SSR で CSS-in-JS を正しく設定しないと、ページ読み込み時に一瞬スタイルが適用されていない状態（FOUC）が発生します。
+              HTML はサーバーから届いているのに、スタイルは JavaScript の実行を待っている状態です。
+            </p>
+
+            <CodeBlock
+              language="text"
+              title="FOUC が起きる流れ"
+              code={`1. サーバーが HTML を生成して送信
+   → <div class="sc-abc123">カード</div>  ← クラス名はあるがスタイルがない
+
+2. ブラウザが HTML を表示
+   → スタイルなしの素のテキストが一瞬表示される（FOUC）
+
+3. JavaScript がロード・実行される
+   → styled-components がスタイルを <style> タグに注入
+
+4. スタイルが適用される
+   → やっと正しい見た目になる`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">対策: サーバーでスタイルを事前抽出</h3>
+            <CodeBlock
+              language="tsx"
+              title="styled-components の SSR 対策（概要）"
+              code={`// サーバー側のレンダリング処理
+import { ServerStyleSheet } from 'styled-components';
+import { renderToString } from 'react-dom/server';
+
+const sheet = new ServerStyleSheet();
+try {
+  // アプリをレンダリングしながらスタイルを収集
+  const html = renderToString(
+    sheet.collectStyles(<App />)
+  );
+
+  // 収集したスタイルを <style> タグとして取得
+  const styleTags = sheet.getStyleTags();
+
+  // HTML にスタイルを埋め込んで送信
+  res.send(\`
+    <html>
+      <head>\${styleTags}</head>
+      <body><div id="root">\${html}</div></body>
+    </html>
+  \`);
+} finally {
+  sheet.seal();
+}`}
+            />
+
+            <InfoBox type="info" title="ゼロランタイムなら SSR の問題はない">
+              <p>
+                vanilla-extract や Panda CSS のようなゼロランタイム CSS-in-JS は、
+                ビルド時に静的な CSS ファイルを生成するため、SSR 時の特別な処理は不要です。
+                <code className="bg-muted px-1.5 py-0.5 rounded text-sm">&lt;link rel="stylesheet"&gt;</code> で
+                通常の CSS として読み込むだけで済みます。
+                React Server Components とも問題なく動作します。
+              </p>
+            </InfoBox>
+          </section>
+
+          {/* セクション8: ライブラリ概観 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">主要な CSS-in-JS ライブラリ</h2>
 
@@ -504,7 +835,7 @@ const Box = styled.div\`
               ランタイムコストがゼロで、パフォーマンスと開発体験の両立を目指します。
             </p>
 
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
+            <div className="grid md:grid-cols-3 gap-4 mb-6">
               <div className="bg-muted/30 border border-border rounded-lg p-5">
                 <h4 className="font-bold text-foreground mb-2">vanilla-extract</h4>
                 <p className="text-sm text-foreground/80 mb-3">
@@ -526,6 +857,18 @@ const Box = styled.div\`
                 <div className="flex flex-wrap gap-2">
                   <span className="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded">ゼロランタイム</span>
                   <span className="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded">新世代</span>
+                </div>
+              </div>
+
+              <div className="bg-muted/30 border border-border rounded-lg p-5">
+                <h4 className="font-bold text-foreground mb-2">Linaria</h4>
+                <p className="text-sm text-foreground/80 mb-3">
+                  styled-components と同じ API でゼロランタイムを実現。
+                  既存プロジェクトからの移行が容易です。
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded">ゼロランタイム</span>
+                  <span className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">移行容易</span>
                 </div>
               </div>
             </div>
@@ -611,7 +954,7 @@ function Card({ children }) {
             />
           </section>
 
-          {/* セクション6: いつ CSS-in-JS を使うか */}
+          {/* セクション9: いつ CSS-in-JS を使うか */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">CSS-in-JS を選ぶべき場面</h2>
 
@@ -679,7 +1022,7 @@ function Card({ children }) {
             </InfoBox>
           </section>
 
-          {/* セクション7: まとめ */}
+          {/* セクション10: まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
 
@@ -699,7 +1042,7 @@ function Card({ children }) {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-1 font-bold">4.</span>
-                  <span><strong>ランタイム</strong>（styled-components, Emotion）と<strong>ゼロランタイム</strong>（vanilla-extract, Panda CSS）の2種類がある</span>
+                  <span><strong>ランタイム</strong>（styled-components, Emotion）と<strong>ゼロランタイム</strong>（vanilla-extract, Panda CSS, Linaria）の2種類がある</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-1 font-bold">5.</span>
@@ -707,6 +1050,117 @@ function Card({ children }) {
                 </li>
               </ul>
             </div>
+          </section>
+
+          {/* 理解度チェック 1 */}
+          <section>
+            <Quiz
+              question="ランタイム CSS-in-JS（styled-components, Emotion）の主な課題はどれですか？"
+              options={[
+                { label: 'CSS のネスト記法が使えないこと' },
+                { label: 'レンダリングのたびにスタイルを生成・挿入するため、パフォーマンスに影響がある', correct: true },
+                { label: 'TypeScript と組み合わせて使えないこと' },
+                { label: 'テーマ機能がサポートされていないこと' },
+              ]}
+              explanation="ランタイム CSS-in-JS は、コンポーネントがレンダリングされるたびに CSS 文字列の解析、ハッシュの計算、<style> タグへの注入を行うため、パフォーマンスコストがあります。これが大量のコンポーネントで問題になる場合があり、ゼロランタイム CSS-in-JS や Tailwind CSS への移行の動機になっています。"
+            />
+          </section>
+
+          {/* 理解度チェック 2 */}
+          <section>
+            <Quiz
+              question="ゼロランタイム CSS-in-JS（vanilla-extract, Panda CSS）の特徴として正しいのはどれですか？"
+              options={[
+                { label: 'ブラウザ上でリアルタイムにスタイルを生成する' },
+                { label: 'CSS ファイルが不要で、すべて JavaScript として配信される' },
+                { label: 'ビルド時にスタイルが静的な CSS ファイルに変換され、ランタイムコストがゼロになる', correct: true },
+                { label: 'サーバーサイドレンダリングに対応していない' },
+              ]}
+              explanation="ゼロランタイム CSS-in-JS は、ビルドプロセスの中ですべてのスタイルを解析・変換し、通常の CSS ファイルを出力します。ブラウザでは普通の CSS として読み込まれるため、ランタイムの JavaScript 処理が不要で、SSR との相性も優れています。"
+            />
+          </section>
+
+          {/* コーディングチャレンジ */}
+          <section>
+            <CodingChallenge
+              title="CSS-in-JS の概念理解"
+              description="以下のランタイム CSS-in-JS（styled-components）のコードを読んで、vanilla-extract（ゼロランタイム）で同等のスタイルを書いてください。style() 関数を使い、TypeScript オブジェクト記法で card スタイルを定義してください。"
+              initialCode={`// vanilla-extract で書き直してください
+// import { style } from '@vanilla-extract/css';
+
+// export const card = style({
+//   ここにスタイルを書く
+// });`}
+              answer={`import { style } from '@vanilla-extract/css';
+
+export const card = style({
+  padding: 24,
+  borderRadius: 12,
+  background: 'white',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+  transition: 'box-shadow 0.2s ease',
+  ':hover': {
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+  },
+});`}
+              hints={[
+                'vanilla-extract では CSS プロパティをキャメルケースで書きます（例: border-radius → borderRadius）',
+                '数値はそのまま書くと px として解釈されます（例: padding: 24 → padding: 24px）',
+                '擬似セレクタは文字列キーで書きます（例: \':hover\': { ... }）',
+              ]}
+            />
+          </section>
+
+          {/* リファレンスリンク */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'State of CSS 2024 - CSS-in-JS セクション',
+                  url: 'https://2024.stateofcss.com/en-US/css-in-js/',
+                  description: '毎年実施される大規模調査による CSS-in-JS ライブラリの利用率・満足度データ',
+                },
+                {
+                  title: 'vanilla-extract 公式ドキュメント',
+                  url: 'https://vanilla-extract.style/',
+                  description: 'ゼロランタイム CSS-in-JS の代表格。TypeScript ファーストな API ドキュメント',
+                },
+                {
+                  title: 'Panda CSS 公式ドキュメント',
+                  url: 'https://panda-css.com/',
+                  description: 'ゼロランタイム CSS-in-JS の新世代ツール。Chakra UI チームによる開発',
+                },
+                {
+                  title: 'Why We are Breaking Up with CSS-in-JS (Sam Magura)',
+                  url: 'https://dev.to/srmagura/why-were-breaking-up-wiht-css-in-js-4g9b',
+                  description: 'Emotion メンテナーによる CSS-in-JS からの脱却理由の分析記事',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'CSS-in-JS は今から新しいプロジェクトで使うべきですか？',
+                  answer: 'プロジェクトの要件次第です。SPA で動的スタイルが多い場合は styled-components や Emotion は依然として良い選択です。SSR（Next.js App Router）を使う場合や、パフォーマンスを重視する場合は、ゼロランタイム CSS-in-JS（vanilla-extract, Panda CSS）、Tailwind CSS、または CSS Modules を検討してください。',
+                },
+                {
+                  question: 'styled-components と Emotion、どちらを選べばいいですか？',
+                  answer: 'どちらも非常に似た機能を持っています。styled API だけで統一したいなら styled-components、css prop も活用したいなら Emotion がおすすめです。MUI（Material UI）v5 を使う場合は Emotion がデフォルトのスタイリングエンジンとして内蔵されています。次のステップで両方を詳しく学びます。',
+                },
+                {
+                  question: 'vanilla-extract や Panda CSS はなぜ「ゼロランタイム」と呼ばれるのですか？',
+                  answer: 'ビルド時にすべてのスタイルが静的な CSS ファイルに変換されるためです。ブラウザではその CSS ファイルを読み込むだけで、JavaScript によるスタイル生成処理が一切発生しません。結果として、CSS Modules と同等のパフォーマンスが得られます。',
+                },
+                {
+                  question: 'CSS-in-JS を使うとデザイナーとの協業が難しくなりますか？',
+                  answer: 'ランタイム CSS-in-JS は JavaScript のコード内にスタイルを書くため、CSS のみの知識ではコードを読み書きしづらくなります。デザイナーが直接コードを触る場合は、CSS Modules や Tailwind CSS の方が馴染みやすいでしょう。一方で、Figma のデザイントークンを JavaScript オブジェクトとして管理する場合は、CSS-in-JS のテーマ機能と相性が良いです。',
+                },
+              ]}
+            />
           </section>
         </div>
 

@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function PlainCss() {
   return (
@@ -299,7 +303,188 @@ export default Card;`}
             </InfoBox>
           </section>
 
-          {/* セクション4: Vite での CSS Modules */}
+          {/* セクション4: ハッシュ化の仕組み詳解 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">CSS Modules のハッシュ化の仕組み</h2>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              CSS Modules がクラス名をどのように変換するか、その内部動作を詳しく見ていきましょう。
+              「なぜハッシュ化が必要なのか」を理解すると、デバッグ時のクラス名の読み方もわかるようになります。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">変換の流れ</h3>
+            <div className="bg-muted/30 border border-border rounded-lg p-6 mb-4">
+              <div className="space-y-4 text-foreground/80 text-sm">
+                <div>
+                  <strong className="text-foreground">Step 1: ソースコードの解析</strong>
+                  <p className="ml-4 mt-1">ビルドツール（Vite / webpack）が <code className="bg-muted px-1 rounded">.module.css</code> ファイルを検出し、CSSパーサーがクラス名を抽出する。</p>
+                </div>
+                <div>
+                  <strong className="text-foreground">Step 2: ハッシュの生成</strong>
+                  <p className="ml-4 mt-1">ファイルパス + クラス名 + ファイル内容からハッシュ値を計算する。同じファイルの同じクラス名なら常に同じハッシュが生成される（決定的）。</p>
+                </div>
+                <div>
+                  <strong className="text-foreground">Step 3: CSS の書き換え</strong>
+                  <p className="ml-4 mt-1">元のクラス名をハッシュ付きのクラス名に置換した CSS を出力する。</p>
+                </div>
+                <div>
+                  <strong className="text-foreground">Step 4: JavaScript マッピングの生成</strong>
+                  <p className="ml-4 mt-1">元のクラス名と変換後のクラス名の対応関係を JavaScript オブジェクトとしてエクスポートする。</p>
+                </div>
+              </div>
+            </div>
+
+            <CodeBlock
+              language="text"
+              title="変換の例（Vite のデフォルト設定）"
+              code={`入力ファイル: src/components/Card.module.css
+
+元のクラス名        →  変換後のクラス名
+.card              →  ._card_x7h3k_1
+.title             →  ._title_x7h3k_5
+.description       →  ._description_x7h3k_12
+.footer            →  ._footer_x7h3k_18
+
+生成される JavaScript オブジェクト:
+export default {
+  card: "_card_x7h3k_1",
+  title: "_title_x7h3k_5",
+  description: "_description_x7h3k_12",
+  footer: "_footer_x7h3k_18"
+}`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">クラス名のフォーマットをカスタマイズ</h3>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              Vite では <code className="bg-muted px-1.5 py-0.5 rounded text-sm">generateScopedName</code> オプションでクラス名のフォーマットを変更できます。
+              開発環境ではデバッグしやすい名前に、本番環境では短い名前にするのがベストプラクティスです。
+            </p>
+
+            <CodeBlock
+              language="typescript"
+              title="vite.config.ts — 開発/本番で異なるクラス名"
+              code={`import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig(({ mode }) => ({
+  plugins: [react()],
+  css: {
+    modules: {
+      generateScopedName:
+        mode === 'development'
+          // 開発: コンポーネント名とクラス名が見えるので DevTools でわかりやすい
+          ? '[name]__[local]__[hash:base64:5]'
+          // 本番: 短いハッシュのみで CSS ファイルサイズを削減
+          : '[hash:base64:8]',
+    },
+  },
+}));
+
+// 開発環境での出力例:
+// Card__title__x7h3k → 「Card コンポーネントの title クラス」だとすぐわかる
+//
+// 本番環境での出力例:
+// dF4kL9mQ → 短くて効率的`}
+            />
+
+            <div className="bg-muted/30 border border-border rounded-lg p-6 mt-4 mb-4">
+              <h4 className="font-semibold text-foreground mb-3">使用できるプレースホルダー</h4>
+              <div className="space-y-2 text-foreground/80 text-sm font-mono">
+                <p><code>[name]</code> — CSS ファイル名（拡張子なし）</p>
+                <p><code>[local]</code> — 元のクラス名</p>
+                <p><code>[hash:base64:N]</code> — N 文字のハッシュ値</p>
+                <p><code>[folder]</code> — フォルダ名</p>
+                <p><code>[path]</code> — ファイルパス</p>
+              </div>
+            </div>
+          </section>
+
+          {/* セクション5: :global セレクタ */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">:global セレクタ — スコープを外す方法</h2>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              CSS Modules ではすべてのクラス名がローカルスコープになりますが、
+              外部ライブラリのクラスを上書きしたい場合など、グローバルにスタイルを適用したい場面もあります。
+              そんなときに使うのが <code className="bg-muted px-1.5 py-0.5 rounded text-sm">:global</code> セレクタです。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">なぜ :global が必要になるのか</h3>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              たとえば、サードパーティのカルーセルライブラリや DatePicker が生成するクラス名は
+              CSS Modules の管理外です。それらのスタイルをカスタマイズするには、
+              ハッシュ化されないグローバルなクラス名でスタイルを書く必要があります。
+            </p>
+
+            <CodeBlock
+              language="css"
+              title="src/components/DatePickerWrapper.module.css"
+              code={`/* ローカルスコープのクラス（通常通りハッシュ化される） */
+.wrapper {
+  padding: 16px;
+  border-radius: 12px;
+  background: white;
+}
+
+/* :global() で囲んだクラス名はハッシュ化されない */
+.wrapper :global(.react-datepicker) {
+  font-family: inherit;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.wrapper :global(.react-datepicker__header) {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.wrapper :global(.react-datepicker__day--selected) {
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 50%;
+}
+
+/* ブロック記法: 複数のグローバルセレクタをまとめて書ける */
+:global {
+  .tippy-content {
+    padding: 8px 12px;
+    font-size: 0.875rem;
+  }
+
+  .tippy-arrow {
+    color: #1e293b;
+  }
+}`}
+            />
+
+            <div className="mt-4" />
+
+            <CodeBlock
+              language="tsx"
+              title="使用例"
+              code={`import styles from './DatePickerWrapper.module.css';
+import DatePicker from 'react-datepicker';
+
+function DatePickerWrapper() {
+  return (
+    // styles.wrapper はハッシュ化されたローカルクラス
+    // 内部の .react-datepicker 等は :global によりハッシュ化されない
+    <div className={styles.wrapper}>
+      <DatePicker />
+    </div>
+  );
+}`}
+            />
+
+            <InfoBox type="warning" title=":global の使いすぎに注意">
+              <p>
+                <code className="bg-muted px-1.5 py-0.5 rounded text-sm">:global</code> を多用すると、
+                CSS Modules の利点であるスコープの隔離が失われます。
+                サードパーティライブラリのスタイル上書きなど、本当に必要な場面に限定して使いましょう。
+                必ず親のローカルクラスでネストして、影響範囲を限定するのがベストプラクティスです。
+              </p>
+            </InfoBox>
+          </section>
+
+          {/* セクション6: Vite での CSS Modules */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">Vite での CSS Modules セットアップ</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
@@ -312,7 +497,7 @@ export default Card;`}
               code={`// Vite では .module.css ファイルを import するだけで自動的に CSS Modules として扱われる
 import styles from './Button.module.css';
 
-// ✅ styles はオブジェクトとして使える
+// styles はオブジェクトとして使える
 console.log(styles);
 // → { button: "_button_a1b2c_1", primary: "_primary_a1b2c_8", ... }`}
             />
@@ -362,7 +547,7 @@ export default defineConfig({
             />
           </section>
 
-          {/* セクション5: className の扱い方 */}
+          {/* セクション7: className の扱い方 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">className の扱い方</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
@@ -450,12 +635,21 @@ function Button({ variant = 'primary', size = 'md', disabled, children }: Button
             />
           </section>
 
-          {/* セクション6: composes（スタイルの合成） */}
+          {/* セクション8: composes の実践 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">composes でスタイルを合成する</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
               CSS Modules には <code className="bg-muted px-1.5 py-0.5 rounded text-sm">composes</code> という独自の機能があり、
               他のクラスのスタイルを継承（合成）できます。
+              これは CSS のカスケードとは異なる仕組みで、ビルド時に処理されるため実行時のコストはゼロです。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">なぜ composes が生まれたのか</h3>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              従来の CSS では「スタイルの再利用」は主にカスケードと継承で行っていました。
+              しかし、これは CSS の詳細度（specificity）問題を引き起こしがちです。
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">composes</code> はビルド時に複数のクラス名を
+              HTML 要素に付与することで、詳細度を一切変えずにスタイルを合成します。
             </p>
 
             <CodeBlock
@@ -538,15 +732,125 @@ function Button({ variant = 'primary', children, onClick }: ButtonProps) {
 }`}
             />
 
+            <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">composes の内部動作</h3>
+            <CodeBlock
+              language="text"
+              title="生成される HTML を見てみよう"
+              code={`CSS Modules の composes は「クラス名を複数付与する」ことで動作します。
+
+例: styles.primary を参照すると...
+
+JavaScript 上: styles.primary → "_base_a1b2c_1 _primary_a1b2c_8"
+                                  ^^^^^^^^^^^ 合成された base のクラスも含まれる
+
+生成される HTML:
+<button class="_base_a1b2c_1 _primary_a1b2c_8">プライマリ</button>
+
+→ 2つのクラスが付与されるので、base と primary 両方のスタイルが適用される
+→ 詳細度は変わらない（どちらも .クラス名 = 詳細度 010）`}
+            />
+
             <InfoBox type="info" title="composes はビルド時に解決される">
               <p>
                 <code className="bg-muted px-1.5 py-0.5 rounded text-sm">composes</code> はランタイムではなくビルド時に処理されます。
                 生成される HTML には複数のクラス名が付与されるため、パフォーマンスへの影響はありません。
+                別ファイルからの <code className="bg-muted px-1.5 py-0.5 rounded text-sm">composes: ... from '...'</code> も同様にビルド時に解決されます。
               </p>
             </InfoBox>
           </section>
 
-          {/* セクション7: 比較表 */}
+          {/* セクション9: CSS Modules + TypeScript */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">CSS Modules + TypeScript（typed-css-modules）</h2>
+            <p className="text-foreground/80 mb-4 leading-relaxed">
+              CSS Modules のデフォルトの型定義は <code className="bg-muted px-1.5 py-0.5 rounded text-sm">{`{ [key: string]: string }`}</code> なので、
+              存在しないクラス名を書いてもコンパイルエラーになりません。
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">typed-css-modules</code> を使うと、
+              各 CSS Modules ファイルに対応する型定義ファイルを自動生成でき、クラス名のタイプセーフティが得られます。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">なぜ型が必要なのか</h3>
+            <CodeBlock
+              language="tsx"
+              title="型定義がない場合の問題"
+              code={`import styles from './Card.module.css';
+
+// 問題: "tigle" はタイポだが、TypeScript はエラーにしない
+<h3 className={styles.tigle}>タイトル</h3>
+// → undefined が className に渡され、クラスが適用されない
+// → 画面上でスタイルが崩れるが、コンパイルエラーにはならない`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">typed-css-modules のセットアップ</h3>
+            <CodeBlock
+              language="bash"
+              title="インストールと実行"
+              code={`# インストール
+npm install -D typed-css-modules
+
+# 実行: .module.css ファイルに対応する .module.css.d.ts を生成
+npx tcm src
+
+# ウォッチモード: ファイル変更時に自動で型定義を再生成
+npx tcm src --watch`}
+            />
+
+            <div className="mt-4" />
+
+            <CodeBlock
+              language="typescript"
+              title="自動生成される Card.module.css.d.ts"
+              code={`// このファイルは typed-css-modules により自動生成されます
+// 手動で編集しないでください
+declare const styles: {
+  readonly card: string;
+  readonly title: string;
+  readonly description: string;
+  readonly footer: string;
+};
+export default styles;`}
+            />
+
+            <div className="mt-4" />
+
+            <CodeBlock
+              language="tsx"
+              title="型定義があると安全に書ける"
+              code={`import styles from './Card.module.css';
+
+// 型定義により、存在するクラス名のみが補完候補に出る
+<h3 className={styles.title}>タイトル</h3>       // OK
+<h3 className={styles.tigle}>タイトル</h3>       // TS エラー！
+// → Property 'tigle' does not exist on type '...'
+
+// エディタの補完で card, title, description, footer が候補に表示される`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">package.json にスクリプトを追加</h3>
+            <CodeBlock
+              language="json"
+              title="package.json"
+              code={`{
+  "scripts": {
+    "dev": "vite",
+    "build": "tcm src && tsc && vite build",
+    "tcm": "tcm src",
+    "tcm:watch": "tcm src --watch"
+  }
+}`}
+            />
+
+            <InfoBox type="info" title="Vite プラグインによる代替手段">
+              <p>
+                <code className="bg-muted px-1.5 py-0.5 rounded text-sm">vite-plugin-css-modules-dts</code> を使えば、
+                Vite のビルドプロセスに統合して型定義を自動生成することもできます。
+                <code className="bg-muted px-1.5 py-0.5 rounded text-sm">typed-css-modules</code> の代わりに
+                こちらを選ぶプロジェクトも増えています。
+              </p>
+            </InfoBox>
+          </section>
+
+          {/* セクション10: 比較表 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">プレーン CSS vs CSS Modules 比較</h2>
 
@@ -605,7 +909,7 @@ function Button({ variant = 'primary', children, onClick }: ButtonProps) {
             </div>
           </section>
 
-          {/* セクション8: 実践例 */}
+          {/* セクション11: 実践例 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">実践例: カードコンポーネント</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
@@ -816,7 +1120,7 @@ function App() {
             />
           </section>
 
-          {/* セクション9: ファイル構成のベストプラクティス */}
+          {/* セクション12: ファイル構成のベストプラクティス */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">ファイル構成のベストプラクティス</h2>
             <p className="text-foreground/80 mb-4 leading-relaxed">
@@ -854,7 +1158,7 @@ function App() {
             </InfoBox>
           </section>
 
-          {/* セクション10: いつどちらを使うか */}
+          {/* セクション13: いつどちらを使うか */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">いつどちらを使うか</h2>
 
@@ -911,9 +1215,150 @@ function App() {
                 </ul>
               </div>
             </div>
+          </section>
 
-            <div className="mt-6" />
+          {/* 理解度チェック 1 */}
+          <section>
+            <Quiz
+              question="CSS Modules でクラス名が衝突しない理由として正しいものはどれですか？"
+              options={[
+                { label: 'CSS の詳細度（specificity）が自動的に上がるから' },
+                { label: 'ビルド時にクラス名がハッシュ付きのユニークな名前に変換されるから', correct: true },
+                { label: 'クラス名が !important 付きで出力されるから' },
+                { label: 'ブラウザが Shadow DOM を使ってスコープを分離するから' },
+              ]}
+              explanation="CSS Modules はビルド時にファイルパスとクラス名からハッシュ値を生成し、元のクラス名をユニークな名前に変換します。これにより、異なるファイルで同じクラス名を使っても衝突しません。Shadow DOM やスタイルの詳細度は関与しません。"
+            />
+          </section>
 
+          {/* 理解度チェック 2 */}
+          <section>
+            <Quiz
+              question="CSS Modules の :global セレクタの正しい使い方はどれですか？"
+              options={[
+                { label: 'すべてのスタイルを :global で囲んでパフォーマンスを向上させる' },
+                { label: ':global を使うとスタイルが自動的にメモ化される' },
+                { label: 'サードパーティライブラリのクラス名をカスタマイズする際に、ハッシュ化を避けるために使う', correct: true },
+                { label: ':global を使うとスタイルがインライン化される' },
+              ]}
+              explanation=":global セレクタは、CSS Modules のハッシュ化処理をスキップし、記述したクラス名をそのままグローバルに出力します。主にサードパーティライブラリが生成するクラス名（例: .react-datepicker__day）のスタイルをカスタマイズする場面で使います。"
+            />
+          </section>
+
+          {/* コーディングチャレンジ */}
+          <section>
+            <CodingChallenge
+              title="CSS Modules でカードコンポーネントをスタイリング"
+              description="以下の CSS Modules ファイルを完成させてください。.card にホバー効果（translateY と shadow の変化）を追加し、.tag クラスを composes を使って .badge の基本スタイルを継承するように書いてください。"
+              initialCode={`.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ここに .card:hover を追加 */
+
+.tag {
+  /* composes を使って .badge を継承し、色を追加 */
+}`}
+              answer={`.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.tag {
+  composes: badge;
+  background-color: #eff6ff;
+  color: #3b82f6;
+}`}
+              hints={[
+                'card:hover では transform: translateY(-4px) で要素を上に移動させ、box-shadow を大きくします',
+                'composes: badge; と書くことで .badge クラスのスタイルを .tag に継承できます',
+                'composes は必ず他のプロパティより前に書くことが推奨されています',
+              ]}
+            />
+          </section>
+
+          {/* リファレンスリンク */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'Vite 公式 - CSS Modules',
+                  url: 'https://vite.dev/guide/features#css-modules',
+                  description: 'Vite における CSS Modules のサポートと設定オプションの公式ドキュメント',
+                },
+                {
+                  title: 'CSS Modules GitHub リポジトリ',
+                  url: 'https://github.com/css-modules/css-modules',
+                  description: 'CSS Modules の仕様と設計思想がまとめられた公式リポジトリ',
+                },
+                {
+                  title: 'MDN - CSS の基礎',
+                  url: 'https://developer.mozilla.org/ja/docs/Learn_web_development/Core/Styling_basics',
+                  description: 'CSS の基本的な概念とセレクタについての MDN リファレンス',
+                },
+                {
+                  title: 'typed-css-modules',
+                  url: 'https://github.com/Quramy/typed-css-modules',
+                  description: 'CSS Modules の型定義ファイルを自動生成するツール',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'CSS Modules は SCSS / Sass と併用できますか？',
+                  answer: 'はい、.module.scss という拡張子のファイルを作成すれば、CSS Modules と SCSS を組み合わせて使えます。Vite では sass パッケージをインストールするだけで対応できます（npm install -D sass）。ネストや変数など SCSS の機能をそのまま CSS Modules のスコープ内で使えます。',
+                },
+                {
+                  question: 'CSS Modules のクラス名にハイフンが含まれる場合はどうすればいいですか？',
+                  answer: 'styles["my-class"] のようにブラケット記法でアクセスします。ドット記法（styles.my-class）は JavaScript の構文エラーになるため使えません。チームで統一するなら camelCase のクラス名（.myClass）を推奨します。Vite の設定で localsConvention: "camelCaseOnly" を指定すると、CSS のケバブケースを JS 側で自動的にキャメルケースに変換できます。',
+                },
+                {
+                  question: 'CSS Modules はランタイムコストがありますか？',
+                  answer: 'いいえ、CSS Modules はビルド時にすべての変換が完了します。ランタイムでは通常の CSS と同じように動作するため、パフォーマンスへの影響はゼロです。これは styled-components や Emotion などのランタイム CSS-in-JS ライブラリとの大きな違いです。',
+                },
+                {
+                  question: 'CSS Modules と CSS-in-JS のどちらを選ぶべきですか？',
+                  answer: 'CSS の知識を直接活かしたい場合や、パフォーマンスを重視する場合は CSS Modules がおすすめです。JavaScript の力を使った動的なスタイリング（props に基づくスタイル変更、テーマの管理など）が多い場合は CSS-in-JS が便利です。次のステップで CSS-in-JS について詳しく学びます。',
+                },
+              ]}
+            />
+          </section>
+
+          {/* まとめ */}
+          <section>
             <InfoBox type="success" title="まとめ">
               <p>
                 プレーン CSS はグローバルなスタイルに、CSS Modules はコンポーネントのスタイルに使いましょう。

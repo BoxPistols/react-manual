@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function Props() {
   return (
@@ -50,9 +54,106 @@ function Greeting({ name }: { name: string }) {
               language="tsx"
               title="Props は関数の引数と同じ"
             />
-            <InfoBox type="info" title="一方向のデータフロー">
+          </section>
+
+          {/* データフローの詳細解説 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Props の一方向データフロー</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              React のデータは常に<strong>親から子へ</strong>流れます。これを「一方向データフロー（one-way data flow）」と呼びます。水が高いところから低いところへ流れるように、データも上位のコンポーネントから下位のコンポーネントへ一方通行で流れます。
+            </p>
+
+            <div className="p-6 rounded-xl border border-border bg-card mb-6">
+              <h3 className="font-bold text-foreground mb-4 text-center">Props のデータフロー図</h3>
+              <div className="space-y-4">
+                {/* 親コンポーネント */}
+                <div className="bg-blue-50 dark:bg-blue-950/30 border-2 border-blue-300 dark:border-blue-700 rounded-lg p-4 text-center">
+                  <p className="font-bold text-blue-700 dark:text-blue-300 mb-1">親コンポーネント（App）</p>
+                  <p className="text-sm text-muted-foreground">データを持ち、子に渡す側</p>
+                  <code className="text-xs bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded mt-2 inline-block">
+                    {'const user = { name: "田中", role: "デザイナー" }'}
+                  </code>
+                </div>
+
+                {/* 矢印 */}
+                <div className="flex justify-center">
+                  <div className="flex flex-col items-center text-primary">
+                    <span className="text-2xl">↓</span>
+                    <span className="text-xs font-semibold bg-primary/10 px-3 py-1 rounded-full">Props として渡す</span>
+                    <span className="text-2xl">↓</span>
+                  </div>
+                </div>
+
+                {/* 子コンポーネントたち */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-300 dark:border-green-700 rounded-lg p-3 text-center">
+                    <p className="font-bold text-green-700 dark:text-green-300 text-sm mb-1">子A: Header</p>
+                    <code className="text-xs">name="田中"</code>
+                  </div>
+                  <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-300 dark:border-green-700 rounded-lg p-3 text-center">
+                    <p className="font-bold text-green-700 dark:text-green-300 text-sm mb-1">子B: ProfileCard</p>
+                    <code className="text-xs">user={'{user}'}</code>
+                  </div>
+                  <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-300 dark:border-green-700 rounded-lg p-3 text-center">
+                    <p className="font-bold text-green-700 dark:text-green-300 text-sm mb-1">子C: Sidebar</p>
+                    <code className="text-xs">role="デザイナー"</code>
+                  </div>
+                </div>
+
+                {/* 注意 */}
+                <div className="flex justify-center mt-2">
+                  <div className="flex items-center gap-2 text-red-500 dark:text-red-400">
+                    <span className="text-2xl">✕</span>
+                    <span className="text-sm font-semibold">子から親へは直接渡せない</span>
+                    <span className="text-2xl">↑</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <InfoBox type="info" title="なぜ一方向なのか？">
               <p>
-                React のデータは常に親から子へ流れます（一方向データフロー）。子コンポーネントは受け取った Props を直接変更できません。これにより、データの流れが予測しやすくなります。
+                データの流れが一方向に限定されることで、「このデータはどこから来たのか？」が常に明確になります。双方向だとデータの出所が追いにくくなり、バグの原因になります。React はこの設計によって、大規模なアプリケーションでもデータの流れを予測しやすくしています。
+              </p>
+            </InfoBox>
+
+            <CodeBlock
+              code={`// 親コンポーネント: データの源泉
+function App() {
+  const user = { name: '田中', role: 'デザイナー' };
+
+  return (
+    <div>
+      {/* 親 → 子 の方向でデータが流れる */}
+      <Header userName={user.name} />
+      <ProfileCard user={user} />
+      <Sidebar role={user.role} />
+    </div>
+  );
+}
+
+// 子コンポーネント: 受け取ったデータを表示するだけ
+function Header({ userName }: { userName: string }) {
+  return <h1>ようこそ、{userName}さん</h1>;
+}
+
+// 子コンポーネントは受け取った Props を変更できない
+function ProfileCard({ user }: { user: { name: string; role: string } }) {
+  // user.name = '佐藤'; // エラー！Props は読み取り専用
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <p>{user.role}</p>
+    </div>
+  );
+}`}
+              language="tsx"
+              title="一方向データフローの実装例"
+            />
+
+            <InfoBox type="success" title="Figma との対比">
+              <p>
+                Figma でコンポーネントのプロパティを設定するとき、インスタンス側からマスターコンポーネントの定義を変更できませんよね。それと同じで、子コンポーネントは受け取った Props を変更できません。変更したい場合は、親コンポーネントのデータを更新し、新しい Props として再度渡します（これは後の useState で学びます）。
               </p>
             </InfoBox>
           </section>
@@ -187,9 +288,49 @@ function Card({ children, title }: { children: ReactNode; title: string }) {
               language="tsx"
               title="children で柔軟なコンポーネントを作る"
             />
+
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              children は単なるテキストだけでなく、他のコンポーネントや複雑な JSX も受け取れます。レイアウトコンポーネントを作るときに特に威力を発揮します。
+            </p>
+
+            <CodeBlock
+              code={`import { ReactNode } from 'react';
+
+// ページ全体のレイアウトを提供するコンポーネント
+function PageLayout({
+  children,
+  sidebar,
+  header,
+}: {
+  children: ReactNode;
+  sidebar: ReactNode;
+  header: ReactNode;
+}) {
+  return (
+    <div className="min-h-screen">
+      <div className="border-b">{header}</div>
+      <div className="flex">
+        <aside className="w-64 border-r p-4">{sidebar}</aside>
+        <main className="flex-1 p-6">{children}</main>
+      </div>
+    </div>
+  );
+}
+
+// 使い方 - 各スロットに自由なコンテンツを配置
+<PageLayout
+  header={<h1>マイアプリ</h1>}
+  sidebar={<nav>ナビゲーション</nav>}
+>
+  <p>メインコンテンツがここに入る</p>
+</PageLayout>`}
+              language="tsx"
+              title="複数のスロットを持つレイアウトコンポーネント"
+            />
+
             <InfoBox type="info" title="Figma のスロットと同じ">
               <p>
-                children は Figma のコンポーネントで「中身を入れ替えられるスロット」を作るのと同じ考え方です。外側のレイアウト（枠、影、余白）は固定で、中身だけ変えられます。
+                children は Figma のコンポーネントで「中身を入れ替えられるスロット」を作るのと同じ考え方です。外側のレイアウト（枠、影、余白）は固定で、中身だけ変えられます。さらに、header や sidebar のように名前付きの Props で複数のスロットを作ることもできます。
               </p>
             </InfoBox>
           </section>
@@ -273,6 +414,381 @@ function Greeting3({ name, message, emoji = '👋' }: GreetingProps) {
             <InfoBox type="success" title="おすすめのスタイル">
               <p>
                 Props が3つ以上になったら、interface を別に定義するのがおすすめです。コードが読みやすくなり、再利用もしやすくなります。
+              </p>
+            </InfoBox>
+          </section>
+
+          {/* Props のスプレッド構文 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Props のスプレッド構文（...props）</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              スプレッド構文を使うと、オブジェクトの全プロパティを一度に Props として渡せます。また、コンポーネント側で「自分が使う Props」と「残りの Props」を分けて受け取ることもできます。
+            </p>
+
+            <CodeBlock
+              code={`// 基本: オブジェクトを Props として展開する
+interface UserProps {
+  name: string;
+  age: number;
+  role: string;
+}
+
+const user: UserProps = {
+  name: '田中花子',
+  age: 28,
+  role: 'デザイナー',
+};
+
+// 1つずつ書く場合
+<UserCard name={user.name} age={user.age} role={user.role} />
+
+// スプレッド構文で一括で渡す（同じ結果になる）
+<UserCard {...user} />`}
+              language="tsx"
+              title="Props のスプレッド: 渡す側"
+            />
+
+            <CodeBlock
+              code={`import { ButtonHTMLAttributes } from 'react';
+
+// 実践パターン: 自分の Props + HTML 属性を受け取る
+interface MyButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary';
+  size?: 'sm' | 'md' | 'lg';
+}
+
+function MyButton({ variant = 'primary', size = 'md', ...rest }: MyButtonProps) {
+  // variant と size は自分で使い、残りはすべて <button> に渡す
+  const styles = {
+    primary: 'bg-blue-600 text-white',
+    secondary: 'bg-gray-200 text-gray-800',
+  };
+
+  const sizes = {
+    sm: 'px-3 py-1 text-sm',
+    md: 'px-4 py-2',
+    lg: 'px-6 py-3 text-lg',
+  };
+
+  return (
+    <button
+      className={\`rounded-lg \${styles[variant]} \${sizes[size]}\`}
+      {...rest}  // onClick, disabled, type, aria-* など全部渡る
+    />
+  );
+}
+
+// HTML の button 属性がそのまま使える
+<MyButton variant="primary" onClick={() => alert('クリック！')}>
+  送信
+</MyButton>
+<MyButton variant="secondary" disabled type="submit" aria-label="キャンセル">
+  キャンセル
+</MyButton>`}
+              language="tsx"
+              title="rest パラメータで残りの Props を受け取る"
+              showLineNumbers
+            />
+
+            <InfoBox type="warning" title="スプレッドの注意点">
+              <p>
+                スプレッド構文は便利ですが、意図しない Props まで渡してしまうリスクがあります。特に <code>{'<div {...props} />'}</code> のように HTML 要素に直接展開すると、不正な属性が渡される可能性があります。「自分が使う Props」と「残り」を明示的に分けて受け取るパターン（上の rest の例）が安全です。
+              </p>
+            </InfoBox>
+          </section>
+
+          {/* 実践的なUIコンポーネント例 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">実践的な UI コンポーネント集</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              Props の使い方を理解するために、実際のデザインシステムでよく使われるコンポーネントを作ってみましょう。それぞれの Props 設計のポイントにも注目してください。
+            </p>
+
+            {/* Alert コンポーネント */}
+            <h3 className="text-lg font-semibold text-foreground mb-3 mt-8">Alert コンポーネント</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              ユーザーに通知やエラーメッセージを表示するコンポーネントです。type で見た目を切り替え、onClose で閉じる機能を提供します。
+            </p>
+            <CodeBlock
+              code={`import { ReactNode } from 'react';
+
+interface AlertProps {
+  children: ReactNode;
+  type?: 'info' | 'success' | 'warning' | 'error';
+  title?: string;
+  closable?: boolean;
+  onClose?: () => void;
+}
+
+function Alert({
+  children,
+  type = 'info',
+  title,
+  closable = false,
+  onClose,
+}: AlertProps) {
+  const styles = {
+    info: {
+      container: 'bg-blue-50 border-blue-200 text-blue-800',
+      icon: 'i',  // 実際にはアイコンコンポーネントを使う
+    },
+    success: {
+      container: 'bg-green-50 border-green-200 text-green-800',
+      icon: '✓',
+    },
+    warning: {
+      container: 'bg-amber-50 border-amber-200 text-amber-800',
+      icon: '!',
+    },
+    error: {
+      container: 'bg-red-50 border-red-200 text-red-800',
+      icon: '✕',
+    },
+  };
+
+  return (
+    <div className={\`p-4 border rounded-lg \${styles[type].container}\`}>
+      <div className="flex items-start gap-3">
+        <span className="font-bold text-lg">{styles[type].icon}</span>
+        <div className="flex-1">
+          {title && <h4 className="font-bold mb-1">{title}</h4>}
+          <div className="text-sm">{children}</div>
+        </div>
+        {closable && (
+          <button onClick={onClose} className="text-lg leading-none opacity-60 hover:opacity-100">
+            &times;
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// 使用例
+<Alert type="success" title="保存完了">
+  変更が正常に保存されました。
+</Alert>
+
+<Alert type="error" title="エラー" closable onClose={() => console.log('閉じた')}>
+  ネットワーク接続を確認してください。
+</Alert>
+
+<Alert type="warning">
+  この操作は取り消せません。
+</Alert>`}
+              language="tsx"
+              title="Alert コンポーネント"
+              showLineNumbers
+            />
+
+            {/* Badge コンポーネント */}
+            <h3 className="text-lg font-semibold text-foreground mb-3 mt-8">Badge コンポーネント</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              ステータスやカテゴリを表示する小さなラベルです。色やサイズを Props で柔軟に切り替えられます。
+            </p>
+            <CodeBlock
+              code={`interface BadgeProps {
+  label: string;
+  color?: 'gray' | 'blue' | 'green' | 'red' | 'yellow' | 'purple';
+  size?: 'sm' | 'md';
+  rounded?: boolean;  // 角丸をピルにするか
+  dot?: boolean;      // 先頭にドットを表示するか
+}
+
+function Badge({
+  label,
+  color = 'gray',
+  size = 'sm',
+  rounded = false,
+  dot = false,
+}: BadgeProps) {
+  const colorStyles = {
+    gray: 'bg-gray-100 text-gray-700',
+    blue: 'bg-blue-100 text-blue-700',
+    green: 'bg-green-100 text-green-700',
+    red: 'bg-red-100 text-red-700',
+    yellow: 'bg-yellow-100 text-yellow-800',
+    purple: 'bg-purple-100 text-purple-700',
+  };
+
+  const sizeStyles = {
+    sm: 'px-2 py-0.5 text-xs',
+    md: 'px-3 py-1 text-sm',
+  };
+
+  const dotColors = {
+    gray: 'bg-gray-500',
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    red: 'bg-red-500',
+    yellow: 'bg-yellow-500',
+    purple: 'bg-purple-500',
+  };
+
+  return (
+    <span
+      className={\`
+        inline-flex items-center gap-1.5 font-medium
+        \${colorStyles[color]}
+        \${sizeStyles[size]}
+        \${rounded ? 'rounded-full' : 'rounded'}
+      \`}
+    >
+      {dot && (
+        <span className={\`w-1.5 h-1.5 rounded-full \${dotColors[color]}\`} />
+      )}
+      {label}
+    </span>
+  );
+}
+
+// 使用例
+<Badge label="新着" color="blue" />
+<Badge label="レビュー中" color="yellow" dot />
+<Badge label="公開済み" color="green" rounded />
+<Badge label="下書き" color="gray" size="md" />`}
+              language="tsx"
+              title="Badge コンポーネント"
+              showLineNumbers
+            />
+
+            {/* Avatar コンポーネント */}
+            <h3 className="text-lg font-semibold text-foreground mb-3 mt-8">Avatar コンポーネント</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              ユーザーのプロフィール画像を表示するコンポーネントです。画像がない場合はイニシャルで代替表示します。
+            </p>
+            <CodeBlock
+              code={`interface AvatarProps {
+  src?: string;          // 画像URL（オプショナル）
+  name: string;          // フォールバック用の名前
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  status?: 'online' | 'offline' | 'busy';
+}
+
+function Avatar({ src, name, size = 'md', status }: AvatarProps) {
+  const sizeStyles = {
+    sm: 'w-8 h-8 text-xs',
+    md: 'w-10 h-10 text-sm',
+    lg: 'w-14 h-14 text-base',
+    xl: 'w-20 h-20 text-xl',
+  };
+
+  const statusColors = {
+    online: 'bg-green-400',
+    offline: 'bg-gray-400',
+    busy: 'bg-red-400',
+  };
+
+  // 名前からイニシャルを取得（例: "田中花子" → "田"）
+  const initial = name.charAt(0);
+
+  // ランダムっぽい背景色を名前から決定
+  const bgColors = [
+    'bg-blue-500', 'bg-purple-500', 'bg-pink-500',
+    'bg-amber-500', 'bg-teal-500', 'bg-indigo-500',
+  ];
+  const bgColor = bgColors[name.length % bgColors.length];
+
+  return (
+    <div className="relative inline-block">
+      {src ? (
+        <img
+          src={src}
+          alt={name}
+          className={\`\${sizeStyles[size]} rounded-full object-cover\`}
+        />
+      ) : (
+        <div
+          className={\`
+            \${sizeStyles[size]} \${bgColor}
+            rounded-full flex items-center justify-center
+            text-white font-bold
+          \`}
+        >
+          {initial}
+        </div>
+      )}
+
+      {/* ステータスインジケーター */}
+      {status && (
+        <span
+          className={\`
+            absolute bottom-0 right-0
+            w-3 h-3 rounded-full border-2 border-white
+            \${statusColors[status]}
+          \`}
+        />
+      )}
+    </div>
+  );
+}
+
+// 使用例
+<Avatar name="田中花子" src="/avatars/tanaka.jpg" status="online" />
+<Avatar name="佐藤太郎" size="lg" status="busy" />  {/* 画像なし: イニシャル表示 */}
+<Avatar name="鈴木" size="sm" />  {/* ステータスなし */}`}
+              language="tsx"
+              title="Avatar コンポーネント"
+              showLineNumbers
+            />
+
+            {/* Tag コンポーネント */}
+            <h3 className="text-lg font-semibold text-foreground mb-3 mt-8">Tag コンポーネント</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              削除可能なタグは、フィルタリング UI やタグ入力などでよく使われるパターンです。
+            </p>
+            <CodeBlock
+              code={`interface TagProps {
+  label: string;
+  onRemove?: () => void;  // 削除ハンドラがあれば削除ボタンを表示
+  color?: 'default' | 'blue' | 'green' | 'red';
+  icon?: ReactNode;       // タグの先頭にアイコンを表示
+}
+
+function Tag({ label, onRemove, color = 'default', icon }: TagProps) {
+  const colorStyles = {
+    default: 'bg-gray-100 text-gray-700 border-gray-200',
+    blue: 'bg-blue-50 text-blue-700 border-blue-200',
+    green: 'bg-green-50 text-green-700 border-green-200',
+    red: 'bg-red-50 text-red-700 border-red-200',
+  };
+
+  return (
+    <span
+      className={\`
+        inline-flex items-center gap-1 px-2.5 py-1
+        text-sm font-medium border rounded-md
+        \${colorStyles[color]}
+      \`}
+    >
+      {icon && <span className="w-4 h-4">{icon}</span>}
+      {label}
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="ml-1 opacity-60 hover:opacity-100 text-base leading-none"
+          aria-label={\`\${label} を削除\`}
+        >
+          &times;
+        </button>
+      )}
+    </span>
+  );
+}
+
+// 使用例
+<Tag label="React" color="blue" />
+<Tag label="TypeScript" color="blue" onRemove={() => console.log('削除')} />
+<Tag label="完了" color="green" />
+<Tag label="緊急" color="red" onRemove={() => handleRemove('urgent')} />`}
+              language="tsx"
+              title="Tag コンポーネント"
+              showLineNumbers
+            />
+
+            <InfoBox type="success" title="Props 設計のポイント">
+              <p>
+                これらのコンポーネントに共通するパターンを整理すると: (1) 必須の Props は最小限にする、(2) オプショナル Props にはデフォルト値を設定する、(3) ユニオン型でバリエーションを制限する、(4) 関数型の Props でカスタム動作を可能にする。この4つを意識すると、使いやすいコンポーネント API が設計できます。
               </p>
             </InfoBox>
           </section>
@@ -402,6 +918,83 @@ function TeamPage() {
             />
           </section>
 
+          {/* Quiz 1 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">理解度チェック</h2>
+
+            <Quiz
+              question="Props のデータの流れとして正しいのはどれですか？"
+              options={[
+                { label: '子コンポーネントから親コンポーネントへ流れる' },
+                { label: '親コンポーネントから子コンポーネントへ一方向に流れる', correct: true },
+                { label: '親子間で双方向にデータをやりとりできる' },
+                { label: 'どのコンポーネントからでも自由にアクセスできる' },
+              ]}
+              explanation="React の Props は常に親から子への一方向データフロー（one-way data flow）です。子コンポーネントは受け取った Props を直接変更できません。子から親にデータを伝えたい場合は、親がコールバック関数を Props として渡し、子がその関数を呼び出すパターンを使います（イベント処理で学びます）。"
+            />
+
+            <Quiz
+              question="children prop の使い方として正しいのはどれですか？"
+              options={[
+                { label: 'children は文字列しか受け取れない' },
+                { label: 'children は props オブジェクトに含まれず、別の引数として渡される' },
+                { label: 'コンポーネントの開始タグと終了タグの間に書いた内容が children として渡される', correct: true },
+                { label: 'children を使うにはコンポーネント側で useChildren() を呼ぶ必要がある' },
+              ]}
+              explanation="children は特別な Props で、<Component>ここの内容</Component> のようにタグの間に書いた内容が自動的に children として渡されます。文字列だけでなく、JSX や他のコンポーネントも渡せます。型は ReactNode を使います。"
+            />
+          </section>
+
+          {/* CodingChallenge */}
+          <section>
+            <CodingChallenge
+              title="Badge コンポーネントを Props で柔軟にしよう"
+              description="以下の Badge コンポーネントに、color（'blue' | 'green' | 'red'、デフォルト 'blue'）と size（'sm' | 'md'、デフォルト 'sm'）の Props を追加して、見た目を切り替えられるようにしてください。"
+              initialCode={`interface BadgeProps {
+  label: string;
+  // ここに color と size の Props を追加
+}
+
+function Badge({ label }: BadgeProps) {
+  return (
+    <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">
+      {label}
+    </span>
+  );
+}`}
+              answer={`interface BadgeProps {
+  label: string;
+  color?: 'blue' | 'green' | 'red';
+  size?: 'sm' | 'md';
+}
+
+function Badge({ label, color = 'blue', size = 'sm' }: BadgeProps) {
+  const colorStyles = {
+    blue: 'bg-blue-100 text-blue-700',
+    green: 'bg-green-100 text-green-700',
+    red: 'bg-red-100 text-red-700',
+  };
+
+  const sizeStyles = {
+    sm: 'px-2 py-0.5 text-xs',
+    md: 'px-3 py-1 text-sm',
+  };
+
+  return (
+    <span className={\`\${colorStyles[color]} \${sizeStyles[size]} rounded\`}>
+      {label}
+    </span>
+  );
+}`}
+              hints={[
+                'color と size にはそれぞれ ? をつけてオプショナルにしましょう',
+                'ユニオン型（"blue" | "green" | "red"）で値を制限します',
+                '分割代入のデフォルト値（color = "blue"）を設定しましょう',
+                'Record やオブジェクトで、色・サイズごとのクラス名をマッピングすると綺麗です',
+              ]}
+            />
+          </section>
+
           {/* まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
@@ -412,6 +1005,7 @@ function TeamPage() {
                   <li>- 親から子への一方向データフロー</li>
                   <li>- 文字列、数値、真偽値、オブジェクト、配列を渡せる</li>
                   <li>- 子コンポーネントは Props を変更できない</li>
+                  <li>- children でタグ間のコンテンツを渡せる</li>
                 </ul>
               </div>
               <div className="p-4 rounded-lg border border-border bg-card">
@@ -420,9 +1014,53 @@ function TeamPage() {
                   <li>- デフォルト値で使いやすい API を設計する</li>
                   <li>- children でレイアウトコンポーネントを作る</li>
                   <li>- interface で Props の型を明確にする</li>
+                  <li>- スプレッド構文で HTML 属性を透過的に渡す</li>
                 </ul>
               </div>
             </div>
+          </section>
+
+          {/* ReferenceLinks */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'Passing Props to a Component - React 公式',
+                  url: 'https://react.dev/learn/passing-props-to-a-component',
+                  description: 'Props の渡し方、分割代入、children、デフォルト値など基本を網羅した公式ガイド',
+                },
+                {
+                  title: 'Thinking in React - React 公式',
+                  url: 'https://react.dev/learn/thinking-in-react',
+                  description: 'コンポーネント分割と Props によるデータフローの設計思想を学べる',
+                },
+                {
+                  title: 'Component Props - TypeScript + React',
+                  url: 'https://react.dev/learn/typescript#typing-component-props',
+                  description: 'Props に TypeScript の型をつける方法の公式ガイド',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'props を子コンポーネントから親コンポーネントに渡せますか？',
+                  answer: '直接渡すことはできません。React のデータフローは親→子の一方向です。ただし、親がコールバック関数を props として子に渡し、子がその関数を呼び出すことで、間接的に親にデータを伝えることができます。例えば onClick={() => onSelect(id)} のように、子がイベント発生時に親の関数を呼ぶパターンです。これは次のステップ「イベント処理」で詳しく学びます。',
+                },
+                {
+                  question: 'props が多すぎる場合はどうすればいいですか？',
+                  answer: 'props が 5 つ以上になったら、設計を見直すサインです。対策としては: (1) 関連する props をオブジェクトにまとめる（user={{ name, email }} など）、(2) children や合成（Composition）パターンを使う、(3) コンポーネントを分割して責務を減らす。「Props Drilling」（何階層もバケツリレーで渡す）が起きている場合は、Context API の利用を検討します。',
+                },
+                {
+                  question: 'props と state の違いは何ですか？',
+                  answer: 'props は「外から受け取る読み取り専用のデータ」、state は「コンポーネント内部で管理する変更可能なデータ」です。props は関数の引数、state は関数内のローカル変数に例えられます。親コンポーネントの state を子コンポーネントに props として渡すのが React の典型的なパターンです。state については次のステップ「useState」で詳しく学びます。',
+                },
+              ]}
+            />
           </section>
         </div>
 

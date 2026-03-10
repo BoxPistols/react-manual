@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function Forms() {
   return (
@@ -69,6 +73,92 @@ function ControlledInput() {
             <InfoBox type="info" title="なぜ制御コンポーネントを使うのか？">
               <p>
                 value と onChange を使うことで、React が入力値の「唯一の真実の情報源（Single Source of Truth）」になります。バリデーション、値のフォーマット、条件付きの入力制限など、あらゆる制御が可能になります。
+              </p>
+            </InfoBox>
+          </section>
+
+          {/* 非制御コンポーネント */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">非制御コンポーネント（Uncontrolled Components）</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              制御コンポーネントの対となる方法が「非制御コンポーネント」です。state で値を管理せず、DOM 自体が値を保持します。<code className="text-sm bg-muted px-1.5 py-0.5 rounded">useRef</code> を使って DOM から直接値を取得します。
+            </p>
+            <CodeBlock
+              code={`import { useRef } from 'react';
+
+function UncontrolledInput() {
+  // useRef で DOM 要素への参照を作成
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // DOM から直接値を取得
+    const value = inputRef.current?.value;
+    console.log('入力値:', value);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="p-6 max-w-md space-y-4">
+      {/* ref を渡すだけ。value も onChange も不要 */}
+      <input
+        ref={inputRef}
+        type="text"
+        defaultValue=""  // 初期値は defaultValue で設定
+        className="w-full px-3 py-2 border rounded-lg"
+      />
+      <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+        送信
+      </button>
+    </form>
+  );
+}
+
+// 非制御コンポーネントの使いどころ
+// - ファイル入力（<input type="file">）
+// - サードパーティライブラリとの連携
+// - 送信時にだけ値が必要で、リアルタイムの制御が不要な場合`}
+              language="tsx"
+              title="非制御コンポーネントと useRef"
+              showLineNumbers
+            />
+
+            <div className="my-6 overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-border">
+                    <th className="text-left py-2 px-3 text-foreground">比較項目</th>
+                    <th className="text-left py-2 px-3 text-foreground">制御コンポーネント</th>
+                    <th className="text-left py-2 px-3 text-foreground">非制御コンポーネント</th>
+                  </tr>
+                </thead>
+                <tbody className="text-muted-foreground">
+                  <tr className="border-b border-border">
+                    <td className="py-2 px-3 font-medium">値の管理</td>
+                    <td className="py-2 px-3">useState</td>
+                    <td className="py-2 px-3">DOM（useRef）</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="py-2 px-3 font-medium">リアルタイム制御</td>
+                    <td className="py-2 px-3">可能</td>
+                    <td className="py-2 px-3">不可</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="py-2 px-3 font-medium">バリデーション</td>
+                    <td className="py-2 px-3">リアルタイムに可能</td>
+                    <td className="py-2 px-3">送信時のみ</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="py-2 px-3 font-medium">推奨度</td>
+                    <td className="py-2 px-3">React 推奨</td>
+                    <td className="py-2 px-3">特定のケースで使用</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <InfoBox type="success" title="基本は制御コンポーネント">
+              <p>
+                React の公式ドキュメントでは、ほとんどのケースで制御コンポーネントを使うことを推奨しています。非制御コンポーネントは、ファイル入力（<code>{'<input type="file">'}</code>）のように、プログラムから値を設定できない要素で使います。
               </p>
             </InfoBox>
           </section>
@@ -323,6 +413,20 @@ function CheckboxRadio() {
             />
           </section>
 
+          {/* Quiz 1 */}
+          <section>
+            <Quiz
+              question="制御コンポーネントで input の値を管理するために必要な props の組み合わせはどれですか？"
+              options={[
+                { label: 'defaultValue と onChange' },
+                { label: 'value と onChange', correct: true },
+                { label: 'ref と onChange' },
+                { label: 'value と onInput' },
+              ]}
+              explanation="制御コンポーネントでは、value で state の値を input に反映し、onChange で入力値を受け取って state を更新します。defaultValue は非制御コンポーネントで使う初期値設定用の prop です。ref も非制御コンポーネントのアプローチです。"
+            />
+          </section>
+
           {/* フォーム送信 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">フォーム送信（onSubmit）</h2>
@@ -341,94 +445,57 @@ function SignupForm() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();  // ページ再読み込みを防止
-
-    // バリデーション
     if (formData.password !== formData.confirmPassword) {
       alert('パスワードが一致しません');
       return;
     }
-
     setIsSubmitting(true);
-
-    // 実際の API 呼び出しのシミュレーション
     await new Promise((resolve) => setTimeout(resolve, 1500));
-
     console.log('送信データ:', formData);
     setIsSubmitting(false);
-    setSubmitted(true);
   };
-
-  if (submitted) {
-    return (
-      <div className="p-6 text-center">
-        <div className="text-4xl mb-4">&#x2705;</div>
-        <h2 className="text-xl font-bold">登録完了！</h2>
-        <p className="text-gray-500 mt-2">ようこそ、{formData.username}さん</p>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="p-6 max-w-md space-y-4">
       <h2 className="text-xl font-bold">アカウント作成</h2>
-
       <div>
         <label className="block text-sm font-medium mb-1">ユーザー名</label>
         <input
-          type="text"
-          value={formData.username}
+          type="text" value={formData.username}
           onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-          required
-          className="w-full px-3 py-2 border rounded-lg"
+          required className="w-full px-3 py-2 border rounded-lg"
         />
       </div>
-
       <div>
         <label className="block text-sm font-medium mb-1">メール</label>
         <input
-          type="email"
-          value={formData.email}
+          type="email" value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
-          className="w-full px-3 py-2 border rounded-lg"
+          required className="w-full px-3 py-2 border rounded-lg"
         />
       </div>
-
       <div>
         <label className="block text-sm font-medium mb-1">パスワード</label>
         <input
-          type="password"
-          value={formData.password}
+          type="password" value={formData.password}
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          required
-          minLength={8}
-          className="w-full px-3 py-2 border rounded-lg"
+          required minLength={8} className="w-full px-3 py-2 border rounded-lg"
         />
       </div>
-
       <div>
         <label className="block text-sm font-medium mb-1">パスワード（確認）</label>
         <input
-          type="password"
-          value={formData.confirmPassword}
+          type="password" value={formData.confirmPassword}
           onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-          required
-          className="w-full px-3 py-2 border rounded-lg"
+          required className="w-full px-3 py-2 border rounded-lg"
         />
       </div>
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
+      <button type="submit" disabled={isSubmitting}
         className={\`w-full py-2 rounded-lg text-white font-medium
-          \${isSubmitting
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-blue-500 hover:bg-blue-600'
-          }\`}
+          \${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}\`}
       >
         {isSubmitting ? '送信中...' : 'アカウントを作成'}
       </button>
@@ -586,6 +653,29 @@ function ProfileForm() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               ユーザーが正しい形式でデータを入力しているかをチェックするのがバリデーションです。リアルタイムバリデーションと送信時バリデーションの2つの方法があります。
             </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">リアルタイムバリデーション vs 送信時バリデーション</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="p-4 rounded-lg border border-border bg-card">
+                <h4 className="font-bold text-foreground mb-2">リアルタイムバリデーション</h4>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>- 入力中またはフォーカスが外れた時に検証</li>
+                  <li>- ユーザーにすぐフィードバックを返せる</li>
+                  <li>- パスワード強度表示などに最適</li>
+                  <li>- 過度に使うと煩わしい</li>
+                </ul>
+              </div>
+              <div className="p-4 rounded-lg border border-border bg-card">
+                <h4 className="font-bold text-foreground mb-2">送信時バリデーション</h4>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>- 送信ボタン押下時に一括検証</li>
+                  <li>- 入力中にエラーが出ないので快適</li>
+                  <li>- シンプルなフォームに最適</li>
+                  <li>- エラー箇所が一目でわかるようにする</li>
+                </ul>
+              </div>
+            </div>
+
             <CodeBlock
               code={`import { useState } from 'react';
 
@@ -740,88 +830,174 @@ function ValidatedForm() {
             </InfoBox>
           </section>
 
-          {/* 実践例: お問い合わせフォーム */}
+          {/* React Hook Form の紹介 */}
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">実践例: 完全なお問い合わせフォーム</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">React Hook Form の紹介</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
-              ここまでの知識を総合して、テキスト入力、セレクト、チェックボックス、バリデーション、送信処理を含む本格的なフォームを作ります。
+              ここまでの手動バリデーションで「コードが多い...」と感じた方もいるでしょう。実際のプロジェクトでは、フォームライブラリを使うことが一般的です。React Hook Form は最も人気のあるフォームライブラリの1つです。
+            </p>
+
+            <CodeBlock
+              code={`// React Hook Form を使わない場合（手動管理）
+// - 各フィールドごとに useState が必要
+// - handleChange を自分で書く
+// - バリデーション関数を自作
+// - errors, touched の管理も自前
+// → フィールドが増えるとコードが膨大に
+
+// React Hook Form を使う場合
+import { useForm } from 'react-hook-form';
+
+interface SignupData {
+  name: string;
+  email: string;
+  password: string;
+}
+
+function SignupWithRHF() {
+  const {
+    register,     // input に接続する関数
+    handleSubmit,  // 送信ハンドラ（バリデーション付き）
+    formState: { errors, isSubmitting },  // エラーと送信状態
+  } = useForm<SignupData>();
+
+  const onSubmit = async (data: SignupData) => {
+    // バリデーション通過後のデータが引数に入る
+    console.log(data);
+    await new Promise((r) => setTimeout(r, 1000));
+    alert(\`登録完了！ こんにちは、\${data.name}さん\`);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="p-6 max-w-md space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-1">名前</label>
+        <input
+          {...register('name', {
+            required: 'お名前は必須です',
+            minLength: { value: 2, message: '2文字以上で入力してください' },
+          })}
+          className="w-full px-3 py-2 border rounded-lg"
+        />
+        {errors.name && (
+          <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">メール</label>
+        <input
+          type="email"
+          {...register('email', {
+            required: 'メールアドレスは必須です',
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: '正しい形式で入力してください',
+            },
+          })}
+          className="w-full px-3 py-2 border rounded-lg"
+        />
+        {errors.email && (
+          <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">パスワード</label>
+        <input
+          type="password"
+          {...register('password', {
+            required: 'パスワードは必須です',
+            minLength: { value: 8, message: '8文字以上で入力してください' },
+          })}
+          className="w-full px-3 py-2 border rounded-lg"
+        />
+        {errors.password && (
+          <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+      >
+        {isSubmitting ? '送信中...' : '登録'}
+      </button>
+    </form>
+  );
+}`}
+              language="tsx"
+              title="React Hook Form でフォームをシンプルに"
+              showLineNumbers
+            />
+            <InfoBox type="info" title="なぜフォームライブラリを使うのか？">
+              <div className="space-y-2">
+                <p><strong>コード量の削減</strong>: useState、handleChange、バリデーション関数が不要になり、コードが大幅に短くなります。</p>
+                <p><strong>パフォーマンス</strong>: React Hook Form は非制御コンポーネントベースなので、入力のたびに再レンダリングが発生しません。大きなフォームでは大きな差になります。</p>
+                <p><strong>バリデーション</strong>: Zod や Yup などのスキーマライブラリと統合できます。</p>
+                <p><strong>まずは基本を理解してから</strong>: ライブラリの内部で何が起きているかを理解するために、制御コンポーネントの基本は必ず押さえておきましょう。</p>
+              </div>
+            </InfoBox>
+          </section>
+
+          {/* Quiz 2 */}
+          <section>
+            <Quiz
+              question="非制御コンポーネントで DOM から値を取得するために使う React の Hook はどれですか？"
+              options={[
+                { label: 'useState' },
+                { label: 'useEffect' },
+                { label: 'useRef', correct: true },
+                { label: 'useCallback' },
+              ]}
+              explanation="useRef は DOM 要素への参照を作成し、.current プロパティで DOM 要素にアクセスできます。非制御コンポーネントでは、useRef で input 要素を参照し、inputRef.current.value で値を取得します。useState は制御コンポーネントのアプローチです。"
+            />
+          </section>
+
+          {/* 実践例: 統合的なフォームパターン */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">実践パターン: フォームの状態管理</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              本格的なフォームでは、入力データだけでなく送信状態（idle / submitting / success / error）も管理する必要があります。以下のパターンを押さえておきましょう。
             </p>
             <CodeBlock
               code={`import { useState } from 'react';
 
-type InquiryType = 'general' | 'support' | 'partnership' | 'other';
-
-interface ContactFormData {
-  name: string;
-  email: string;
-  inquiryType: InquiryType;
-  subject: string;
-  message: string;
-  newsletter: boolean;
-  privacyPolicy: boolean;
-}
-
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
-function ContactForm() {
-  const [formData, setFormData] = useState<ContactFormData>({
-    name: '',
-    email: '',
-    inquiryType: 'general',
-    subject: '',
-    message: '',
-    newsletter: false,
-    privacyPolicy: false,
+function PracticalForm() {
+  const [formData, setFormData] = useState({
+    name: '', email: '', subject: '', message: '',
+    newsletter: false, privacyPolicy: false,
   });
-
   const [status, setStatus] = useState<FormStatus>('idle');
-  const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // 汎用 handleChange（テキスト + チェックボックス対応）
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, type } = e.target;
-    const value =
-      type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value;
-
+    const value = type === 'checkbox'
+      ? (e.target as HTMLInputElement).checked
+      : e.target.value;
     setFormData((prev) => ({ ...prev, [name]: value }));
-
-    // 入力中にエラーをクリア
-    if (errors[name as keyof ContactFormData]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
-
-  const validate = (): boolean => {
-    const newErrors: typeof errors = {};
-
-    if (!formData.name.trim()) newErrors.name = '必須項目です';
-    if (!formData.email.trim()) {
-      newErrors.email = '必須項目です';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = '正しい形式で入力してください';
-    }
-    if (!formData.subject.trim()) newErrors.subject = '必須項目です';
-    if (!formData.message.trim()) {
-      newErrors.message = '必須項目です';
-    } else if (formData.message.length < 10) {
-      newErrors.message = '10文字以上で入力してください';
-    }
-    if (!formData.privacyPolicy) {
-      newErrors.privacyPolicy = '同意が必要です';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    // バリデーション → 送信 → 状態管理
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) newErrors.name = '必須項目です';
+    if (!formData.email.trim()) newErrors.email = '必須項目です';
+    if (!formData.privacyPolicy) newErrors.privacyPolicy = '同意が必要です';
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
 
     setStatus('submitting');
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((r) => setTimeout(r, 2000)); // API 呼び出し
       setStatus('success');
     } catch {
       setStatus('error');
@@ -831,169 +1007,95 @@ function ContactForm() {
   // 送信完了画面
   if (status === 'success') {
     return (
-      <div className="p-8 max-w-md mx-auto text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-3xl">&#x2705;</span>
-        </div>
+      <div className="p-8 text-center">
         <h2 className="text-2xl font-bold mb-2">送信完了</h2>
-        <p className="text-gray-500">
-          お問い合わせありがとうございます。
-          <br />
-          2営業日以内にご返信いたします。
-        </p>
-        <button
-          onClick={() => {
-            setStatus('idle');
-            setFormData({
-              name: '', email: '', inquiryType: 'general',
-              subject: '', message: '', newsletter: false, privacyPolicy: false,
-            });
-          }}
-          className="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          新しいお問い合わせ
-        </button>
+        <p className="text-gray-500">ありがとうございます。</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 max-w-lg mx-auto space-y-5">
-      <h2 className="text-2xl font-bold">お問い合わせ</h2>
-      <p className="text-sm text-gray-500">
-        <span className="text-red-500">*</span> は必須項目です
-      </p>
-
+    <form onSubmit={handleSubmit} className="p-6 max-w-lg space-y-5">
       {status === 'error' && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-          送信に失敗しました。時間をおいて再度お試しください。
+          送信に失敗しました。再度お試しください。
         </div>
       )}
-
-      {/* 名前 */}
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          お名前 <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text" name="name" value={formData.name}
-          onChange={handleChange}
-          className={\`w-full px-3 py-2 border rounded-lg \${errors.name ? 'border-red-500' : ''}\`}
-        />
-        {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
-      </div>
-
-      {/* メール */}
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          メールアドレス <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="email" name="email" value={formData.email}
-          onChange={handleChange}
-          className={\`w-full px-3 py-2 border rounded-lg \${errors.email ? 'border-red-500' : ''}\`}
-        />
-        {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
-      </div>
-
-      {/* お問い合わせ種別 */}
-      <div>
-        <label className="block text-sm font-medium mb-1">お問い合わせ種別</label>
-        <select
-          name="inquiryType" value={formData.inquiryType}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded-lg bg-white"
-        >
-          <option value="general">一般的なお問い合わせ</option>
-          <option value="support">技術サポート</option>
-          <option value="partnership">パートナーシップ</option>
-          <option value="other">その他</option>
-        </select>
-      </div>
-
-      {/* 件名 */}
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          件名 <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text" name="subject" value={formData.subject}
-          onChange={handleChange}
-          className={\`w-full px-3 py-2 border rounded-lg \${errors.subject ? 'border-red-500' : ''}\`}
-        />
-        {errors.subject && <p className="text-sm text-red-500 mt-1">{errors.subject}</p>}
-      </div>
-
-      {/* メッセージ */}
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          メッセージ <span className="text-red-500">*</span>
-          <span className="text-gray-400 ml-2">{formData.message.length}/1000</span>
-        </label>
-        <textarea
-          name="message" value={formData.message}
-          onChange={(e) => {
-            if (e.target.value.length <= 1000) handleChange(e);
-          }}
-          rows={5}
-          className={\`w-full px-3 py-2 border rounded-lg resize-none \${errors.message ? 'border-red-500' : ''}\`}
-        />
-        {errors.message && <p className="text-sm text-red-500 mt-1">{errors.message}</p>}
-      </div>
-
-      {/* チェックボックス */}
-      <div className="space-y-3">
-        <label className="flex items-start gap-2 cursor-pointer">
-          <input
-            type="checkbox" name="newsletter"
-            checked={formData.newsletter}
-            onChange={handleChange}
-            className="w-4 h-4 mt-0.5"
-          />
-          <span className="text-sm">ニュースレターを受け取る（任意）</span>
-        </label>
-
-        <label className="flex items-start gap-2 cursor-pointer">
-          <input
-            type="checkbox" name="privacyPolicy"
-            checked={formData.privacyPolicy}
-            onChange={handleChange}
-            className="w-4 h-4 mt-0.5"
-          />
-          <span className={\`text-sm \${errors.privacyPolicy ? 'text-red-500' : ''}\`}>
-            プライバシーポリシーに同意する <span className="text-red-500">*</span>
-          </span>
-        </label>
-        {errors.privacyPolicy && (
-          <p className="text-sm text-red-500">{errors.privacyPolicy}</p>
-        )}
-      </div>
-
-      {/* 送信ボタン */}
-      <button
-        type="submit"
-        disabled={status === 'submitting'}
-        className={\`w-full py-3 rounded-lg text-white font-medium transition-colors
-          \${status === 'submitting'
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-blue-500 hover:bg-blue-600'
-          }\`}
-      >
-        {status === 'submitting' ? (
-          <span className="flex items-center justify-center gap-2">
-            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            送信中...
-          </span>
-        ) : (
-          '送信する'
-        )}
+      {/* 各フィールド: name属性 + handleChange + errors表示 */}
+      <input name="name" value={formData.name} onChange={handleChange} />
+      {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+      {/* ... 他のフィールドも同じパターン ... */}
+      <button type="submit" disabled={status === 'submitting'}>
+        {status === 'submitting' ? '送信中...' : '送信する'}
       </button>
     </form>
   );
 }`}
               language="tsx"
-              title="完全なお問い合わせフォーム"
+              title="フォーム状態管理の実践パターン"
               showLineNumbers
+            />
+            <InfoBox type="success" title="実践フォームのポイント">
+              <div className="space-y-1">
+                <p><strong>状態管理</strong>: formData（入力値）、errors（エラー）、status（送信状態）の3つを分けて管理</p>
+                <p><strong>汎用ハンドラ</strong>: name 属性 + Computed Property で1つの handleChange で全フィールドを管理</p>
+                <p><strong>UX</strong>: 送信中はボタンを無効化し、完了画面・エラー表示を条件分岐で切り替える</p>
+              </div>
+            </InfoBox>
+          </section>
+
+          {/* CodingChallenge */}
+          <section>
+            <CodingChallenge
+              title="バリデーション付きサインアップフォーム"
+              description="サインアップフォームのバリデーション関数を完成させてください。条件: (1) name は必須かつ2文字以上、(2) email は必須かつメール形式、(3) password は必須かつ8文字以上。エラーがあればオブジェクトにメッセージを設定し、なければ空のオブジェクトを返してください。"
+              initialCode={`interface Errors {
+  name?: string;
+  email?: string;
+  password?: string;
+}
+
+function validate(name: string, email: string, password: string): Errors {
+  const errors: Errors = {};
+
+  // ここにバリデーションロジックを書いてください
+
+  return errors;
+}`}
+              answer={`interface Errors {
+  name?: string;
+  email?: string;
+  password?: string;
+}
+
+function validate(name: string, email: string, password: string): Errors {
+  const errors: Errors = {};
+
+  if (!name.trim()) {
+    errors.name = 'お名前は必須です';
+  } else if (name.length < 2) {
+    errors.name = '2文字以上で入力してください';
+  }
+
+  if (!email.trim()) {
+    errors.email = 'メールアドレスは必須です';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = '正しいメールアドレスの形式で入力してください';
+  }
+
+  if (!password.trim()) {
+    errors.password = 'パスワードは必須です';
+  } else if (password.length < 8) {
+    errors.password = '8文字以上で入力してください';
+  }
+
+  return errors;
+}`}
+              hints={[
+                'まず各フィールドが空でないかを .trim() で確認し、空なら「必須です」のエラーを設定します。',
+                'メール形式のチェックには正規表現 /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ を使えます。',
+                'if-else if の形で、「空チェック」→「形式・長さチェック」の順に書くとスッキリします。',
+              ]}
             />
           </section>
 
@@ -1005,6 +1107,7 @@ function ContactForm() {
                 <h3 className="font-bold text-foreground mb-2">フォームの基本</h3>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>- value + onChange = 制御コンポーネント</li>
+                  <li>- ref + defaultValue = 非制御コンポーネント</li>
                   <li>- onSubmit + preventDefault でフォーム送信</li>
                   <li>- name 属性で汎用ハンドラを実現</li>
                   <li>- チェックボックスは checked + onChange</li>
@@ -1017,14 +1120,53 @@ function ContactForm() {
                   <li>- 送信中は loading 表示 + ボタン無効化</li>
                   <li>- エラー/成功状態を明確に伝える</li>
                   <li>- 必須項目は * で示す</li>
+                  <li>- 複雑なフォームにはライブラリを検討</li>
                 </ul>
               </div>
             </div>
-            <InfoBox type="info" title="次のステップ">
-              <p>
-                ここで作ったフォームは useState で十分管理できますが、フォームが複雑になると React Hook Form や Zod などのライブラリが活躍します。まずは基本の制御コンポーネントパターンをしっかり理解しておきましょう。
-              </p>
-            </InfoBox>
+          </section>
+
+          {/* ReferenceLinks */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'React 公式: Sharing State Between Components',
+                  url: 'https://react.dev/learn/sharing-state-between-components',
+                  description: 'フォームの状態を親コンポーネントで管理し、子コンポーネント間で共有する方法',
+                },
+                {
+                  title: 'React Hook Form 公式サイト',
+                  url: 'https://react-hook-form.com/',
+                  description: 'パフォーマンスに優れたフォームライブラリ。バリデーション、エラーハンドリングをシンプルに実装できる',
+                },
+                {
+                  title: 'React 公式: Referencing Values with Refs',
+                  url: 'https://react.dev/learn/referencing-values-with-refs',
+                  description: 'useRef の使い方と、DOM 要素への参照を扱う方法',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: '制御コンポーネントと非制御コンポーネント、どっちがいい？',
+                  answer: '基本的には制御コンポーネントが推奨です。リアルタイムバリデーション、入力値のフォーマット、条件付きの入力制限など、あらゆる制御が可能だからです。非制御コンポーネントは、ファイル入力や、大量のフィールドがあってパフォーマンスが気になるケース、サードパーティライブラリとの連携時に使います。React Hook Form は内部で非制御コンポーネントを使っているため、再レンダリングが少なく高パフォーマンスです。',
+                },
+                {
+                  question: 'フォームライブラリは最初から使うべき？',
+                  answer: '学習段階では、まず useState と onChange による制御コンポーネントの仕組みを理解するのが大切です。基本を理解した上でライブラリを使えば、何が起きているか分かるので効率的に使えます。実際のプロジェクトでは、フィールドが5つ以上あるフォームや複雑なバリデーションが必要な場合に React Hook Form を導入するのがおすすめです。',
+                },
+                {
+                  question: 'ファイルアップロードはどう実装する？',
+                  answer: 'ファイル入力（<input type="file">）は制御コンポーネントにできないため、useRef で参照するか、onChange で FileList を state に保存します。例: onChange={(e) => setFile(e.target.files?.[0] ?? null)} のように書きます。アップロード先の API には FormData オブジェクトを使って送信するのが一般的です。ドラッグ&ドロップ対応には react-dropzone などのライブラリが便利です。',
+                },
+              ]}
+            />
           </section>
         </div>
 

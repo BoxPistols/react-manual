@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function CustomHooks() {
   return (
@@ -69,7 +73,7 @@ function DarkModeSwitch() {
 
   return (
     <button onClick={toggle}>
-      {isDark ? '🌙 ダーク' : '☀️ ライト'}
+      {isDark ? 'ダーク' : 'ライト'}
     </button>
   );
 }`}
@@ -489,7 +493,280 @@ function useDebounce<T>(value: T, delay: number): T {
             </div>
           </section>
 
-          {/* セクション 6: カスタム Hook の設計ガイド */}
+          {/* セクション 6: OSS のカスタム Hooks ライブラリ */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">よく使われる OSS のカスタム Hooks</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              自分でカスタム Hook を一から作る前に、既に広く使われている OSS ライブラリを確認しましょう。
+              実績のあるライブラリを使えば、エッジケースやバグ対応も含めて高品質な Hook が手に入ります。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">usehooks-ts</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              TypeScript で書かれた軽量なカスタム Hooks コレクションです。
+              依存関係がなく、必要な Hook だけをインポートできます。
+            </p>
+            <CodeBlock
+              language="tsx"
+              title="usehooks-ts の主要な Hook"
+              code={`import { useLocalStorage } from 'usehooks-ts';
+import { useMediaQuery } from 'usehooks-ts';
+import { useDebounceValue } from 'usehooks-ts';
+import { useClickOutside } from 'usehooks-ts';
+import { useCopyToClipboard } from 'usehooks-ts';
+import { useEventListener } from 'usehooks-ts';
+import { useInterval } from 'usehooks-ts';
+import { useIsClient } from 'usehooks-ts';
+
+// useLocalStorage: localStorage との同期（SSR 対応済み）
+const [theme, setTheme] = useLocalStorage('theme', 'light');
+
+// useMediaQuery: CSS メディアクエリを JavaScript で判定
+const isMobile = useMediaQuery('(max-width: 768px)');
+const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
+
+// useDebounceValue: 値のデバウンス
+const [debouncedValue] = useDebounceValue(searchQuery, 300);
+
+// useCopyToClipboard: クリップボードへのコピー
+const [copiedText, copy] = useCopyToClipboard();`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">ahooks</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              Alibaba が開発する包括的なカスタム Hooks ライブラリです。
+              60 以上の Hook が用意されており、大規模アプリケーション向けの高度な Hook も含まれています。
+            </p>
+            <CodeBlock
+              language="tsx"
+              title="ahooks の主要な Hook"
+              code={`import { useRequest } from 'ahooks';
+import { useInfiniteScroll } from 'ahooks';
+import { useVirtualList } from 'ahooks';
+import { useDrag, useDrop } from 'ahooks';
+
+// useRequest: データ取得の高機能 Hook
+// キャッシュ、ポーリング、スロットリング、ページネーションなど
+const { data, loading, error, run } = useRequest(
+  (params) => fetch(\`/api/users?\${params}\`).then((r) => r.json()),
+  {
+    debounceWait: 300,        // デバウンス
+    pollingInterval: 5000,    // 5秒ごとにポーリング
+    cacheKey: 'user-list',    // キャッシュ
+    retryCount: 3,            // エラー時のリトライ
+  }
+);
+
+// useInfiniteScroll: 無限スクロール
+const { data: list, loadMore, loading: scrollLoading } = useInfiniteScroll(
+  (d) => fetchList(d?.nextCursor)
+);`}
+            />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="info" title="自作 vs ライブラリの判断基準">
+                <p>
+                  シンプルな Hook（useToggle, useDebounce など）は自作で十分学習にもなります。
+                  一方、useLocalStorage（SSR 対応やストレージイベント同期）や useRequest（キャッシュ、リトライ、ポーリング）のように
+                  エッジケースが多い Hook はライブラリを使う方が安全です。
+                  プロジェクトの規模と要件に応じて判断しましょう。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 7: カスタム Hook のテスト方法 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">カスタム Hook のテスト方法</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              カスタム Hook の大きなメリットの一つは、UI なしでロジックをテストできることです。
+              <code className="text-sm bg-muted px-1.5 py-0.5 rounded">@testing-library/react</code> の
+              <code className="text-sm bg-muted px-1.5 py-0.5 rounded">renderHook</code> を使えば、
+              コンポーネントを描画せずに Hook のテストが書けます。
+            </p>
+
+            <CodeBlock
+              language="tsx"
+              title="useToggle のテスト"
+              showLineNumbers
+              code={`import { renderHook, act } from '@testing-library/react';
+import { useToggle } from './useToggle';
+
+describe('useToggle', () => {
+  test('初期値が false であること', () => {
+    const { result } = renderHook(() => useToggle());
+    expect(result.current.value).toBe(false);
+  });
+
+  test('初期値を true に設定できること', () => {
+    const { result } = renderHook(() => useToggle(true));
+    expect(result.current.value).toBe(true);
+  });
+
+  test('toggle で値が反転すること', () => {
+    const { result } = renderHook(() => useToggle());
+
+    // act で state 更新をラップする
+    act(() => {
+      result.current.toggle();
+    });
+
+    expect(result.current.value).toBe(true);
+
+    act(() => {
+      result.current.toggle();
+    });
+
+    expect(result.current.value).toBe(false);
+  });
+
+  test('setTrue で true に、setFalse で false になること', () => {
+    const { result } = renderHook(() => useToggle());
+
+    act(() => {
+      result.current.setTrue();
+    });
+    expect(result.current.value).toBe(true);
+
+    act(() => {
+      result.current.setFalse();
+    });
+    expect(result.current.value).toBe(false);
+  });
+});`}
+            />
+
+            <CodeBlock
+              language="tsx"
+              title="useDebounce のテスト（タイマーを使う場合）"
+              showLineNumbers
+              code={`import { renderHook, act } from '@testing-library/react';
+import { useDebounce } from './useDebounce';
+
+describe('useDebounce', () => {
+  // Jest のフェイクタイマーを使う
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test('指定時間後に値が更新されること', () => {
+    const { result, rerender } = renderHook(
+      ({ value, delay }) => useDebounce(value, delay),
+      { initialProps: { value: 'hello', delay: 300 } }
+    );
+
+    // 初期値
+    expect(result.current).toBe('hello');
+
+    // 値を変更
+    rerender({ value: 'world', delay: 300 });
+
+    // まだ 300ms 経っていないので変わらない
+    expect(result.current).toBe('hello');
+
+    // 300ms 経過させる
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
+
+    // 更新されている
+    expect(result.current).toBe('world');
+  });
+});`}
+            />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="success" title="テストのポイント">
+                <p>
+                  <strong>renderHook</strong> で Hook を描画し、<strong>result.current</strong> で現在の戻り値にアクセスします。
+                  state を更新する操作は <strong>act()</strong> でラップする必要があります。
+                  rerender で props を変更したテストや、jest.useFakeTimers() でタイマーを制御したテストも可能です。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 8: use の新しい規約（React 19） */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">use の新しい規約: React 19 の use API</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              React 19 では新しい <code className="text-sm bg-muted px-1.5 py-0.5 rounded">use</code> API が追加されました。
+              これは従来の Hook とは異なり、条件分岐やループの中でも呼べる特別な API です。
+              Promise や Context を読み取るために使います。
+            </p>
+
+            <CodeBlock
+              language="tsx"
+              title="use API の基本"
+              showLineNumbers
+              code={`import { use, Suspense } from 'react';
+
+// use は Promise を読み取れる
+// Suspense と組み合わせて非同期データを宣言的に扱う
+function UserProfile({ userPromise }: { userPromise: Promise<User> }) {
+  // use() で Promise の結果を取得
+  // データが準備できるまで Suspense の fallback が表示される
+  const user = use(userPromise);
+
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+
+// 親コンポーネント
+function App() {
+  const userPromise = fetchUser(1); // Promise を作成
+
+  return (
+    <Suspense fallback={<p>読み込み中...</p>}>
+      <UserProfile userPromise={userPromise} />
+    </Suspense>
+  );
+}`}
+            />
+
+            <CodeBlock
+              language="tsx"
+              title="use で Context を読み取る（条件分岐内でも OK）"
+              code={`import { use } from 'react';
+import { ThemeContext } from './ThemeContext';
+
+function StatusMessage({ isLoggedIn }: { isLoggedIn: boolean }) {
+  // use は条件分岐の中で呼べる！（従来の useContext ではNG）
+  if (isLoggedIn) {
+    const theme = use(ThemeContext);
+    return (
+      <p style={{ color: theme === 'dark' ? 'white' : 'black' }}>
+        ログイン中です
+      </p>
+    );
+  }
+
+  return <p>ログインしてください</p>;
+}`}
+            />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="info" title="use API と従来の Hook の違い">
+                <p>
+                  従来の Hook（useState, useEffect など）はコンポーネントのトップレベルでしか呼べませんが、
+                  <code>use</code> は条件分岐やループの中でも呼べます。
+                  ただし <code>use</code> はあくまで Promise や Context の読み取りに限定されており、
+                  useState や useEffect の代わりにはなりません。
+                  既存の Hook のルールは引き続き有効です。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 9: カスタム Hook の設計ガイド */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">カスタム Hook の設計ガイド</h2>
 
@@ -553,7 +830,7 @@ const { data, loading } = useFetch('/api/users');
             </div>
           </section>
 
-          {/* セクション 7: ファイル構成 */}
+          {/* セクション 10: ファイル構成 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">プロジェクトでのファイル構成</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -585,14 +862,91 @@ const { data, loading } = useFetch('/api/users');
                 <p>カスタム Hook でも、React の Hook ルールは同じです:</p>
                 <ul className="list-disc list-inside mt-2 space-y-1">
                   <li>Hook はコンポーネントまたはカスタム Hook のトップレベルでのみ呼ぶ</li>
-                  <li>条件分岐やループの中で Hook を呼ばない</li>
+                  <li>条件分岐やループの中で Hook を呼ばない（use API は例外）</li>
                   <li>名前は必ず <code>use</code> で始める</li>
                 </ul>
               </InfoBox>
             </div>
           </section>
 
-          {/* セクション 8: まとめ */}
+          {/* Quiz 1 */}
+          <section>
+            <Quiz
+              question="カスタム Hook を作るべきタイミングとして最も適切なものはどれですか？"
+              options={[
+                { label: 'すべてのコンポーネントのロジックをカスタム Hook にすべき' },
+                { label: '同じロジック（useState + useEffect のパターン）が 2 箇所以上で使われている場合', correct: true },
+                { label: 'コンポーネントが 1 つの useState を使っている場合' },
+                { label: 'CSS のスタイリングを管理する場合' },
+              ]}
+              explanation="カスタム Hook の主な目的は「ロジックの再利用」です。同じパターン（特に useState + useEffect の組み合わせ）が複数のコンポーネントで使われている場合に、カスタム Hook として抽出するのが適切です。単純な useState 1 つだけなら Hook に抽出する必要はありません。"
+            />
+          </section>
+
+          {/* Quiz 2 */}
+          <section>
+            <Quiz
+              question="React 19 の use API について正しい説明はどれですか？"
+              options={[
+                { label: 'useState の代替として使える新しい API' },
+                { label: 'Promise や Context を読み取るための API で、条件分岐内でも呼べる', correct: true },
+                { label: 'すべての Hook を条件分岐内で呼べるようにする API' },
+                { label: 'useEffect の代替として非同期処理を扱う API' },
+              ]}
+              explanation="use は Promise や Context の読み取りに使える新しい API で、従来の Hook のルール（トップレベルでのみ呼ぶ）に縛られず、条件分岐やループ内でも呼べます。ただし useState や useEffect の代替ではなく、既存の Hook のルールは引き続き有効です。"
+            />
+          </section>
+
+          {/* CodingChallenge */}
+          <section>
+            <CodingChallenge
+              title="useMediaQuery カスタム Hook を作成する"
+              description="CSS メディアクエリの結果を返すカスタム Hook useMediaQuery を実装してください。引数にメディアクエリ文字列（例: '(max-width: 768px)'）を受け取り、マッチするかどうかの boolean を返します。window.matchMedia を使い、メディアクエリの変化を監視して結果をリアクティブに更新してください。"
+              initialCode={`function useMediaQuery(query: string): boolean {
+  // ここに実装してください
+  // 1. window.matchMedia で初期値を取得
+  // 2. useEffect でメディアクエリの変化を監視
+  // 3. クリーンアップでリスナーを解除
+}`}
+              answer={`function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() => {
+    return window.matchMedia(query).matches;
+  });
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query);
+
+    const handler = (event: MediaQueryListEvent) => {
+      setMatches(event.matches);
+    };
+
+    // 変化を監視
+    mediaQuery.addEventListener('change', handler);
+
+    // 初回のクエリ変更にも対応
+    setMatches(mediaQuery.matches);
+
+    // クリーンアップ
+    return () => {
+      mediaQuery.removeEventListener('change', handler);
+    };
+  }, [query]);
+
+  return matches;
+}
+
+// 使い方
+// const isMobile = useMediaQuery('(max-width: 768px)');
+// const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');`}
+              hints={[
+                'window.matchMedia(query) で MediaQueryList オブジェクトを取得できます。',
+                'MediaQueryList の addEventListener("change", handler) で変化を監視します。',
+                'handler の引数 event.matches がマッチ結果（boolean）です。',
+              ]}
+            />
+          </section>
+
+          {/* セクション 11: まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
             <div className="bg-muted/30 rounded-xl p-6 space-y-3">
@@ -610,9 +964,60 @@ const { data, loading } = useFetch('/api/users');
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-primary font-bold text-lg">4</span>
-                <p className="text-muted-foreground"><strong>hooks/ ディレクトリにまとめる</strong>。名前で何をする Hook かわかるようにし、戻り値は配列またはオブジェクトで返す</p>
+                <p className="text-muted-foreground"><strong>OSS ライブラリを活用</strong>。usehooks-ts や ahooks には実績ある Hook が豊富に揃っている</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">5</span>
+                <p className="text-muted-foreground"><strong>renderHook でテスト</strong>。UI なしでカスタム Hook のロジックを検証できる</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">6</span>
+                <p className="text-muted-foreground"><strong>React 19 の use API</strong>。Promise や Context の読み取りに使え、条件分岐内でも呼べる新しい規約</p>
               </div>
             </div>
+          </section>
+
+          {/* ReferenceLinks */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'カスタムフックでロジックを再利用する - React 公式ガイド',
+                  url: 'https://ja.react.dev/learn/reusing-logic-with-custom-hooks',
+                  description: 'カスタム Hook の作り方、命名規則、設計パターンを学べるチュートリアル',
+                },
+                {
+                  title: 'use - React 公式リファレンス',
+                  url: 'https://ja.react.dev/reference/react/use',
+                  description: 'React 19 で追加された use API の仕様と使い方',
+                },
+                {
+                  title: 'usehooks-ts 公式サイト',
+                  url: 'https://usehooks-ts.com/',
+                  description: 'TypeScript 製カスタム Hook コレクション。ソースコード付きで学習にも最適',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'カスタム Hook の中で別のカスタム Hook を呼べますか？',
+                  answer: 'はい、カスタム Hook の中で他のカスタム Hook を自由に呼べます。たとえば useFetch の中で useDebounce を使ったり、useTheme の中で useLocalStorage を使ったりできます。これがカスタム Hook の強力な点で、小さな Hook を組み合わせて大きな Hook を作る「コンポジション」が可能です。',
+                },
+                {
+                  question: '同じカスタム Hook を複数のコンポーネントで使うと state は共有されますか？',
+                  answer: 'いいえ、共有されません。カスタム Hook はロジックの再利用であり、state の共有ではありません。各コンポーネントが同じカスタム Hook を呼ぶと、それぞれ独立した state が作られます。state を共有したい場合は useContext と組み合わせる必要があります。',
+                },
+                {
+                  question: 'usehooks-ts と ahooks のどちらを選ぶべきですか？',
+                  answer: 'usehooks-ts は軽量で依存関係がなく、必要な Hook だけをインポートできるため、小〜中規模のプロジェクトに適しています。ahooks は 60 以上の Hook を提供し、useRequest（高度なデータ取得）や useVirtualList（仮想リスト）など大規模アプリ向けの Hook も揃っています。プロジェクトの規模と必要な機能に応じて選びましょう。',
+                },
+              ]}
+            />
           </section>
         </div>
 

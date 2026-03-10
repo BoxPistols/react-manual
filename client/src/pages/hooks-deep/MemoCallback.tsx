@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function MemoCallback() {
   return (
@@ -242,7 +246,7 @@ const Chart = memo(function Chart({
     <div>
       {data.labels.map((label, i) => (
         <div key={label}>
-          {label}: {'█'.repeat(data.values[i])}
+          {label}: {'|'.repeat(data.values[i])}
         </div>
       ))}
     </div>
@@ -397,7 +401,154 @@ function TodoList() {
             </div>
           </section>
 
-          {/* セクション 5: いつ使うべきか */}
+          {/* セクション 5: React DevTools Profiler での計測方法 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">React DevTools Profiler で計測する</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              パフォーマンス最適化は「勘」で行うべきではありません。
+              React DevTools の Profiler を使えば、どのコンポーネントがいつ再レンダーされ、
+              どれだけ時間がかかっているかを正確に計測できます。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">Profiler の使い方</h3>
+            <div className="bg-muted/30 rounded-xl p-6 mb-6 space-y-3">
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">1</span>
+                <p className="text-muted-foreground">
+                  <strong>React DevTools 拡張機能をインストール</strong>。
+                  Chrome Web Store または Firefox Add-ons から「React Developer Tools」を追加します。
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">2</span>
+                <p className="text-muted-foreground">
+                  <strong>DevTools を開き「Profiler」タブを選択</strong>。
+                  Components タブの右隣にあります。
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">3</span>
+                <p className="text-muted-foreground">
+                  <strong>録画ボタン（青い丸）をクリック</strong>してから操作し、再度クリックして停止。
+                  フレームグラフが表示されます。
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">4</span>
+                <p className="text-muted-foreground">
+                  <strong>フレームグラフを分析</strong>。黄色やオレンジのバーは再レンダーが重いコンポーネントを示します。
+                  グレーのバーは再レンダーがスキップされたコンポーネントです。
+                </p>
+              </div>
+            </div>
+
+            <CodeBlock
+              language="tsx"
+              title="Profiler で確認すべきポイント"
+              code={`// Profiler で以下の点を確認する:
+
+// 1. 不要な再レンダーがないか
+//    → 変わっていない子コンポーネントが毎回レンダーされていないか
+//    → React.memo + useCallback/useMemo で解決
+
+// 2. レンダー時間が長いコンポーネントはないか
+//    → 1回のレンダーに 16ms 以上かかると 60fps を下回る
+//    → useMemo で重い計算をキャッシュ
+
+// 3. 再レンダーの原因を特定する
+//    Profiler の「Why did this render?」機能で原因がわかる
+//    （設定でオンにする必要がある）`}
+            />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="info" title="Highlight Updates を活用する">
+                <p>
+                  React DevTools の Components タブにある設定で「Highlight updates when components render」
+                  をオンにすると、再レンダーされたコンポーネントが画面上で光ります。
+                  これにより、どの操作でどのコンポーネントが再レンダーされるかを視覚的に確認できます。
+                  過剰に光るコンポーネントが最適化の候補です。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 6: 過剰な最適化のアンチパターン */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">過剰な最適化のアンチパターン</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              useMemo と useCallback は強力なツールですが、使いすぎるとむしろ逆効果になります。
+              「すべてをメモ化する」のはアンチパターンです。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">アンチパターン 1: 軽い計算のメモ化</h3>
+            <CodeBlock
+              language="tsx"
+              title="NG: useMemo のコストの方が高い"
+              code={`// NG: こんな軽い計算に useMemo は不要
+const fullName = useMemo(
+  () => \`\${firstName} \${lastName}\`,
+  [firstName, lastName]
+);
+
+// OK: ただの変数で十分
+const fullName = \`\${firstName} \${lastName}\`;
+
+// NG: 短い配列のマップに useMemo は不要
+const options = useMemo(
+  () => items.map((item) => ({ value: item.id, label: item.name })),
+  [items]
+);
+
+// OK: items が数十件なら直接計算しても十分高速
+const options = items.map((item) => ({ value: item.id, label: item.name }));`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">アンチパターン 2: memo なしの useCallback</h3>
+            <CodeBlock
+              language="tsx"
+              title="NG: 子が memo されていないのに useCallback"
+              code={`// NG: Child が memo されていないなら useCallback は無意味
+// 親が再レンダーされれば Child は必ず再レンダーされる
+function Parent() {
+  const handleClick = useCallback(() => {
+    console.log('クリック');
+  }, []);
+
+  return <Child onClick={handleClick} />; // Child は memo なし
+}
+
+function Child({ onClick }: { onClick: () => void }) {
+  return <button onClick={onClick}>クリック</button>;
+}
+
+// OK: Child が memo されていないなら普通の関数で十分
+function Parent() {
+  const handleClick = () => {
+    console.log('クリック');
+  };
+
+  return <Child onClick={handleClick} />;
+}`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">アンチパターン 3: すべてをメモ化する</h3>
+            <div className="mb-6">
+              <InfoBox type="warning" title="過剰な最適化は害になる">
+                <p>
+                  useMemo / useCallback 自体にもコスト（メモリ使用量・比較処理）があります。
+                  以下の場合は使わないほうがよいです:
+                </p>
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>計算が軽い（単純な算術、短い配列の処理）</li>
+                  <li>子コンポーネントが React.memo されていない</li>
+                  <li>パフォーマンスの問題が実際に起きていない</li>
+                  <li>依存配列が頻繁に変わる（メモ化が毎回無効になる）</li>
+                </ul>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 7: いつ使うべきか */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">いつ使うべき？ 判断フローチャート</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -421,46 +572,88 @@ function TodoList() {
                 <li>カスタム Hook から返す関数を安定させたい</li>
               </ul>
             </div>
+          </section>
 
-            <div className="mb-6">
-              <InfoBox type="warning" title="過剰な最適化は害になる">
-                <p>
-                  useMemo / useCallback 自体にもコスト（メモリ使用量・比較処理）があります。
-                  以下の場合は使わないほうがよいです:
-                </p>
-                <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>計算が軽い（単純な算術、短い配列の処理）</li>
-                  <li>子コンポーネントが React.memo されていない</li>
-                  <li>パフォーマンスの問題が実際に起きていない</li>
-                </ul>
-              </InfoBox>
+          {/* セクション 8: React Compiler の紹介 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">React Compiler: メモ化の自動化</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              React チームは <strong>React Compiler</strong>（旧称 React Forget）を開発しています。
+              これはビルド時にコードを解析し、useMemo や useCallback を自動的に挿入してくれるコンパイラです。
+            </p>
+
+            <div className="bg-muted/30 rounded-xl p-6 mb-6 space-y-3">
+              <h3 className="font-bold text-foreground">React Compiler のポイント</h3>
+              <ul className="list-disc list-inside text-muted-foreground space-y-2">
+                <li>
+                  <strong>手動のメモ化が不要になる</strong>: useMemo, useCallback, React.memo を書かなくても、
+                  コンパイラが自動的にメモ化してくれる
+                </li>
+                <li>
+                  <strong>React 19 以降で利用可能</strong>: 既に Meta 社内（Instagram など）で使われており、
+                  段階的にオープンソースとして公開されている
+                </li>
+                <li>
+                  <strong>既存のコードと互換性あり</strong>: 手動で書いた useMemo/useCallback があっても問題なく動作する
+                </li>
+                <li>
+                  <strong>コンポーネントのルールに従うことが前提</strong>: 純粋でない関数やルール違反のコードでは
+                  最適化がスキップされる
+                </li>
+              </ul>
             </div>
 
             <CodeBlock
               language="tsx"
-              title="useMemo が不要なケース"
-              code={`// NG: こんな軽い計算に useMemo は不要
-const fullName = useMemo(
-  () => \`\${firstName} \${lastName}\`,
-  [firstName, lastName]
-);
+              title="React Compiler 導入前後の比較"
+              code={`// React Compiler 導入前: 手動でメモ化が必要
+function TodoList({ todos, onToggle }: TodoListProps) {
+  const handleToggle = useCallback((id: number) => {
+    onToggle(id);
+  }, [onToggle]);
 
-// OK: ただの変数で十分
-const fullName = \`\${firstName} \${lastName}\`;
+  const sortedTodos = useMemo(
+    () => [...todos].sort((a, b) => a.text.localeCompare(b.text)),
+    [todos]
+  );
 
-// NG: 子が memo されていないのに useCallback を使う
-const handleClick = useCallback(() => {
-  setCount(count + 1);
-}, [count]);
+  return (
+    <ul>
+      {sortedTodos.map((todo) => (
+        <MemoizedTodoItem key={todo.id} todo={todo} onToggle={handleToggle} />
+      ))}
+    </ul>
+  );
+}
 
-// OK: 子が memo されていないなら普通の関数で十分
-const handleClick = () => {
-  setCount(count + 1);
-};`}
+// React Compiler 導入後: シンプルに書くだけでOK
+// コンパイラが自動的にメモ化してくれる
+function TodoList({ todos, onToggle }: TodoListProps) {
+  const sortedTodos = [...todos].sort((a, b) => a.text.localeCompare(b.text));
+
+  return (
+    <ul>
+      {sortedTodos.map((todo) => (
+        <TodoItem key={todo.id} todo={todo} onToggle={onToggle} />
+      ))}
+    </ul>
+  );
+}`}
             />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="info" title="今 useMemo/useCallback を学ぶべき？">
+                <p>
+                  React Compiler が普及すれば手動のメモ化は減りますが、今学ぶ価値は十分あります。
+                  (1) 多くの既存プロジェクトではまだ手動メモ化が必要、
+                  (2) コンパイラが何をしているかを理解するには基礎知識が必要、
+                  (3) 「なぜメモ化が必要か」を理解することで React の再レンダーの仕組みが深く理解できます。
+                </p>
+              </InfoBox>
+            </div>
           </section>
 
-          {/* セクション 6: 実践パターン */}
+          {/* セクション 9: 実践パターン */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">実践: 検索フィルター付きの商品一覧</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -572,7 +765,103 @@ function ProductCatalog({ products }: { products: Product[] }) {
             />
           </section>
 
-          {/* セクション 7: まとめ */}
+          {/* Quiz 1 */}
+          <section>
+            <Quiz
+              question="React.memo でラップしたコンポーネントに、親から毎回新しいオブジェクトを props として渡すとどうなりますか？"
+              options={[
+                { label: 'React.memo が深い比較を行い、値が同じなら再レンダーをスキップする' },
+                { label: 'オブジェクトの参照が毎回変わるため、memo が効かず毎回再レンダーされる', correct: true },
+                { label: 'React がエラーを出す' },
+                { label: 'React.memo が自動的に useMemo を適用する' },
+              ]}
+              explanation="React.memo は props を浅い比較（===）で判定します。オブジェクトは毎回新しい参照が作られるため === で false となり、memo が効きません。この問題を解決するには、親コンポーネントで useMemo を使ってオブジェクトの参照を安定させる必要があります。"
+            />
+          </section>
+
+          {/* Quiz 2 */}
+          <section>
+            <Quiz
+              question="useCallback の依存配列を空 [] にしたとき、コールバック内で state の最新値を使うにはどうすべきですか？"
+              options={[
+                { label: '依存配列に state を追加する' },
+                { label: 'state 更新関数の関数形式（prev => ...）を使う', correct: true },
+                { label: 'useRef で state を参照する' },
+                { label: 'useCallback を使わずに通常の関数として定義する' },
+              ]}
+              explanation="setTodos(prev => prev.filter(...)) のように関数形式で state を更新すると、コールバック関数が state 変数を直接参照せずに済むため、依存配列を空にできます。これにより関数の参照が安定し、React.memo された子コンポーネントの不要な再レンダーを防げます。"
+            />
+          </section>
+
+          {/* CodingChallenge */}
+          <section>
+            <CodingChallenge
+              title="重い計算のメモ化とフィルタリング"
+              description="10,000件の数値配列 numbers を受け取り、(1) query に一致する数値をフィルタリングし、(2) フィルタリング結果の合計を計算するコンポーネントを完成させてください。filteredNumbers と total の両方を useMemo でメモ化してください。query が変わらない限り再計算されないようにします。"
+              initialCode={`function NumberFilter({ numbers }: { numbers: number[] }) {
+  const [query, setQuery] = useState('');
+
+  // ここに useMemo でフィルタリングを実装
+  const filteredNumbers = // ...
+
+  // ここに useMemo で合計を計算
+  const total = // ...
+
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="数値で絞り込み..."
+      />
+      <p>件数: {filteredNumbers.length} / 合計: {total}</p>
+      <ul>
+        {filteredNumbers.slice(0, 100).map((n, i) => (
+          <li key={i}>{n}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}`}
+              answer={`function NumberFilter({ numbers }: { numbers: number[] }) {
+  const [query, setQuery] = useState('');
+
+  const filteredNumbers = useMemo(() => {
+    if (!query) return numbers;
+    return numbers.filter((n) =>
+      String(n).includes(query)
+    );
+  }, [numbers, query]);
+
+  const total = useMemo(() => {
+    return filteredNumbers.reduce((sum, n) => sum + n, 0);
+  }, [filteredNumbers]);
+
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="数値で絞り込み..."
+      />
+      <p>件数: {filteredNumbers.length} / 合計: {total}</p>
+      <ul>
+        {filteredNumbers.slice(0, 100).map((n, i) => (
+          <li key={i}>{n}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}`}
+              hints={[
+                'useMemo(() => { ... }, [依存値]) の形で filteredNumbers を計算します。依存値は numbers と query です。',
+                'total は filteredNumbers に依存するので、filteredNumbers を依存配列に入れた別の useMemo で計算します。',
+                'reduce で合計を計算: filteredNumbers.reduce((sum, n) => sum + n, 0)',
+              ]}
+            />
+          </section>
+
+          {/* セクション 10: まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
             <div className="bg-muted/30 rounded-xl p-6 space-y-3">
@@ -590,9 +879,65 @@ function ProductCatalog({ products }: { products: Product[] }) {
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-primary font-bold text-lg">4</span>
-                <p className="text-muted-foreground"><strong>最適化は必要になってから</strong>。まず動くものを作り、パフォーマンスの問題が実際に起きたときに導入する</p>
+                <p className="text-muted-foreground"><strong>React DevTools Profiler</strong> で計測してから最適化する。勘ではなくデータに基づいて判断</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">5</span>
+                <p className="text-muted-foreground"><strong>過剰な最適化は逆効果</strong>。軽い計算のメモ化や、memo なし子への useCallback は不要</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">6</span>
+                <p className="text-muted-foreground"><strong>React Compiler</strong> が将来的に自動メモ化を実現する。今の知識は基礎として重要</p>
               </div>
             </div>
+          </section>
+
+          {/* ReferenceLinks */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'useMemo - React 公式リファレンス',
+                  url: 'https://ja.react.dev/reference/react/useMemo',
+                  description: 'useMemo の API 仕様、使い方、注意点を網羅した公式ドキュメント',
+                },
+                {
+                  title: 'useCallback - React 公式リファレンス',
+                  url: 'https://ja.react.dev/reference/react/useCallback',
+                  description: 'useCallback の API 仕様と useMemo との関係を解説',
+                },
+                {
+                  title: 'memo - React 公式リファレンス',
+                  url: 'https://ja.react.dev/reference/react/memo',
+                  description: 'React.memo の使い方とカスタム比較関数の設定方法',
+                },
+                {
+                  title: 'React Compiler - React 公式ドキュメント',
+                  url: 'https://ja.react.dev/learn/react-compiler',
+                  description: 'React Compiler の概要、導入方法、現在の状況',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'useMemo と useCallback の違いは何ですか？',
+                  answer: 'useMemo は「計算結果の値」をキャッシュし、useCallback は「関数自体」をキャッシュします。実は useCallback(fn, deps) は useMemo(() => fn, deps) と同じ動作です。useCallback は関数のメモ化に特化した便利な書き方と考えてください。',
+                },
+                {
+                  question: 'React.memo のカスタム比較関数はどう使いますか？',
+                  answer: 'memo の第2引数に比較関数を渡せます。例えば memo(Component, (prevProps, nextProps) => prevProps.id === nextProps.id) のように書くと、id が同じなら再レンダーをスキップします。ただし、カスタム比較は複雑になりがちなので、通常はデフォルトの浅い比較 + useMemo/useCallback で十分です。',
+                },
+                {
+                  question: 'React Compiler はいつ使えるようになりますか？',
+                  answer: 'React Compiler は React 19 以降で利用可能で、既にオープンソースとして公開されています。babel-plugin-react-compiler をインストールすることで導入できます。ただし安定版としての成熟度はプロジェクトによって判断が必要です。React 公式ブログやドキュメントで最新の状況を確認してください。',
+                },
+              ]}
+            />
           </section>
         </div>
 

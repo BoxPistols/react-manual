@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function UseEffect() {
   return (
@@ -51,7 +55,50 @@ export default function UseEffect() {
             </ul>
           </section>
 
-          {/* セクション 2: useEffect の基本構文 */}
+          {/* セクション 2: useEffect のメンタルモデル */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">useEffect のメンタルモデル: 「同期」ではなく「副作用」</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              useEffect を正しく使うために最も大切なのは、そのメンタルモデルです。
+              多くの初学者は useEffect を「ライフサイクルメソッドの代替」と考えがちですが、
+              React 公式の推奨するメンタルモデルは<strong>「外部システムとの同期」</strong>です。
+            </p>
+            <CodeBlock
+              language="tsx"
+              title="メンタルモデルの違い"
+              code={`// NG なメンタルモデル: ライフサイクルベース
+// 「マウント時にこれをやって、更新時にあれをやって...」
+useEffect(() => {
+  // componentDidMount の代わり？ → 違う！
+}, []);
+
+// OK なメンタルモデル: 同期ベース
+// 「この state/props と外部システムを同期させる」
+useEffect(() => {
+  // roomId が変わるたびに、チャットルームとの接続を同期する
+  const connection = createConnection(roomId);
+  connection.connect();
+  return () => connection.disconnect();
+}, [roomId]);`}
+            />
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              この「同期」の考え方を持つと、自然にクリーンアップが必要なケースが見えてきます。
+              「接続したなら切断する」「登録したなら解除する」「開始したなら停止する」。
+              セットアップとクリーンアップは常にペアです。
+            </p>
+            <div className="mb-6">
+              <InfoBox type="info" title="React 18 の Strict Mode">
+                <p>
+                  開発モード（Strict Mode）では、React は意図的にコンポーネントを 2 回マウント・アンマウントします。
+                  これは「クリーンアップが正しく実装されているか」を検証するための仕組みです。
+                  「useEffect が 2 回実行される」と困惑したら、それは Strict Mode の正常な動作です。
+                  本番ビルドでは 1 回だけ実行されます。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 3: useEffect の基本構文 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">useEffect の基本構文</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -83,7 +130,7 @@ function MyComponent() {
             </div>
           </section>
 
-          {/* セクション 3: 依存配列の詳細 */}
+          {/* セクション 4: 依存配列の詳細 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">依存配列を理解する</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -158,7 +205,7 @@ function MyComponent() {
             />
           </section>
 
-          {/* セクション 4: クリーンアップ */}
+          {/* セクション 5: クリーンアップ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">クリーンアップ関数</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -229,7 +276,7 @@ function WindowSize() {
             />
           </section>
 
-          {/* セクション 5: データ取得 */}
+          {/* セクション 6: データ取得 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">実践: API からデータを取得する</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -319,15 +366,180 @@ function UserList() {
             </div>
           </section>
 
-          {/* セクション 6: 検索パラメータ付きのデータ取得 */}
+          {/* セクション 7: レースコンディション対策 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">レースコンディション対策</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              レースコンディションとは、「複数の非同期処理が同時に走り、古い結果が新しい結果を上書きしてしまう」問題です。
+              たとえばユーザーがすばやくページを切り替えた場合、前のページのデータが後から到着して、
+              現在のページのデータを上書きしてしまうことがあります。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">方法 1: boolean フラグで無視する</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              最もシンプルな方法は、クリーンアップ時にフラグを立て、レスポンスを無視することです。
+            </p>
+            <CodeBlock
+              language="tsx"
+              title="boolean フラグによるレースコンディション対策"
+              showLineNumbers
+              code={`function UserProfile({ userId }: { userId: number }) {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // フラグ: このエフェクトがまだ有効かどうか
+    let ignore = false;
+
+    const fetchUser = async () => {
+      const res = await fetch(
+        \`https://jsonplaceholder.typicode.com/users/\${userId}\`
+      );
+      const data: User = await res.json();
+
+      // クリーンアップで ignore = true になっていたら
+      // この結果は古い（userId が既に変わっている）ので無視
+      if (!ignore) {
+        setUser(data);
+      }
+    };
+
+    fetchUser();
+
+    // クリーンアップ: userId が変わったら前の結果を無視
+    return () => {
+      ignore = true;
+    };
+  }, [userId]);
+
+  return user ? <p>{user.name}</p> : <p>読み込み中...</p>;
+}`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">方法 2: AbortController でリクエスト自体をキャンセル</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              より効率的な方法として、AbortController を使って HTTP リクエスト自体をキャンセルできます。
+              不要な通信をネットワークレベルで中止できるため、帯域幅の節約にもなります。
+            </p>
+            <CodeBlock
+              language="tsx"
+              title="AbortController によるキャンセル"
+              showLineNumbers
+              code={`function UserProfile({ userId }: { userId: number }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // AbortController のインスタンスを作成
+    const controller = new AbortController();
+
+    const fetchUser = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch(
+          \`https://jsonplaceholder.typicode.com/users/\${userId}\`,
+          { signal: controller.signal } // ← signal を渡す
+        );
+
+        if (!res.ok) {
+          throw new Error(\`HTTP \${res.status}\`);
+        }
+
+        const data: User = await res.json();
+        setUser(data);
+      } catch (err) {
+        // AbortError は「正常なキャンセル」なので無視する
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          console.log('リクエストがキャンセルされました');
+          return;
+        }
+        setError(
+          err instanceof Error ? err.message : '不明なエラー'
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+
+    // クリーンアップ: controller.abort() でリクエストをキャンセル
+    return () => {
+      controller.abort();
+    };
+  }, [userId]);
+
+  if (loading) return <p>読み込み中...</p>;
+  if (error) return <p>エラー: {error}</p>;
+
+  return (
+    <div>
+      <h2>{user?.name}</h2>
+      <p>{user?.email}</p>
+    </div>
+  );
+}`}
+            />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="success" title="AbortController の仕組み">
+                <p>
+                  AbortController は Web 標準の API です。<code>controller.abort()</code> を呼ぶと、
+                  その <code>signal</code> を渡した fetch リクエストが即座に中断され、
+                  <code>AbortError</code> が throw されます。ブラウザはネットワーク接続自体を切断するため、
+                  レスポンスの待ち時間やデータ転送も節約できます。
+                </p>
+              </InfoBox>
+            </div>
+
+            <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">AbortController をタイムアウトに応用する</h3>
+            <CodeBlock
+              language="tsx"
+              title="リクエストのタイムアウト設定"
+              code={`useEffect(() => {
+  const controller = new AbortController();
+
+  // 5秒経過したら自動的にキャンセル
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, 5000);
+
+  const fetchData = async () => {
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      const data = await res.json();
+      setData(data);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setError('リクエストがタイムアウトしました');
+        return;
+      }
+      setError('データの取得に失敗しました');
+    }
+  };
+
+  fetchData();
+
+  return () => {
+    clearTimeout(timeoutId);
+    controller.abort();
+  };
+}, [url]);`}
+            />
+          </section>
+
+          {/* セクション 8: 検索パラメータ付きのデータ取得 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">応用: 検索条件が変わるたびにデータを再取得</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
               依存配列に検索キーワードを入れることで、入力が変わるたびに自動的にデータを再取得できます。
+              AbortController を使ったレースコンディション対策も含めた完全版です。
             </p>
             <CodeBlock
               language="tsx"
-              title="検索連動のデータ取得"
+              title="検索連動のデータ取得（レースコンディション対策済み）"
               showLineNumbers
               code={`import { useState, useEffect } from 'react';
 
@@ -415,7 +627,7 @@ function SearchPosts() {
             </div>
           </section>
 
-          {/* セクション 7: タイマーの例 */}
+          {/* セクション 9: タイマーの例 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">実践: タイマーを作る</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -486,7 +698,7 @@ function CountdownTimer() {
             />
           </section>
 
-          {/* セクション 8: よくある間違い */}
+          {/* セクション 10: よくある間違い */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">よくある間違いと注意点</h2>
 
@@ -553,7 +765,145 @@ const filteredItems = items.filter((item) => item.active);
             />
           </section>
 
-          {/* セクション 9: まとめ */}
+          {/* セクション 11: useEffect のライフサイクル図解 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">useEffect のライフサイクルを図解する</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              useEffect がいつ実行され、クリーンアップがいつ呼ばれるかを時系列で理解しましょう。
+            </p>
+            <CodeBlock
+              language="text"
+              title="useEffect の実行タイミング"
+              code={`[初回レンダー]
+  1. コンポーネントの関数が実行される（JSX を返す）
+  2. React が DOM を更新する
+  3. ブラウザが画面を描画する
+  4. useEffect のコールバックが実行される ← ここ
+
+[依存値が変わったとき]
+  1. コンポーネントの関数が再実行される
+  2. React が DOM を更新する
+  3. ブラウザが画面を描画する
+  4. 前回の useEffect のクリーンアップが実行される ← ここ
+  5. 新しい useEffect のコールバックが実行される ← ここ
+
+[アンマウント時]
+  1. React がコンポーネントを削除
+  2. 最後の useEffect のクリーンアップが実行される ← ここ`}
+            />
+            <div className="mt-6 mb-6">
+              <InfoBox type="info" title="重要: useEffect は描画後に実行される">
+                <p>
+                  useEffect はレンダー（DOM 更新）の後に非同期で実行されます。
+                  そのため、useEffect の中で重い処理をしても画面の描画はブロックされません。
+                  逆に「DOM 更新の前に実行したい」場合は <code>useLayoutEffect</code> を使いますが、
+                  こちらは特殊なケースでのみ必要です。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* Quiz 1 */}
+          <section>
+            <Quiz
+              question="useEffect のクリーンアップ関数はいつ実行されますか？"
+              options={[
+                { label: 'コンポーネントがマウントされたとき' },
+                { label: 'useEffect のコールバックが実行される直前（再実行時）と、コンポーネントがアンマウントされたとき', correct: true },
+                { label: 'コンポーネントの state が変更されるたび' },
+                { label: 'ブラウザのタブが閉じられたとき' },
+              ]}
+              explanation="クリーンアップ関数は、依存値が変わって useEffect が再実行される直前と、コンポーネントがアンマウントされるときに実行されます。前回のエフェクトを掃除してから新しいエフェクトを開始する、という流れです。"
+            />
+          </section>
+
+          {/* Quiz 2 */}
+          <section>
+            <Quiz
+              question="次のうち、useEffect を使うべきでないケースはどれですか？"
+              options={[
+                { label: 'API からデータを取得して表示する' },
+                { label: 'ウィンドウの resize イベントを監視する' },
+                { label: 'props から計算できるフィルター結果を state に保存する', correct: true },
+                { label: 'WebSocket 接続を確立してメッセージを受信する' },
+              ]}
+              explanation="props や state から計算できる値は、レンダー中に直接変数に代入すれば十分です。わざわざ useEffect + useState で管理すると、不要な再レンダーが発生し、コードも複雑になります。React 公式でも「You Might Not Need an Effect」として注意が呼びかけられています。"
+            />
+          </section>
+
+          {/* CodingChallenge */}
+          <section>
+            <CodingChallenge
+              title="API からユーザーリストを取得して表示する"
+              description="useEffect と AbortController を使って、https://jsonplaceholder.typicode.com/users からユーザーリストを取得し、名前の一覧を表示するコンポーネントを完成させてください。loading 状態と AbortController によるクリーンアップも実装してください。"
+              initialCode={`function UserList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // ここにデータ取得処理を実装してください
+    // AbortController によるクリーンアップも忘れずに
+  }, []);
+
+  if (loading) return <p>読み込み中...</p>;
+
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}`}
+              answer={`function UserList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch(
+          'https://jsonplaceholder.typicode.com/users',
+          { signal: controller.signal }
+        );
+        const data = await res.json();
+        setUsers(data);
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return;
+        }
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+
+    return () => controller.abort();
+  }, []);
+
+  if (loading) return <p>読み込み中...</p>;
+
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}`}
+              hints={[
+                'AbortController のインスタンスを作成し、fetch の第2引数に { signal: controller.signal } を渡します。',
+                'クリーンアップ関数で controller.abort() を呼びます。',
+                'catch ブロックで AbortError を判定して、キャンセルの場合は何もせず return します。',
+              ]}
+            />
+          </section>
+
+          {/* セクション 12: まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
             <div className="bg-muted/30 rounded-xl p-6 space-y-3">
@@ -563,17 +913,77 @@ const filteredItems = items.filter((item) => item.active);
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-primary font-bold text-lg">2</span>
-                <p className="text-muted-foreground"><strong>依存配列で実行タイミングを制御</strong>。空配列はマウント時のみ、値を入れるとその値が変わったときに再実行</p>
+                <p className="text-muted-foreground"><strong>メンタルモデルは「外部システムとの同期」</strong>。ライフサイクルではなく、state/props と外部の状態を一致させる仕組み</p>
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-primary font-bold text-lg">3</span>
-                <p className="text-muted-foreground"><strong>クリーンアップ関数を忘れずに</strong>。タイマーやイベントリスナーは必ず後片付けする</p>
+                <p className="text-muted-foreground"><strong>依存配列で実行タイミングを制御</strong>。空配列はマウント時のみ、値を入れるとその値が変わったときに再実行</p>
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-primary font-bold text-lg">4</span>
+                <p className="text-muted-foreground"><strong>クリーンアップ関数を忘れずに</strong>。タイマーやイベントリスナーは必ず後片付けする</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">5</span>
+                <p className="text-muted-foreground"><strong>AbortController でレースコンディションを防ぐ</strong>。非同期処理のキャンセルはクリーンアップの必須パターン</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">6</span>
                 <p className="text-muted-foreground"><strong>useEffect を使いすぎない</strong>。計算結果やイベント処理には不要。外部システムとの同期にだけ使う</p>
               </div>
             </div>
+          </section>
+
+          {/* ReferenceLinks */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'useEffect - React 公式リファレンス',
+                  url: 'https://ja.react.dev/reference/react/useEffect',
+                  description: 'useEffect の API 仕様、使い方、注意点を網羅した公式ドキュメント',
+                },
+                {
+                  title: 'エフェクトで同期する - React 公式ガイド',
+                  url: 'https://ja.react.dev/learn/synchronizing-with-effects',
+                  description: 'useEffect のメンタルモデルと正しい使い方を学べるチュートリアル',
+                },
+                {
+                  title: 'エフェクトは不要かもしれない - React 公式ガイド',
+                  url: 'https://ja.react.dev/learn/you-might-not-need-an-effect',
+                  description: 'useEffect の過剰使用を避けるためのガイド。代替パターンも紹介',
+                },
+                {
+                  title: 'エフェクトから依存値を取り除く - React 公式ガイド',
+                  url: 'https://ja.react.dev/learn/removing-effect-dependencies',
+                  description: '依存配列の不要な値を減らして、エフェクトをシンプルにする方法',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'useEffect と useLayoutEffect の違いは何ですか？',
+                  answer: 'useEffect はブラウザの描画後に非同期で実行されますが、useLayoutEffect は DOM 更新後、ブラウザの描画前に同期的に実行されます。useLayoutEffect は DOM のサイズや位置を測定してから描画したい場合（ツールチップの位置計算など）に使います。ほとんどのケースでは useEffect で十分です。',
+                },
+                {
+                  question: '開発モードで useEffect が 2 回実行されるのはバグですか？',
+                  answer: 'バグではありません。React 18 の Strict Mode では、意図的にコンポーネントをマウント → アンマウント → 再マウントさせます。これはクリーンアップが正しく実装されているかを検証するための仕組みです。本番ビルドでは 1 回だけ実行されます。2 回実行されても問題ないようにクリーンアップを実装しましょう。',
+                },
+                {
+                  question: 'useEffect の中で async/await を直接使えないのはなぜですか？',
+                  answer: 'useEffect のコールバック関数は「クリーンアップ関数」または「undefined」を返す必要がありますが、async 関数は必ず Promise を返します。Promise はクリーンアップ関数として使えないため、useEffect のコールバック自体を async にすることはできません。代わりに、コールバック内で async 関数を定義して呼び出すパターンを使います。',
+                },
+                {
+                  question: 'データ取得に useEffect を使わず、TanStack Query や SWR を使うべきですか？',
+                  answer: '実際のプロダクション開発では、TanStack Query（旧 React Query）や SWR の利用が推奨されています。これらのライブラリはキャッシュ、再試行、レースコンディション対策、重複排除、バックグラウンド更新などを自動的に処理してくれます。useEffect での手動データ取得は学習目的には優れていますが、本番では専用ライブラリの方が堅牢で使いやすいです。',
+                },
+              ]}
+            />
           </section>
         </div>
 

@@ -2,6 +2,10 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import Quiz from '@/components/Quiz';
+import CodingChallenge from '@/components/CodingChallenge';
+import ReferenceLinks from '@/components/ReferenceLinks';
+import Faq from '@/components/Faq';
 
 export default function UseContext() {
   return (
@@ -157,7 +161,7 @@ function ThemeToggleButton() {
           : 'bg-white text-gray-800 p-3 rounded border'
       }
     >
-      {theme === 'dark' ? '🌙 ダークモード' : '☀️ ライトモード'}
+      {theme === 'dark' ? 'ダークモード' : 'ライトモード'}
     </button>
   );
 }
@@ -321,7 +325,7 @@ function Header() {
     <header className={isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}>
       <h1>My App</h1>
       <button onClick={toggleTheme}>
-        {isDark ? '☀️ ライトモードに切り替え' : '🌙 ダークモードに切り替え'}
+        {isDark ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
       </button>
     </header>
   );
@@ -344,7 +348,234 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
             />
           </section>
 
-          {/* セクション 5: 認証情報の共有 */}
+          {/* セクション 5: 複数 Context の組み合わせ */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">複数 Context の組み合わせ</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              実際のアプリでは、テーマ、認証、言語、通知など複数の Context を組み合わせて使います。
+              それぞれの Context を独立して作成し、必要な場所で useContext を呼ぶことで、
+              関心の分離を保ちながらグローバルなデータ共有が実現できます。
+            </p>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">言語切り替え Context</h3>
+            <CodeBlock
+              language="tsx"
+              title="context/LanguageContext.tsx"
+              showLineNumbers
+              code={`import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+} from 'react';
+
+type Language = 'ja' | 'en' | 'zh';
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const translations: Record<Language, Record<string, string>> = {
+  ja: { greeting: 'こんにちは', logout: 'ログアウト', settings: '設定' },
+  en: { greeting: 'Hello', logout: 'Logout', settings: 'Settings' },
+  zh: { greeting: '你好', logout: '登出', settings: '设置' },
+};
+
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<Language>('ja');
+
+  // 簡易的な翻訳関数
+  const t = (key: string): string => {
+    return translations[language][key] ?? key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage は LanguageProvider の中で使ってください');
+  }
+  return context;
+}`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">複数の Context を組み合わせて使う</h3>
+            <CodeBlock
+              language="tsx"
+              title="複数 Context を消費するコンポーネント"
+              showLineNumbers
+              code={`import { useTheme } from './context/ThemeContext';
+import { useLanguage } from './context/LanguageContext';
+import { useAuth } from './context/AuthContext';
+
+function Header() {
+  // 3 つの Context からそれぞれ必要な値を取得
+  const { isDark, toggleTheme } = useTheme();
+  const { t, language, setLanguage } = useLanguage();
+  const { user, isLoggedIn, logout } = useAuth();
+
+  return (
+    <header className={isDark ? 'bg-gray-900 text-white' : 'bg-white'}>
+      <h1>{t('greeting')}{isLoggedIn ? \`, \${user?.name}\` : ''}</h1>
+
+      <div className="flex gap-2">
+        {/* テーマ切り替え */}
+        <button onClick={toggleTheme}>
+          {isDark ? 'Light' : 'Dark'}
+        </button>
+
+        {/* 言語切り替え */}
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value as 'ja' | 'en' | 'zh')}
+        >
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+        </select>
+
+        {/* ログアウト */}
+        {isLoggedIn && (
+          <button onClick={logout}>{t('logout')}</button>
+        )}
+      </div>
+    </header>
+  );
+}`}
+            />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="info" title="Provider のネスト順序">
+                <p>
+                  Provider 同士に依存関係がある場合、依存される側を外側に配置します。
+                  たとえば AuthProvider が ThemeProvider に依存する場合は、ThemeProvider を外側に置きます。
+                  依存関係がなければ順序は自由ですが、よく使われる「テーマ → 認証 → 言語」のような慣習に従うと読みやすくなります。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 6: Context vs Props Drilling の判断基準 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Context vs Props Drilling の判断基準</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              Context は強力ですが、すべての props リレーを Context に置き換えるべきではありません。
+              どちらを使うかの判断基準を見てみましょう。
+            </p>
+
+            <div className="overflow-x-auto mb-6">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">シナリオ</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">推奨</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">理由</th>
+                  </tr>
+                </thead>
+                <tbody className="text-muted-foreground">
+                  <tr className="border-b border-border">
+                    <td className="py-3 px-4">親→子の 1-2 段の props 受け渡し</td>
+                    <td className="py-3 px-4 font-medium">Props</td>
+                    <td className="py-3 px-4">シンプルで追跡しやすい</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="py-3 px-4">テーマ、認証、言語などアプリ全体の設定</td>
+                    <td className="py-3 px-4 font-medium">Context</td>
+                    <td className="py-3 px-4">多くのコンポーネントが必要とするデータ</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="py-3 px-4">中間コンポーネントが props を使わず通過させるだけ</td>
+                    <td className="py-3 px-4 font-medium">Context</td>
+                    <td className="py-3 px-4">Props Drilling の典型的なケース</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="py-3 px-4">コンポーネントの再利用性を保ちたい</td>
+                    <td className="py-3 px-4 font-medium">Props</td>
+                    <td className="py-3 px-4">Context に依存すると再利用しにくくなる</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4">頻繁に変わる値（入力中のテキストなど）</td>
+                    <td className="py-3 px-4 font-medium">Props / State</td>
+                    <td className="py-3 px-4">Context は全消費者を再レンダーさせる</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 className="text-lg font-semibold text-foreground mb-3">Context の代わりに「コンポジション」を使う</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              Props Drilling の解決策は Context だけではありません。
+              「コンポーネント合成（コンポジション）」で、中間コンポーネントが props を受け渡す必要をなくすこともできます。
+            </p>
+            <CodeBlock
+              language="tsx"
+              title="コンポジションで Props Drilling を回避"
+              showLineNumbers
+              code={`// NG: Props Drilling
+function App() {
+  const [user, setUser] = useState(currentUser);
+  return <Layout user={user} />; // Layout → Sidebar → UserMenu に渡す
+}
+
+// OK: コンポジション（children を使う）
+function App() {
+  const [user, setUser] = useState(currentUser);
+
+  return (
+    <Layout
+      sidebar={
+        // App が直接 UserMenu を作る → Layout は user を知らなくてよい
+        <Sidebar>
+          <UserMenu user={user} />
+        </Sidebar>
+      }
+    >
+      <Main />
+    </Layout>
+  );
+}
+
+function Layout({
+  sidebar,
+  children,
+}: {
+  sidebar: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  // Layout は user props を受け取る必要がない！
+  return (
+    <div className="flex">
+      {sidebar}
+      <main>{children}</main>
+    </div>
+  );
+}`}
+            />
+
+            <div className="mt-6 mb-6">
+              <InfoBox type="success" title="コンポジション vs Context の使い分け">
+                <p>
+                  コンポジションは「特定のコンポーネントにだけ渡したい」場合に適しています。
+                  一方、Context は「ツリーのどこからでもアクセスしたい」場合に適しています。
+                  React 公式ドキュメントでも、Context を使う前にまずコンポジションを検討することを推奨しています。
+                </p>
+              </InfoBox>
+            </div>
+          </section>
+
+          {/* セクション 7: 認証情報の共有 */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">もう一つの実例: 認証情報の共有</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
@@ -450,9 +681,9 @@ function UserMenu() {
             />
           </section>
 
-          {/* セクション 6: 注意点 */}
+          {/* セクション 8: パフォーマンスの落とし穴 */}
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">Context の注意点</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">パフォーマンスの落とし穴と対策</h2>
 
             <div className="mb-6">
               <InfoBox type="warning" title="Context の値が変わると全消費者が再レンダーされる">
@@ -463,6 +694,57 @@ function UserMenu() {
               </InfoBox>
             </div>
 
+            <h3 className="text-lg font-semibold text-foreground mb-3">問題: value オブジェクトの不必要な再生成</h3>
+            <CodeBlock
+              language="tsx"
+              title="NG: レンダーのたびに新しいオブジェクトが作られる"
+              code={`function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  // NG: レンダーのたびに新しいオブジェクトが作られる
+  // → Context の消費者がすべて再レンダーされる
+  return (
+    <ThemeContext.Provider
+      value={{
+        theme,
+        toggleTheme: () => setTheme((p) => p === 'light' ? 'dark' : 'light'),
+      }}
+    >
+      {children}
+    </ThemeContext.Provider>
+  );
+}`}
+            />
+
+            <CodeBlock
+              language="tsx"
+              title="OK: useMemo で value を安定させる"
+              showLineNumbers
+              code={`import { useMemo, useCallback } from 'react';
+
+function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  // useCallback で関数を安定させる
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  }, []);
+
+  // useMemo で value オブジェクトを安定させる
+  const value = useMemo(
+    () => ({ theme, toggleTheme }),
+    [theme, toggleTheme]
+  );
+
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}`}
+            />
+
+            <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">対策: Context を分割する</h3>
             <CodeBlock
               language="tsx"
               title="Context を分割してパフォーマンスを改善"
@@ -484,6 +766,46 @@ const NotificationContext = createContext<NotificationContextType>(...);
 // theme が変わっても AuthContext を使うコンポーネントは再レンダーされない`}
             />
 
+            <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">対策: state と dispatch を別の Context にする</h3>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              次のステップで学ぶ useReducer と組み合わせる場合、state（読み取り）と dispatch（操作）を
+              別々の Context に分けることで、dispatch しか使わないコンポーネント（ボタンなど）は
+              state が変わっても再レンダーされなくなります。
+            </p>
+            <CodeBlock
+              language="tsx"
+              title="state と dispatch の分離"
+              code={`// state 用の Context
+const TodoStateContext = createContext<TodoState | undefined>(undefined);
+
+// dispatch 用の Context
+const TodoDispatchContext = createContext<Dispatch<TodoAction> | undefined>(
+  undefined
+);
+
+function TodoProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(todoReducer, initialState);
+
+  return (
+    <TodoStateContext.Provider value={state}>
+      <TodoDispatchContext.Provider value={dispatch}>
+        {children}
+      </TodoDispatchContext.Provider>
+    </TodoStateContext.Provider>
+  );
+}
+
+// state が変わっても AddButton は再レンダーされない
+function AddButton() {
+  const dispatch = useContext(TodoDispatchContext);
+  return (
+    <button onClick={() => dispatch?.({ type: 'add', payload: '新規' })}>
+      追加
+    </button>
+  );
+}`}
+            />
+
             <div className="mt-6">
               <InfoBox type="info" title="Context は万能薬ではない">
                 <p>
@@ -495,7 +817,121 @@ const NotificationContext = createContext<NotificationContextType>(...);
             </div>
           </section>
 
-          {/* セクション 7: まとめ */}
+          {/* Quiz 1 */}
+          <section>
+            <Quiz
+              question="Context の Provider の外で useContext を呼ぶとどうなりますか？"
+              options={[
+                { label: 'エラーが発生してアプリがクラッシュする' },
+                { label: 'createContext に渡したデフォルト値が返される', correct: true },
+                { label: 'undefined が返される' },
+                { label: '空のオブジェクトが返される' },
+              ]}
+              explanation="Provider の外で useContext を呼ぶと、createContext() に渡したデフォルト値が返されます。ただし、これは意図しない使い方であることが多いため、カスタム Hook でラップして Provider の外で使った場合にエラーを投げるようにするのがベストプラクティスです。"
+            />
+          </section>
+
+          {/* Quiz 2 */}
+          <section>
+            <Quiz
+              question="Context の value が変更されたとき、再レンダーされるのはどのコンポーネントですか？"
+              options={[
+                { label: 'Provider の子孫すべてのコンポーネント' },
+                { label: 'useContext でその Context を購読しているコンポーネントのみ', correct: true },
+                { label: 'Provider の直接の子コンポーネントのみ' },
+                { label: 'アプリ全体のすべてのコンポーネント' },
+              ]}
+              explanation="Context の値が変わったとき、再レンダーされるのは useContext でその Context を購読（消費）しているコンポーネントだけです。ただし、再レンダーされたコンポーネントの子も通常どおり再レンダーされる点に注意してください。React.memo でラップされた子は props が変わらなければスキップされます。"
+            />
+          </section>
+
+          {/* CodingChallenge */}
+          <section>
+            <CodingChallenge
+              title="テーマ + 言語の 2 つの Context を作る"
+              description="ThemeContext（light/dark の切り替え）と LanguageContext（ja/en の切り替え）の 2 つの Context を作成し、それぞれの Provider とカスタム Hook（useTheme, useLanguage）を実装してください。useTheme は { theme, toggleTheme } を、useLanguage は { language, setLanguage } を返すようにします。"
+              initialCode={`// ThemeContext を作成してください
+const ThemeContext = createContext(/* ... */);
+
+export function ThemeProvider({ children }) {
+  // ここに実装
+}
+
+export function useTheme() {
+  // ここに実装
+}
+
+// LanguageContext を作成してください
+const LanguageContext = createContext(/* ... */);
+
+export function LanguageProvider({ children }) {
+  // ここに実装
+}
+
+export function useLanguage() {
+  // ここに実装
+}`}
+              answer={`import { createContext, useContext, useState, ReactNode } from 'react';
+
+// Theme Context
+type Theme = 'light' | 'dark';
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('light');
+  const toggleTheme = () => setTheme((p) => (p === 'light' ? 'dark' : 'light'));
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error('useTheme は ThemeProvider の中で使ってください');
+  return context;
+}
+
+// Language Context
+type Language = 'ja' | 'en';
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<Language>('ja');
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) throw new Error('useLanguage は LanguageProvider の中で使ってください');
+  return context;
+}`}
+              hints={[
+                'createContext のデフォルト値は undefined にして、カスタム Hook で undefined チェックを行うパターンが安全です。',
+                'Provider の value には、state と更新関数をオブジェクトにまとめて渡します。',
+                'カスタム Hook では useContext の結果が undefined なら Error を throw します。',
+              ]}
+            />
+          </section>
+
+          {/* セクション 9: まとめ */}
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
             <div className="bg-muted/30 rounded-xl p-6 space-y-3">
@@ -513,9 +949,60 @@ const NotificationContext = createContext<NotificationContextType>(...);
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-primary font-bold text-lg">4</span>
-                <p className="text-muted-foreground"><strong>関心ごとに Context を分割</strong>する。1 つの巨大な Context は避け、テーマ・認証・言語などに分ける</p>
+                <p className="text-muted-foreground"><strong>複数の Context を組み合わせ</strong>て、テーマ・認証・言語などの関心事を分離できる</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">5</span>
+                <p className="text-muted-foreground"><strong>パフォーマンスに注意</strong>。useMemo で value を安定させ、Context を適切に分割する</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-primary font-bold text-lg">6</span>
+                <p className="text-muted-foreground"><strong>Context の前にコンポジションを検討</strong>する。すべてを Context にする必要はない</p>
               </div>
             </div>
+          </section>
+
+          {/* ReferenceLinks */}
+          <section>
+            <ReferenceLinks
+              links={[
+                {
+                  title: 'useContext - React 公式リファレンス',
+                  url: 'https://ja.react.dev/reference/react/useContext',
+                  description: 'useContext の API 仕様、使い方、注意点を網羅した公式ドキュメント',
+                },
+                {
+                  title: 'コンテクストで深くデータを渡す - React 公式ガイド',
+                  url: 'https://ja.react.dev/learn/passing-data-deeply-with-context',
+                  description: 'Context の基本的な使い方を学べるチュートリアル',
+                },
+                {
+                  title: 'コンテクストでステートをスケールする - React 公式ガイド',
+                  url: 'https://ja.react.dev/learn/scaling-up-with-reducer-and-context',
+                  description: 'useReducer と useContext を組み合わせたパターン',
+                },
+              ]}
+            />
+          </section>
+
+          {/* FAQ */}
+          <section>
+            <Faq
+              items={[
+                {
+                  question: 'Context と Redux や Zustand の違いは何ですか？',
+                  answer: 'Context は React 組み込みの「値を渡すしくみ」であり、厳密には状態管理ライブラリではありません。Redux や Zustand は状態管理に特化しており、ミドルウェア、DevTools、セレクタによる部分的な再レンダー制御などの機能を備えています。小〜中規模のアプリなら Context + useReducer で十分ですが、大規模で頻繁に更新される状態を扱う場合は専用ライブラリの方がパフォーマンスと開発体験で優れます。',
+                },
+                {
+                  question: 'Context の値をネストした Provider で上書きできますか？',
+                  answer: 'はい。同じ Context の Provider を入れ子にすると、最も近い Provider の値が使われます。これは「テーマの一部だけダークモードにする」といったケースで便利です。たとえばアプリ全体は light テーマだが、フッターだけ dark テーマにする、といった実装が可能です。',
+                },
+                {
+                  question: 'サーバーコンポーネント（RSC）で Context は使えますか？',
+                  answer: 'React Server Components では useContext を直接呼ぶことはできません。Context は「Provider → 子コンポーネント」というクライアントサイドの仕組みであり、Server Components にはその概念がないためです。Server Components から Client Components に Props を渡し、Client Components 側で Context を利用するパターンが推奨されています。',
+                },
+              ]}
+            />
           </section>
         </div>
 
