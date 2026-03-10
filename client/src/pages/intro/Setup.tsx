@@ -2,8 +2,12 @@ import CodeBlock from '@/components/CodeBlock';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
+import { Monitor, Apple } from 'lucide-react';
+import { usePlatform } from '@/contexts/PlatformContext';
 
 export default function Setup() {
+  const { platform, setPlatform } = usePlatform();
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
@@ -22,394 +26,340 @@ export default function Setup() {
           ブラウザに「Hello」を表示するところまで進めましょう。
         </p>
 
-        <WhyNowBox tags={['Node.js', 'pnpm', 'VS Code', 'Vite']}>
+        {/* OS 切り替えタブ */}
+        <div className="flex p-1 bg-muted rounded-xl mb-8 w-fit">
+          <button
+            onClick={() => setPlatform('mac')}
+            className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+              platform === 'mac'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Apple size={16} />
+            macOS
+          </button>
+          <button
+            onClick={() => setPlatform('windows')}
+            className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+              platform === 'windows'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Monitor size={16} />
+            Windows
+          </button>
+        </div>
+
+        <WhyNowBox tags={['Terminal', 'Node.js', 'Volta', 'pnpm', 'VS Code']}>
           <p>
             料理をする前にキッチンを整えるように、コードを書く前に開発環境を整えます。
-            ここで正しくセットアップしておけば、以降の全てのステップがスムーズに進みます。
-            逆に、ここで躓くと先に進めません。焦らず一つずつ確認しながら進めましょう。
+            デザイナーにとって最大の難所は「ターミナル（黒い画面）」かもしれませんが、
+            一度セットアップしてしまえば、あとは決まったコマンドを打つだけです。
+            {platform === 'mac' ? 'Mac なら標準の「ターミナル」' : 'Windows なら「PowerShell」'} を使って進めていきましょう。
           </p>
         </WhyNowBox>
 
         <div className="space-y-12 mt-8">
-          {/* Node.js のインストール */}
+          {/* 1. ターミナルの準備 */}
           <section>
-            <h2 className="text-3xl font-bold text-foreground mb-6">Node.js のインストール</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-6">1. {platform === 'mac' ? 'ターミナル' : 'PowerShell'} の準備</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
-              Node.js は JavaScript をブラウザの外（あなたのパソコン上）で動かすための実行環境です。
-              React の開発ツールはすべて Node.js 上で動くため、最初にインストールが必要です。
+              ターミナル（または PowerShell）は、文字でパソコンに命令を出す道具です。
+              React の開発では必須となります。
             </p>
 
-            <h3 className="text-xl font-bold text-foreground mb-4">推奨: nvm 経由でインストール</h3>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              nvm（Node Version Manager）を使うと、Node.js のバージョンを簡単に切り替えられます。
-              プロジェクトによって異なるバージョンが必要になることがあるため、nvm の利用を強く推奨します。
-            </p>
-
-            <div className="space-y-4 mb-6">
-              <div>
-                <p className="text-sm font-medium text-foreground mb-2">1. Homebrew をインストール（未導入の場合）</p>
-                <CodeBlock
-                  code={`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`}
-                  language="bash"
-                  title="ターミナル"
-                />
+            {platform === 'mac' ? (
+              <div className="rounded-xl border border-border bg-card p-6 mb-6">
+                <h3 className="font-bold text-foreground mb-3 flex items-center gap-2 text-lg">
+                  macOS: ターミナル
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                  Mac に最初から入っている「ターミナル」アプリを使います。
+                  背景が黒や白のシンプルな画面ですが、ここで全てのツールを操作します。
+                </p>
+                <div className="bg-slate-950 rounded-lg p-4 mb-4 border border-slate-800">
+                  <div className="flex gap-1.5 mb-3">
+                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                    <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                  </div>
+                  <code className="text-slate-300 text-sm">
+                    Last login: Tue Mar 10 10:00:00 on ttys000<br />
+                    user@MacBook-Pro ~ % _
+                  </code>
+                </div>
+                <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
+                  <li><strong>起動方法:</strong> Cmd + Space で「terminal」と検索</li>
+                  <li><strong>見た目:</strong> 白または黒の背景に、最後に <code className="bg-muted px-1 rounded">%</code> が表示されます</li>
+                </ul>
               </div>
-
-              <div>
-                <p className="text-sm font-medium text-foreground mb-2">2. nvm をインストール</p>
-                <CodeBlock
-                  code={`brew install nvm
-
-# nvm のディレクトリを作成
-mkdir ~/.nvm
-
-# シェル設定ファイルに以下を追記（zsh の場合）
-# ~/.zshrc を開いて末尾に追加してください
-export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"`}
-                  language="bash"
-                  title="ターミナル"
-                />
+            ) : (
+              <div className="rounded-xl border border-border bg-card p-6 mb-6">
+                <h3 className="font-bold text-foreground mb-3 flex items-center gap-2 text-lg">
+                  Windows: PowerShell
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                  Windows では「PowerShell（パワーシェル）」がターミナルの役割を果たします。
+                  見た目は青色または黒色の画面です。
+                </p>
+                <div className="bg-indigo-950 rounded-lg p-4 mb-4 border border-indigo-900 shadow-inner">
+                  <div className="flex justify-between items-center mb-3 border-b border-indigo-900 pb-2">
+                    <span className="text-[10px] text-indigo-300 font-mono">Windows PowerShell</span>
+                    <div className="flex gap-3">
+                      <div className="w-2 h-0.5 bg-indigo-300" />
+                      <div className="w-2.5 h-2.5 border border-indigo-300" />
+                      <div className="text-indigo-300 text-xs mt-[-4px]">×</div>
+                    </div>
+                  </div>
+                  <code className="text-indigo-100 text-sm">
+                    Windows PowerShell<br />
+                    Copyright (C) Microsoft Corporation. All rights reserved.<br /><br />
+                    PS C:\Users\YourName&gt; _
+                  </code>
+                </div>
+                <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
+                  <li><strong>起動方法:</strong> Winキー で「PowerShell」と検索</li>
+                  <li><strong>見た目:</strong> 青または黒の背景に、最初に <code className="bg-muted px-1 rounded">PS</code> と表示されます</li>
+                </ul>
               </div>
+            )}
 
-              <div>
-                <p className="text-sm font-medium text-foreground mb-2">3. ターミナルを再起動して Node.js をインストール</p>
-                <CodeBlock
-                  code={`# 最新の LTS（長期サポート版）をインストール
-nvm install --lts
-
-# インストール確認
-node --version
-# v22.x.x と表示されればOK`}
-                  language="bash"
-                  title="ターミナル"
-                />
-              </div>
-            </div>
-
-            <InfoBox type="info" title="LTS とは？">
-              <p>
-                LTS（Long Term Support）は長期サポート版のことです。
-                最新の機能よりも安定性を重視したバージョンで、実務では LTS を使うのが一般的です。
-              </p>
-            </InfoBox>
-          </section>
-
-          {/* pnpm のインストール */}
-          <section>
-            <h2 className="text-3xl font-bold text-foreground mb-6">pnpm のインストール</h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              pnpm はパッケージマネージャーと呼ばれるツールです。
-              React やその他のライブラリ（=パッケージ）をプロジェクトにインストールするために使います。
-              npm や yarn と同じ役割ですが、pnpm はディスク容量を節約でき、動作も高速です。
-            </p>
-
+            <h3 className="text-xl font-bold text-foreground mb-4">基本コマンド</h3>
             <CodeBlock
-              code={`# pnpm をインストール
-npm install -g pnpm
-
-# インストール確認
-pnpm --version
-# 9.x.x と表示されればOK`}
-              language="bash"
-              title="ターミナル"
-            />
-
-            <div className="mt-4">
-              <InfoBox type="info" title="npm と pnpm の違い">
-                <p>
-                  npm は Node.js に付属する標準のパッケージマネージャーです。
-                  pnpm はその高速版と考えてください。使い方はほぼ同じで、<code className="text-xs bg-muted px-1 py-0.5 rounded">npm install</code> の代わりに
-                  <code className="text-xs bg-muted px-1 py-0.5 rounded">pnpm install</code> と入力するだけです。
-                </p>
-              </InfoBox>
-            </div>
-          </section>
-
-          {/* VS Code / Cursor */}
-          <section>
-            <h2 className="text-3xl font-bold text-foreground mb-6">エディタのセットアップ</h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              コードを書くためのエディタをインストールします。
-              <strong>VS Code</strong>（Visual Studio Code）が最も広く使われており、React 開発に最適な拡張機能が揃っています。
-              AI コーディングに興味がある方は <strong>Cursor</strong> もおすすめです（VS Code ベースなので操作感は同じ）。
-            </p>
-
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
-              <div className="rounded-xl border border-border bg-card p-5">
-                <h4 className="font-bold text-foreground mb-2">VS Code</h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Microsoft 製の無料エディタ。フロントエンド開発の事実上の標準。
-                </p>
-                <code className="text-xs bg-muted px-2 py-1 rounded block">
-                  https://code.visualstudio.com/
-                </code>
-              </div>
-              <div className="rounded-xl border border-border bg-card p-5">
-                <h4 className="font-bold text-foreground mb-2">Cursor</h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  VS Code ベースの AI エディタ。AI アシスタントが内蔵されている。
-                </p>
-                <code className="text-xs bg-muted px-2 py-1 rounded block">
-                  https://cursor.sh/
-                </code>
-              </div>
-            </div>
-
-            <h3 className="text-xl font-bold text-foreground mb-4">おすすめの拡張機能</h3>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              以下の拡張機能をインストールすると、開発効率が大幅に上がります。
-              VS Code の拡張機能タブ（左サイドバーのブロックアイコン）から検索してインストールしてください。
-            </p>
-
-            <div className="space-y-3 mb-4">
-              <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card">
-                <div className="w-8 h-8 rounded bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center flex-shrink-0">
-                  <span className="text-yellow-600 dark:text-yellow-400 text-xs font-bold">ES</span>
-                </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">ES7+ React/Redux/React-Native snippets</p>
-                  <p className="text-xs text-muted-foreground">React コンポーネントの雛形を素早く生成できる。<code className="bg-muted px-1 rounded">rafce</code> と入力するだけ。</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card">
-                <div className="w-8 h-8 rounded bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center flex-shrink-0">
-                  <span className="text-purple-600 dark:text-purple-400 text-xs font-bold">P</span>
-                </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">Prettier - Code formatter</p>
-                  <p className="text-xs text-muted-foreground">保存時にコードを自動整形してくれる。インデントや改行を気にしなくてよくなる。</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card">
-                <div className="w-8 h-8 rounded bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center flex-shrink-0">
-                  <span className="text-indigo-600 dark:text-indigo-400 text-xs font-bold">ES</span>
-                </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">ESLint</p>
-                  <p className="text-xs text-muted-foreground">コードの問題点（バグの原因になりそうな書き方）をリアルタイムで指摘してくれる。</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card">
-                <div className="w-8 h-8 rounded bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center flex-shrink-0">
-                  <span className="text-cyan-600 dark:text-cyan-400 text-xs font-bold">TW</span>
-                </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">Tailwind CSS IntelliSense</p>
-                  <p className="text-xs text-muted-foreground">Tailwind CSS のクラス名を自動補完してくれる。STEP 22 以降で大活躍。</p>
-                </div>
-              </div>
-            </div>
-
-            <InfoBox type="info" title="Prettier の設定">
-              <p>
-                Prettier をインストールしたら、VS Code の設定で「Format On Save」をオンにしましょう。
-                <code className="bg-muted px-1 py-0.5 rounded text-xs">Cmd + ,</code> で設定を開き、「format on save」と検索してチェックを入れます。
-              </p>
-            </InfoBox>
-          </section>
-
-          {/* ターミナルの基本 */}
-          <section>
-            <h2 className="text-3xl font-bold text-foreground mb-6">ターミナルの基本操作</h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              デザイナーにとってターミナル（黒い画面）は馴染みがないかもしれません。
-              でも、React 開発で使うコマンドは数種類だけです。以下の基本コマンドを覚えておきましょう。
-            </p>
-
-            <CodeBlock
-              code={`# 現在いるフォルダを確認
-pwd
-
-# フォルダの中身を一覧表示
-ls
-
-# フォルダを移動する
+              code={`# フォルダを移動する (Change Directory)
 cd フォルダ名
 
 # 一つ上のフォルダに戻る
 cd ..
 
-# ホームディレクトリに戻る
-cd ~
-
-# フォルダを作成する
-mkdir フォルダ名
-
-# コマンドを中断する（開発サーバーを止める時など）
+# コマンドを中断する / サーバーを止める
 Ctrl + C`}
               language="bash"
-              title="基本コマンド"
+              title={platform === 'mac' ? 'ターミナル' : 'PowerShell'}
             />
+          </section>
 
-            <div className="mt-4">
-              <InfoBox type="info" title="VS Code 内蔵ターミナル">
-                <p>
-                  VS Code には内蔵ターミナルがあります。
-                  <code className="bg-muted px-1 py-0.5 rounded text-xs">Ctrl + `</code>（バッククォート）で開閉できます。
-                  わざわざ別のターミナルアプリを開く必要はありません。
+          {/* 2. Git のインストール */}
+          <section>
+            <h2 className="text-3xl font-bold text-foreground mb-6">2. Git のインストール</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              プログラムの変更履歴を記録するツールです。React プロジェクトの作成に必要です。
+            </p>
+
+            {platform === 'mac' ? (
+              <div className="p-6 rounded-xl border border-border bg-card">
+                <h3 className="font-bold text-foreground mb-3">macOS での導入</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  標準で入っていることが多いですが、一度確認しましょう。
+                </p>
+                <CodeBlock code="git --version" language="bash" title="ターミナル" />
+                <p className="text-xs text-muted-foreground mt-3">
+                  ※インストールを促すダイアログが出たら、指示に従って進めてください。
+                </p>
+              </div>
+            ) : (
+              <div className="p-6 rounded-xl border border-border bg-card">
+                <h3 className="font-bold text-foreground mb-3 text-lg">Windows での導入</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  公式サイトから「Git for Windows」をダウンロードしてインストールしてください。
+                </p>
+                <a
+                  href="https://git-scm.com/download/win"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Git for Windows をダウンロード
+                </a>
+                <p className="text-xs text-muted-foreground mt-4 leading-relaxed">
+                  ※インストールの設定は、全て「Next（デフォルト）」のままで大丈夫です。
+                </p>
+              </div>
+            )}
+          </section>
+
+          {/* 3. Node.js のインストール */}
+          <section>
+            <h2 className="text-3xl font-bold text-foreground mb-6">3. Node.js のインストール</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              React を動かすためのエンジンです。
+              <strong>Volta（ボルタ）</strong> という管理ツールを使うと、後の作業が非常に楽になります。
+            </p>
+
+            <div className="space-y-6">
+              {platform === 'mac' ? (
+                <div className="p-6 rounded-xl border border-primary/20 bg-primary/5">
+                  <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                    <Apple size={18} />
+                    macOS: Volta のインストール
+                  </h3>
+                  <ol className="text-sm text-muted-foreground space-y-4 list-decimal pl-5">
+                    <li>
+                      <p className="font-medium text-foreground mb-1">Homebrew をインストール（未導入の場合）</p>
+                      <CodeBlock
+                        code={`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`}
+                        language="bash"
+                        title="ターミナル"
+                      />
+                    </li>
+                    <li>
+                      <p className="font-medium text-foreground mb-1">Volta をインストール</p>
+                      <CodeBlock
+                        code={`brew install volta`}
+                        language="bash"
+                        title="ターミナル"
+                      />
+                    </li>
+                  </ol>
+                </div>
+              ) : (
+                <div className="p-6 rounded-xl border border-primary/20 bg-primary/5 shadow-sm">
+                  <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                    <Monitor size={18} />
+                    Windows: Volta のインストール
+                  </h3>
+                  <div className="bg-white dark:bg-slate-900 rounded-lg p-5 border border-primary/10 mb-4">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      公式サイトからインストーラーをダウンロードして実行します。
+                    </p>
+                    <a
+                      href="https://volta.sh/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded hover:bg-slate-700 transition-colors"
+                    >
+                      Volta 公式サイト (volta.sh)
+                    </a>
+                    <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+                      "Windows Installer" をダウンロードして実行し、完了後に<strong>PCを再起動</strong>してください。
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="p-6 rounded-xl border border-border bg-card">
+                <h3 className="text-lg font-bold text-foreground mb-4">Node.js を有効化する</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Volta が入ったら、以下のコマンドを 1 行打つだけで Node.js が使えるようになります。
+                </p>
+                <CodeBlock
+                  code={`# 最新の安定版を固定
+volta install node@lts
+
+# インストール確認
+node --version`}
+                  language="bash"
+                  title={platform === 'mac' ? 'ターミナル' : 'PowerShell'}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* 4. pnpm のインストール */}
+          <section>
+            <h2 className="text-3xl font-bold text-foreground mb-6">4. pnpm のインストール</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              ライブラリを追加するためのツールです。
+            </p>
+
+            <CodeBlock
+              code={`# pnpm をインストール
+volta install pnpm
+
+# インストール確認
+pnpm --version`}
+              language="bash"
+              title={platform === 'mac' ? 'ターミナル' : 'PowerShell'}
+            />
+          </section>
+
+          {/* 5. VS Code */}
+          <section>
+            <h2 className="text-3xl font-bold text-foreground mb-6">5. エディタのセットアップ</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              コードを書くためのエディタ、<strong>VS Code</strong> をインストールします。
+            </p>
+            <a
+              href="https://code.visualstudio.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-border text-foreground font-bold rounded-lg hover:bg-muted transition-colors"
+            >
+              VS Code をダウンロード
+            </a>
+            <div className="mt-6">
+              <InfoBox type="info" title="おすすめ拡張機能">
+                <p className="text-sm">
+                  「Prettier」「ESLint」「Tailwind CSS IntelliSense」を入れておくと開発が楽になります。
                 </p>
               </InfoBox>
             </div>
           </section>
 
-          {/* 最初のプロジェクト作成 */}
+          {/* 6. 最初のプロジェクト */}
           <section>
-            <h2 className="text-3xl font-bold text-foreground mb-6">最初の React プロジェクトを作成する</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-6">6. 最初のプロジェクトを作成</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
-              いよいよ React プロジェクトを作成します。<strong>Vite</strong>（ヴィート）という高速なビルドツールを使います。
-              Vite はフランス語で「速い」という意味で、その名の通り開発サーバーの起動が非常に高速です。
+              いよいよ React アプリを作ります。
             </p>
 
-            <div className="space-y-4 mb-6">
+            <div className="space-y-4">
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">1. プロジェクトを作成したいフォルダに移動</p>
+                <p className="text-sm font-medium text-foreground mb-2">1. フォルダを作成して移動</p>
                 <CodeBlock
-                  code={`# ホームディレクトリ直下に projects フォルダを作成
-mkdir -p ~/projects
+                  code={`mkdir -p ~/projects
 cd ~/projects`}
                   language="bash"
-                  title="ターミナル"
+                  title={platform === 'mac' ? 'ターミナル' : 'PowerShell'}
                 />
               </div>
 
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">2. Vite で React + TypeScript プロジェクトを作成</p>
+                <p className="text-sm font-medium text-foreground mb-2">2. Vite プロジェクトを作成</p>
                 <CodeBlock
                   code={`pnpm create vite my-app --template react-ts`}
                   language="bash"
-                  title="ターミナル"
+                  title={platform === 'mac' ? 'ターミナル' : 'PowerShell'}
                 />
-                <p className="text-sm text-muted-foreground mt-2">
-                  <code className="bg-muted px-1 py-0.5 rounded text-xs">my-app</code> の部分がプロジェクト名です。好きな名前に変えてOKです。
-                </p>
               </div>
 
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">3. プロジェクトフォルダに入り、パッケージをインストール</p>
+                <p className="text-sm font-medium text-foreground mb-2">3. 起動する</p>
                 <CodeBlock
                   code={`cd my-app
-pnpm install`}
+pnpm install
+pnpm dev`}
                   language="bash"
-                  title="ターミナル"
-                />
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-foreground mb-2">4. 開発サーバーを起動</p>
-                <CodeBlock
-                  code={`pnpm dev`}
-                  language="bash"
-                  title="ターミナル"
+                  title={platform === 'mac' ? 'ターミナル' : 'PowerShell'}
                 />
               </div>
             </div>
 
-            <InfoBox type="success" title="ブラウザで確認">
-              <p>
-                ターミナルに <code className="bg-muted px-1 py-0.5 rounded text-xs">http://localhost:5173</code> と表示されたら成功です。
-                このURLをブラウザで開くと、Vite + React のデフォルトページが表示されます。
-                おめでとうございます！あなたの最初の React アプリが動いています。
+            <InfoBox type="success" title="成功！">
+              <p className="text-sm">
+                ブラウザで <code className="bg-muted px-1 rounded">http://localhost:5173</code> を開いて、画面が表示されれば完了です。
               </p>
             </InfoBox>
           </section>
 
-          {/* プロジェクト構成の簡単な説明 */}
+          {/* まとめ */}
           <section>
-            <h2 className="text-3xl font-bold text-foreground mb-6">プロジェクト構成を確認する</h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              作成されたプロジェクトのフォルダ構成を簡単に見てみましょう。今は全てを理解する必要はありません。
-              次の STEP 3 で詳しく解説します。
-            </p>
-
-            <CodeBlock
-              code={`my-app/
-├── node_modules/     # インストールされたパッケージ（触らない）
-├── public/           # 静的ファイル（画像など）
-├── src/              # ここにコードを書いていく
-│   ├── App.tsx       # メインのコンポーネント（ここを編集する）
-│   ├── App.css       # App のスタイル
-│   ├── main.tsx      # アプリのエントリーポイント
-│   ├── index.css     # グローバルスタイル
-│   └── vite-env.d.ts # Vite の型定義
-├── index.html        # HTML テンプレート
-├── package.json      # プロジェクト設定とパッケージ一覧
-├── tsconfig.json     # TypeScript 設定
-└── vite.config.ts    # Vite 設定`}
-              language="text"
-              title="プロジェクト構成"
-            />
-
-            <div className="mt-4">
-              <InfoBox type="info" title="重要なポイント">
-                <p>
-                  <code className="bg-muted px-1 py-0.5 rounded text-xs">node_modules</code> フォルダは非常に大きく（数万ファイル）、
-                  Git にもコミットしません。<code className="bg-muted px-1 py-0.5 rounded text-xs">pnpm install</code> で自動生成されるので、
-                  中身を見たり編集したりする必要はありません。
-                </p>
-              </InfoBox>
-            </div>
-          </section>
-
-          {/* VS Code でプロジェクトを開く */}
-          <section>
-            <h2 className="text-3xl font-bold text-foreground mb-6">VS Code でプロジェクトを開く</h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              作成したプロジェクトを VS Code で開きましょう。
-            </p>
-
-            <CodeBlock
-              code={`# VS Code でプロジェクトを開く
-code .
-
-# Cursor の場合
-cursor .`}
-              language="bash"
-              title="ターミナル"
-            />
-
-            <p className="text-muted-foreground mt-4 leading-relaxed">
-              <code className="bg-muted px-1 py-0.5 rounded text-xs">code .</code> コマンドが動かない場合は、
-              VS Code を開いて <code className="bg-muted px-1 py-0.5 rounded text-xs">Cmd + Shift + P</code> で
-              コマンドパレットを開き、「Shell Command: Install 'code' command in PATH」を選択してください。
-            </p>
-
-            <div className="mt-6">
-              <InfoBox type="warning" title="開発サーバーを止めるには">
-                <p>
-                  <code className="bg-muted px-1 py-0.5 rounded text-xs">pnpm dev</code> で起動した開発サーバーは、
-                  ターミナルで <code className="bg-muted px-1 py-0.5 rounded text-xs">Ctrl + C</code> を押すと停止できます。
-                  ターミナルのウィンドウを閉じるだけでは停止しない場合があるので注意してください。
-                </p>
-              </InfoBox>
-            </div>
-          </section>
-
-          {/* このステップのまとめ */}
-          <section>
-            <h2 className="text-3xl font-bold text-foreground mb-6">このステップのまとめ</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-6">まとめ</h2>
             <div className="rounded-xl border border-border bg-card p-6">
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="text-secondary font-bold mt-0.5">&#10003;</span>
-                  <span>nvm 経由で <strong>Node.js</strong>（LTS）をインストールした</span>
+                <li className="flex items-center gap-2">
+                  <span className="text-primary font-bold">✓</span>
+                  <span>{platform === 'mac' ? 'ターミナル' : 'PowerShell'} の使い方がわかった</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-secondary font-bold mt-0.5">&#10003;</span>
-                  <span><strong>pnpm</strong> パッケージマネージャーをインストールした</span>
+                <li className="flex items-center gap-2">
+                  <span className="text-primary font-bold">✓</span>
+                  <span>Git、Node.js (Volta)、pnpm をインストールした</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-secondary font-bold mt-0.5">&#10003;</span>
-                  <span><strong>VS Code</strong>（または Cursor）と拡張機能をセットアップした</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-secondary font-bold mt-0.5">&#10003;</span>
-                  <span>ターミナルの基本コマンドを学んだ</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-secondary font-bold mt-0.5">&#10003;</span>
-                  <span><strong>Vite + React + TypeScript</strong> のプロジェクトを作成し、開発サーバーで表示を確認した</span>
+                <li className="flex items-center gap-2">
+                  <span className="text-primary font-bold">✓</span>
+                  <span>最初の React アプリがブラウザで動いた</span>
                 </li>
               </ul>
             </div>

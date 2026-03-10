@@ -1,5 +1,6 @@
 import { Switch, Route } from "wouter";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { PlatformProvider } from "./contexts/PlatformContext";
 import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
 import Setup from "./pages/intro/Setup";
@@ -47,17 +48,27 @@ import TailwindMui from "./pages/nextjs-css/TailwindMui";
 import CssModulesSc from "./pages/nextjs-css/CssModulesSc";
 import Vercel from "./pages/deploy/Vercel";
 import Summary from "./pages/deploy/Summary";
+import SbIntro from "./pages/storybook/SbIntro";
+import SbSetup from "./pages/storybook/SbSetup";
+import SbStructure from "./pages/storybook/SbStructure";
+import SbCss from "./pages/storybook/SbCss";
+import SbFigma from "./pages/storybook/SbFigma";
+import SbAdvanced from "./pages/storybook/SbAdvanced";
+import ArchOverview from "./pages/architecture/ArchOverview";
+import DesignSystem from "./pages/architecture/DesignSystem";
+import Maintenance from "./pages/architecture/Maintenance";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
 
 function App() {
   return (
     <ThemeProvider>
-      <div className="flex min-h-screen bg-background text-foreground font-poppins">
-        <Navigation />
-        <main className="flex-1 md:ml-64 w-full">
-          <Switch>
-            <Route path="/" component={Home} />
+      <PlatformProvider>
+        <div className="flex min-h-screen bg-background text-foreground font-poppins">
+          <Navigation />
+          <main className="flex-1 md:ml-64 w-full">
+            <Switch>
+              <Route path="/" component={Home} />
             <Route path="/intro/setup" component={Setup} />
             <Route path="/react-basics/hello-react" component={HelloReact} />
             <Route path="/react-basics/jsx" component={Jsx} />
@@ -103,11 +114,21 @@ function App() {
             <Route path="/nextjs-css/css-modules-sc" component={CssModulesSc} />
             <Route path="/deploy/vercel" component={Vercel} />
             <Route path="/deploy/summary" component={Summary} />
+            <Route path="/storybook/intro" component={SbIntro} />
+            <Route path="/storybook/setup" component={SbSetup} />
+            <Route path="/storybook/structure" component={SbStructure} />
+            <Route path="/storybook/css" component={SbCss} />
+            <Route path="/storybook/figma" component={SbFigma} />
+            <Route path="/storybook/advanced" component={SbAdvanced} />
+            <Route path="/architecture/overview" component={ArchOverview} />
+            <Route path="/architecture/design-system" component={DesignSystem} />
+            <Route path="/architecture/maintenance" component={Maintenance} />
             <Route component={NotFound} />
           </Switch>
         </main>
       </div>
       <Toaster position="bottom-right" />
+      </PlatformProvider>
     </ThemeProvider>
   );
 }
