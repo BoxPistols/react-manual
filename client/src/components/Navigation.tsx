@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
-import { ChevronDown, Menu, X, Search, Sun, Moon } from 'lucide-react';
+import { ChevronDown, Menu, X, Search, Sun, Moon, Columns2, Maximize } from 'lucide-react';
 import { pages, sections, getPageByPath, getSectionPages } from '@/lib/navigation';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLayout } from '@/contexts/LayoutContext';
 
 const navSections = sections.map((s) => ({
   ...s,
@@ -17,6 +18,7 @@ export default function Navigation() {
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { theme, toggleTheme } = useTheme();
+  const { layoutMode, toggleLayout } = useLayout();
   const [location] = useLocation();
 
   const currentPage = useMemo(() => getPageByPath(location), [location]);
@@ -81,14 +83,25 @@ export default function Navigation() {
             />
           </div>
 
-          {/* ダークモード切替 */}
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center gap-2 px-4 py-2 mb-4 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
-          >
-            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-            <span>{theme === 'dark' ? 'ライトモード' : 'ダークモード'}</span>
-          </button>
+          {/* ダークモード切替 + レイアウト切替 */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={toggleTheme}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+              title={theme === 'dark' ? 'ライトモード' : 'ダークモード'}
+            >
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+              <span className="text-xs">{theme === 'dark' ? 'ライト' : 'ダーク'}</span>
+            </button>
+            <button
+              onClick={toggleLayout}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+              title={layoutMode === 'normal' ? 'ワイドモード' : '通常モード'}
+            >
+              {layoutMode === 'normal' ? <Maximize size={16} /> : <Columns2 size={16} />}
+              <span className="text-xs">{layoutMode === 'normal' ? 'ワイド' : '通常'}</span>
+            </button>
+          </div>
 
           {/* 検索結果 */}
           {hasSearch ? (

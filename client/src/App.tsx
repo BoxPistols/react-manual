@@ -1,6 +1,8 @@
+import type { ReactNode } from "react";
 import { Switch, Route } from "wouter";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { PlatformProvider } from "./contexts/PlatformContext";
+import { LayoutProvider, useLayout } from "./contexts/LayoutContext";
 import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
 import Setup from "./pages/intro/Setup";
@@ -61,14 +63,24 @@ import NotFound from "./pages/NotFound";
 import KeyboardNav from "./components/KeyboardNav";
 import { Toaster } from "sonner";
 
+function MainContent({ children }: { children: ReactNode }) {
+  const { layoutMode } = useLayout();
+  return (
+    <main className={`flex-1 md:ml-64 w-full ${layoutMode === 'wide' ? 'layout-wide' : ''}`}>
+      {children}
+    </main>
+  );
+}
+
 function App() {
   return (
     <ThemeProvider>
       <PlatformProvider>
+        <LayoutProvider>
         <div className="flex min-h-screen bg-background text-foreground font-sans">
           <Navigation />
           <KeyboardNav />
-          <main className="flex-1 md:ml-64 w-full">
+          <MainContent>
             <Switch>
               <Route path="/" component={Home} />
             <Route path="/intro/setup" component={Setup} />
@@ -127,9 +139,10 @@ function App() {
             <Route path="/architecture/maintenance" component={Maintenance} />
             <Route component={NotFound} />
           </Switch>
-        </main>
+        </MainContent>
       </div>
       <Toaster position="bottom-right" />
+      </LayoutProvider>
       </PlatformProvider>
     </ThemeProvider>
   );
