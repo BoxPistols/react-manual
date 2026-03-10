@@ -181,10 +181,10 @@ export default function Navigation() {
                                 key={sub.href}
                                 href={sub.href}
                                 onClick={() => setIsOpen(false)}
-                                className={`block px-4 py-2 text-sm rounded-lg transition-colors ${
+                                className={`block px-4 py-2 text-sm transition-colors ${
                                   location === sub.href
-                                    ? 'nav-active'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                                    ? 'nav-active rounded-r-lg'
+                                    : 'rounded-lg text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
                                 }`}
                               >
                                 {sub.title}
@@ -228,10 +228,10 @@ export default function Navigation() {
                             key={sub.href}
                             href={sub.href}
                             onClick={() => setIsOpen(false)}
-                            className={`block px-4 py-2 text-sm rounded-lg transition-colors ${
+                            className={`block px-4 py-2 text-sm transition-colors ${
                               location === sub.href
-                                ? 'bg-primary/10 text-primary font-medium'
-                                : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                                ? 'nav-active rounded-r-lg'
+                                : 'rounded-lg text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
                             }`}
                           >
                             {sub.title}
@@ -273,10 +273,10 @@ export default function Navigation() {
                             key={sub.href}
                             href={sub.href}
                             onClick={() => setIsOpen(false)}
-                            className={`block px-4 py-2 text-sm rounded-lg transition-colors ${
+                            className={`block px-4 py-2 text-sm transition-colors ${
                               location === sub.href
-                                ? 'bg-primary/10 text-primary font-medium'
-                                : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                                ? 'nav-active rounded-r-lg'
+                                : 'rounded-lg text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
                             }`}
                           >
                             {sub.title}
@@ -318,10 +318,10 @@ export default function Navigation() {
                             key={sub.href}
                             href={sub.href}
                             onClick={() => setIsOpen(false)}
-                            className={`block px-4 py-2 text-sm rounded-lg transition-colors ${
+                            className={`block px-4 py-2 text-sm transition-colors ${
                               location === sub.href
-                                ? 'bg-primary/10 text-primary font-medium'
-                                : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                                ? 'nav-active rounded-r-lg'
+                                : 'rounded-lg text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
                             }`}
                           >
                             {sub.title}

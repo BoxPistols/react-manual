@@ -104,7 +104,7 @@ export const Loading = {
             </p>
 
             <div className="space-y-4 mb-6">
-              <div className="p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-950/30">
+              <div className="p-4 rounded-r-lg border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-950/30">
                 <h3 className="font-bold text-foreground mb-2">エンジニアの視点</h3>
                 <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-4">
                   <li>コンポーネントを単独で開発できるので、依存関係に振り回されない</li>
@@ -113,7 +113,7 @@ export const Loading = {
                   <li>リファクタリング時にビジュアルリグレッションを検出できる</li>
                 </ul>
               </div>
-              <div className="p-4 rounded-lg border-l-4 border-pink-500 bg-pink-50 dark:bg-pink-950/30">
+              <div className="p-4 rounded-r-lg border-l-4 border-pink-500 bg-pink-50 dark:bg-pink-950/30">
                 <h3 className="font-bold text-foreground mb-2">デザイナーの視点</h3>
                 <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-4">
                   <li>実装済みコンポーネントの「実物」を確認できる（Figma のモックではなく）</li>
@@ -122,7 +122,7 @@ export const Loading = {
                   <li>「こう実装されるはず」ではなく「こう実装されている」を確認できる</li>
                 </ul>
               </div>
-              <div className="p-4 rounded-lg border-l-4 border-green-500 bg-green-50 dark:bg-green-950/30">
+              <div className="p-4 rounded-r-lg border-l-4 border-green-500 bg-green-50 dark:bg-green-950/30">
                 <h3 className="font-bold text-foreground mb-2">チーム全体の視点</h3>
                 <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-4">
                   <li>「このコンポーネント、すでにあるよ」という発見ができる（重複開発の防止）</li>
