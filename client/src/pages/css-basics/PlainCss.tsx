@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function PlainCss() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 17</span>
+          <span className="step-badge">STEP 17</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">プレーン CSS と CSS Modules</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -79,22 +80,21 @@ export default function PlainCss() {
             <div className="mt-4" />
 
             <h3 className="text-lg font-semibold text-foreground mb-3">コンポーネントでのインポート</h3>
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="src/App.tsx"
-              code={`import './styles/App.css';
-
-function App() {
+              code={`function App() {
   return (
-    <div className="container">
-      <h1 className="title">こんにちは React</h1>
-      <div className="card">
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px' }}>
+      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1a1a1a' }}>こんにちは React</h1>
+      <div style={{ background: 'white', borderRadius: 8, padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <p>カードコンテンツ</p>
-        <button className="button">クリック</button>
+        <button style={{ padding: '8px 16px', border: 'none', borderRadius: 4, backgroundColor: '#3b82f6', color: 'white', cursor: 'pointer' }}>クリック</button>
       </div>
     </div>
   );
 }`}
+              previewHeight={180}
             />
 
             <InfoBox type="info" title="class ではなく className">
@@ -253,32 +253,28 @@ function Article() {
 
             <div className="mt-4" />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
-              title="src/components/Card.tsx"
-              code={`// CSS Modules をオブジェクトとしてインポート
-import styles from './Card.module.css';
-
-interface CardProps {
-  title: string;
-  description: string;
-  children?: React.ReactNode;
-}
-
-function Card({ title, description, children }: CardProps) {
+              title="src/components/Card.tsx（CSS Modules のプレビュー）"
+              code={`function App() {
   return (
-    // styles.card → "_card_x7h3k_1" のような一意のクラス名に変換される
-    <div className={styles.card}>
-      <h3 className={styles.title}>{title}</h3>
-      <p className={styles.description}>{description}</p>
-      {children && (
-        <div className={styles.footer}>{children}</div>
-      )}
+    <div style={{
+      background: 'white',
+      borderRadius: 12,
+      padding: 24,
+      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+      transition: 'box-shadow 0.2s ease',
+      maxWidth: 360,
+    }}>
+      <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>カードタイトル</h3>
+      <p style={{ fontSize: '0.875rem', color: '#64748b', lineHeight: 1.6 }}>カードの説明文です。CSS Modules により、クラス名がユニークに変換されます。</p>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
+        <button style={{ padding: '8px 16px', border: 'none', borderRadius: 6, backgroundColor: '#3b82f6', color: 'white', cursor: 'pointer', fontWeight: 500 }}>詳細</button>
+      </div>
     </div>
   );
-}
-
-export default Card;`}
+}`}
+              previewHeight={200}
             />
 
             <div className="mt-4" />
@@ -1099,24 +1095,44 @@ export default ProfileCard;`}
 
             <div className="mt-4" />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
-              title="使用例"
-              code={`import ProfileCard from './components/ProfileCard';
-
-function App() {
+              title="プロフィールカードのプレビュー"
+              code={`function App() {
+  const tags = ['Figma', 'React', 'TypeScript', 'UI デザイン'];
   return (
-    <ProfileCard
-      name="田中 花子"
-      role="UI/UX デザイナー"
-      bio="ユーザー体験を大切にしたデザインを心がけています。Figma と React が好きです。"
-      avatarUrl="/avatar.jpg"
-      tags={['Figma', 'React', 'TypeScript', 'UI デザイン']}
-      onFollow={() => console.log('フォローしました')}
-      onMessage={() => console.log('メッセージ画面を開く')}
-    />
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      background: 'white', borderRadius: 16, padding: '32px 24px',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.08)', maxWidth: 320, margin: '0 auto',
+    }}>
+      <div style={{
+        width: 80, height: 80, borderRadius: '50%', border: '3px solid #e2e8f0',
+        marginBottom: 16, background: 'linear-gradient(135deg, #667eea, #764ba2)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'white', fontSize: '1.5rem', fontWeight: 700,
+      }}>田</div>
+      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>田中 花子</h3>
+      <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: 16 }}>UI/UX デザイナー</p>
+      <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, textAlign: 'center', marginBottom: 20 }}>
+        ユーザー体験を大切にしたデザインを心がけています。
+      </p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: 20 }}>
+        {tags.map(function(tag) {
+          return React.createElement('span', {
+            key: tag,
+            style: { padding: '4px 12px', borderRadius: 9999, fontSize: '0.75rem', fontWeight: 500, backgroundColor: '#eff6ff', color: '#3b82f6' }
+          }, tag);
+        })}
+      </div>
+      <div style={{ display: 'flex', gap: 12, width: '100%' }}>
+        <button style={{ flex: 1, padding: '10px 20px', border: 'none', borderRadius: 8, fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', backgroundColor: '#3b82f6', color: 'white' }}>フォロー</button>
+        <button style={{ flex: 1, padding: '10px 20px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', backgroundColor: 'white', color: '#334155' }}>メッセージ</button>
+      </div>
+    </div>
   );
 }`}
+              previewHeight={400}
             />
           </section>
 

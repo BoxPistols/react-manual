@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function UseContext() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 13</span>
+          <span className="step-badge">STEP 13</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">useContext</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -313,9 +314,82 @@ export function useTheme() {
               </InfoBox>
             </div>
 
+            <CodePreview
+              title="テーマ切り替えの動作デモ → ボタンを押してみよう"
+              previewHeight={260}
+              code={`const ThemeContext = React.createContext({
+  isDark: false,
+  toggleTheme: () => {},
+})
+
+function ThemeProvider({ children }) {
+  const [isDark, setIsDark] = React.useState(false)
+  const toggleTheme = () => setIsDark((prev) => !prev)
+  return (
+    React.createElement(ThemeContext.Provider, { value: { isDark, toggleTheme } }, children)
+  )
+}
+
+function useTheme() {
+  return React.useContext(ThemeContext)
+}
+
+function Header() {
+  const { isDark, toggleTheme } = useTheme()
+  return (
+    <header style={{
+      padding: '12px 16px',
+      backgroundColor: isDark ? '#1F2937' : '#F9FAFB',
+      color: isDark ? '#F9FAFB' : '#1F2937',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderRadius: '8px',
+      marginBottom: '12px',
+    }}>
+      <h1 style={{ fontSize: '16px', fontWeight: 'bold' }}>My App</h1>
+      <button onClick={toggleTheme} style={{
+        padding: '6px 14px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+        backgroundColor: isDark ? '#3B82F6' : '#2563EB', color: 'white', fontSize: '13px',
+      }}>
+        {isDark ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
+      </button>
+    </header>
+  )
+}
+
+function Card({ title, children }) {
+  const { isDark } = useTheme()
+  return (
+    <div style={{
+      padding: '12px 16px',
+      borderRadius: '8px',
+      border: '1px solid',
+      borderColor: isDark ? '#374151' : '#E5E7EB',
+      backgroundColor: isDark ? '#1F2937' : '#FFFFFF',
+      color: isDark ? '#F9FAFB' : '#1F2937',
+      marginBottom: '8px',
+    }}>
+      <h2 style={{ fontWeight: 'bold', marginBottom: '4px', fontSize: '14px' }}>{title}</h2>
+      {children}
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <Header />
+      <Card title="カード 1"><p style={{ fontSize: '13px' }}>Context でテーマが共有されています</p></Card>
+      <Card title="カード 2"><p style={{ fontSize: '13px' }}>どの階層でも useTheme() で取得できます</p></Card>
+    </ThemeProvider>
+  )
+}
+`}
+            />
             <CodeBlock
               language="tsx"
-              title="テーマを使うコンポーネント"
+              title="テーマを使うコンポーネント（コード例）"
               code={`import { useTheme } from './context/ThemeContext';
 
 function Header() {
@@ -412,9 +486,77 @@ export function useLanguage() {
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">複数の Context を組み合わせて使う</h3>
+            <CodePreview
+              title="テーマ + 言語切り替えデモ → 操作してみよう"
+              previewHeight={180}
+              code={`const ThemeCtx = React.createContext({ isDark: false, toggleTheme: () => {} })
+const LangCtx = React.createContext({ language: 'ja', setLanguage: () => {}, t: (k) => k })
+
+const translations = {
+  ja: { greeting: 'こんにちは', settings: '設定' },
+  en: { greeting: 'Hello', settings: 'Settings' },
+  zh: { greeting: '你好', settings: '设置' },
+}
+
+function Providers({ children }) {
+  const [isDark, setIsDark] = React.useState(false)
+  const [language, setLanguage] = React.useState('ja')
+  const t = (key) => translations[language][key] || key
+  return (
+    React.createElement(ThemeCtx.Provider, { value: { isDark, toggleTheme: () => setIsDark(p => !p) } },
+      React.createElement(LangCtx.Provider, { value: { language, setLanguage, t } }, children)
+    )
+  )
+}
+
+function Header() {
+  const { isDark, toggleTheme } = React.useContext(ThemeCtx)
+  const { language, setLanguage, t } = React.useContext(LangCtx)
+  return (
+    <header style={{
+      padding: '12px 16px', borderRadius: '8px', marginBottom: '12px',
+      backgroundColor: isDark ? '#1F2937' : '#F9FAFB',
+      color: isDark ? '#F9FAFB' : '#1F2937',
+      display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
+    }}>
+      <h1 style={{ fontSize: '16px', fontWeight: 'bold' }}>{t('greeting')}</h1>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <button onClick={toggleTheme} style={{ padding: '4px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', backgroundColor: isDark ? '#3B82F6' : '#2563EB', color: 'white', fontSize: '12px' }}>
+          {isDark ? 'Light' : 'Dark'}
+        </button>
+        <select value={language} onChange={(e) => setLanguage(e.target.value)} style={{ padding: '4px 8px', borderRadius: '6px', border: '1px solid #D1D5DB', fontSize: '12px' }}>
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+    </header>
+  )
+}
+
+function Content() {
+  const { isDark } = React.useContext(ThemeCtx)
+  const { t } = React.useContext(LangCtx)
+  return (
+    <div style={{ padding: '12px 16px', borderRadius: '8px', border: '1px solid', borderColor: isDark ? '#374151' : '#E5E7EB', backgroundColor: isDark ? '#1F2937' : '#fff', color: isDark ? '#F9FAFB' : '#1F2937' }}>
+      <p style={{ fontSize: '13px' }}>{t('settings')} - 複数の Context を組み合わせています</p>
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <Providers>
+      <Header />
+      <Content />
+    </Providers>
+  )
+}
+`}
+            />
             <CodeBlock
               language="tsx"
-              title="複数 Context を消費するコンポーネント"
+              title="複数 Context を消費するコンポーネント（コード例）"
               showLineNumbers
               code={`import { useTheme } from './context/ThemeContext';
 import { useLanguage } from './context/LanguageContext';

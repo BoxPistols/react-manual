@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,12 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function TypeScriptBasics() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
-            STEP 7
-          </span>
+          <span className="step-badge">STEP 7</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">
           TypeScript で型をつける
@@ -211,52 +210,46 @@ type ButtonStyle = BaseStyle & {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               コンポーネントの Props に型をつけることで、使うときにエディタが正しい Props を教えてくれます。間違ったデータを渡すとコンパイルエラーになるので、バグを未然に防げます。
             </p>
-            <CodeBlock
-              code={`// Props 用の interface を定義
-interface AlertProps {
-  title: string;
-  message: string;
-  type: 'info' | 'warning' | 'error';  // 決められた値のみ
-  onClose: () => void;                  // 関数の型
-}
-
-function Alert({ title, message, type, onClose }: AlertProps) {
+            <CodePreview
+              code={`function Alert({ title, message, type, onClose }) {
   const colors = {
-    info: 'bg-blue-50 border-blue-200 text-blue-800',
-    warning: 'bg-amber-50 border-amber-200 text-amber-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
+    info: { bg: '#eff6ff', border: '#bfdbfe', text: '#1e40af' },
+    warning: { bg: '#fffbeb', border: '#fde68a', text: '#92400e' },
+    error: { bg: '#fef2f2', border: '#fecaca', text: '#991b1b' },
   };
+  const c = colors[type] || colors.info;
 
   return (
-    <div className={\`p-4 border rounded-lg \${colors[type]}\`}>
-      <div className="flex justify-between items-start">
+    <div style={{
+      padding: '16px', border: '1px solid ' + c.border,
+      borderRadius: '8px', backgroundColor: c.bg, color: c.text,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h3 className="font-bold">{title}</h3>
-          <p className="text-sm mt-1">{message}</p>
+          <h3 style={{ fontWeight: 'bold', margin: 0 }}>{title}</h3>
+          <p style={{ fontSize: '14px', marginTop: '4px' }}>{message}</p>
         </div>
-        <button onClick={onClose} className="text-lg leading-none">
-          &times;
-        </button>
+        <button onClick={onClose} style={{
+          fontSize: '18px', lineHeight: 1, background: 'none',
+          border: 'none', cursor: 'pointer', color: c.text,
+        }}>&times;</button>
       </div>
     </div>
   );
 }
 
-// 正しい使い方 - エディタが補完してくれる
-<Alert
-  title="保存完了"
-  message="変更が保存されました"
-  type="info"
-  onClose={() => console.log('閉じた')}
-/>
-
-// エラーになる例
-// <Alert title="テスト" type="danger" />
-// → "danger" は type に含まれない
-// → message と onClose が不足`}
+function App() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <Alert title="保存完了" message="変更が保存されました" type="info" onClose={() => {}} />
+      <Alert title="注意" message="入力内容を確認してください" type="warning" onClose={() => {}} />
+      <Alert title="エラー" message="送信に失敗しました" type="error" onClose={() => {}} />
+    </div>
+  );
+}`}
               language="tsx"
               title="Props に型を定義する"
-              showLineNumbers
+              previewHeight={220}
             />
           </section>
 
@@ -266,43 +259,50 @@ function Alert({ title, message, type, onClose }: AlertProps) {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               プロパティ名の後に <code className="text-sm bg-muted px-1.5 py-0.5 rounded">?</code> をつけると、その Props は省略可能になります。省略された場合の値は <code className="text-sm bg-muted px-1.5 py-0.5 rounded">undefined</code> です。
             </p>
-            <CodeBlock
-              code={`interface AvatarProps {
-  src: string;          // 必須
-  alt: string;          // 必須
-  size?: number;        // オプショナル（省略可）
-  rounded?: boolean;    // オプショナル
-  border?: boolean;     // オプショナル
-}
-
-function Avatar({
-  src,
-  alt,
-  size = 48,          // デフォルト値を設定
-  rounded = true,
-  border = false,
-}: AvatarProps) {
+            <CodePreview
+              code={`function Avatar({ src, alt, size = 48, rounded = true, border = false }) {
   return (
     <img
       src={src}
       alt={alt}
-      style={{ width: size, height: size }}
-      className={\`
-        object-cover
-        \${rounded ? 'rounded-full' : 'rounded-lg'}
-        \${border ? 'border-2 border-white shadow' : ''}
-      \`}
+      style={{
+        width: size,
+        height: size,
+        objectFit: 'cover',
+        borderRadius: rounded ? '50%' : '8px',
+        border: border ? '2px solid #fff' : 'none',
+        boxShadow: border ? '0 1px 3px rgba(0,0,0,0.2)' : 'none',
+      }}
     />
   );
 }
 
-// 必須の Props だけ渡せばOK
-<Avatar src="/photo.jpg" alt="プロフィール写真" />
-
-// オプショナルな Props を個別に指定
-<Avatar src="/photo.jpg" alt="写真" size={64} rounded={false} />`}
+function App() {
+  const imgUrl = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix';
+  return (
+    <div style={{ display: 'flex', gap: '16px', alignItems: 'end', flexWrap: 'wrap' }}>
+      <div style={{ textAlign: 'center' }}>
+        <Avatar src={imgUrl} alt="デフォルト" />
+        <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>デフォルト</p>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <Avatar src={imgUrl} alt="大きい" size={64} />
+        <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>size=64</p>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <Avatar src={imgUrl} alt="角丸" size={64} rounded={false} />
+        <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>rounded=false</p>
+      </div>
+      <div style={{ textAlign: 'center', backgroundColor: '#3b82f6', padding: '8px', borderRadius: '8px' }}>
+        <Avatar src={imgUrl} alt="ボーダー" size={56} border={true} />
+        <p style={{ fontSize: '11px', color: '#fff', marginTop: '4px' }}>border=true</p>
+      </div>
+    </div>
+  );
+}`}
               language="tsx"
               title="オプショナル Props とデフォルト値"
+              previewHeight={120}
             />
           </section>
 
@@ -312,64 +312,62 @@ function Avatar({
             <p className="text-muted-foreground mb-4 leading-relaxed">
               ユニオン型（<code className="text-sm bg-muted px-1.5 py-0.5 rounded">|</code> で区切る）を使うと、「この中のどれか」という型を作れます。デザインシステムのバリアント（variant）やサイズ（size）を定義するのにぴったりです。
             </p>
-            <CodeBlock
-              code={`// バリアントをユニオン型で定義
-type Variant = 'primary' | 'secondary' | 'outline' | 'ghost';
-type Size = 'sm' | 'md' | 'lg';
-
-interface ButtonProps {
-  children: React.ReactNode;
-  variant?: Variant;   // ユニオン型を使う
-  size?: Size;
-  disabled?: boolean;
-  onClick?: () => void;
-}
-
-function Button({
-  children,
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  onClick,
-}: ButtonProps) {
-  const variantStyles: Record<Variant, string> = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-600 text-white hover:bg-gray-700',
-    outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50',
-    ghost: 'text-blue-600 hover:bg-blue-50',
+            <CodePreview
+              code={`function Button({ children, variant = 'primary', size = 'md', disabled = false, onClick }) {
+  const variantStyles = {
+    primary: { backgroundColor: '#2563eb', color: '#fff', border: 'none' },
+    secondary: { backgroundColor: '#4b5563', color: '#fff', border: 'none' },
+    outline: { backgroundColor: 'transparent', color: '#2563eb', border: '2px solid #2563eb' },
+    ghost: { backgroundColor: 'transparent', color: '#2563eb', border: 'none' },
   };
-
-  const sizeStyles: Record<Size, string> = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
+  const sizeStyles = {
+    sm: { padding: '6px 12px', fontSize: '13px' },
+    md: { padding: '8px 16px', fontSize: '15px' },
+    lg: { padding: '12px 24px', fontSize: '17px' },
   };
 
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={\`
-        rounded-lg font-medium transition-colors
-        \${variantStyles[variant]}
-        \${sizeStyles[size]}
-        \${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-      \`}
+      style={{
+        ...variantStyles[variant],
+        ...sizeStyles[size],
+        borderRadius: '8px',
+        fontWeight: 500,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+      }}
     >
       {children}
     </button>
   );
 }
 
-// エディタが variant の候補を自動補完してくれる
-<Button variant="primary" size="lg">保存する</Button>
-<Button variant="ghost" size="sm">キャンセル</Button>
-<Button variant="outline" onClick={() => alert('クリック！')}>
-  詳細を見る
-</Button>`}
+function App() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <Button variant="primary">Primary</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="outline">Outline</Button>
+        <Button variant="ghost">Ghost</Button>
+      </div>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <Button size="sm">Small</Button>
+        <Button size="md">Medium</Button>
+        <Button size="lg">Large</Button>
+      </div>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <Button disabled>Disabled</Button>
+        <Button variant="outline" onClick={() => alert('クリック！')}>Click me</Button>
+      </div>
+    </div>
+  );
+}`}
               language="tsx"
               title="ユニオン型でデザインバリアントを表現"
-              showLineNumbers
+              previewHeight={180}
             />
             <InfoBox type="info" title="Record 型について">
               <p>

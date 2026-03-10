@@ -1,14 +1,15 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
 
 export default function Shadcn() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 24</span>
+          <span className="step-badge">STEP 24</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">shadcn/ui</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -127,35 +128,29 @@ npx shadcn@latest add button card dialog input select`}
               shadcn/ui の Button はバリアント（種類）とサイズを props で切り替えられます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="Button の使い方"
-              code={`import { Button } from '@/components/ui/button';
-
-function ButtonExamples() {
+              previewHeight={180}
+              code={`function App() {
+  const base = { border: 'none', borderRadius: 6, fontWeight: 500, cursor: 'pointer', fontSize: 14, padding: '8px 16px', transition: 'all 0.15s' };
   return (
-    <div className="flex flex-wrap gap-4">
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
       {/* バリアント */}
-      <Button>デフォルト</Button>
-      <Button variant="secondary">セカンダリ</Button>
-      <Button variant="destructive">削除</Button>
-      <Button variant="outline">アウトライン</Button>
-      <Button variant="ghost">ゴースト</Button>
-      <Button variant="link">リンク</Button>
+      <button style={{ ...base, background: '#18181b', color: '#fff' }}>デフォルト</button>
+      <button style={{ ...base, background: '#f4f4f5', color: '#18181b' }}>セカンダリ</button>
+      <button style={{ ...base, background: '#ef4444', color: '#fff' }}>削除</button>
+      <button style={{ ...base, background: 'transparent', color: '#18181b', border: '1px solid #e4e4e7' }}>アウトライン</button>
+      <button style={{ ...base, background: 'transparent', color: '#18181b' }}>ゴースト</button>
+      <button style={{ ...base, background: 'transparent', color: '#18181b', textDecoration: 'underline', padding: '8px 4px' }}>リンク</button>
 
       {/* サイズ */}
-      <Button size="sm">小さい</Button>
-      <Button size="default">標準</Button>
-      <Button size="lg">大きい</Button>
-      <Button size="icon">🔍</Button>
+      <button style={{ ...base, background: '#18181b', color: '#fff', fontSize: 12, padding: '4px 12px' }}>小さい</button>
+      <button style={{ ...base, background: '#18181b', color: '#fff' }}>標準</button>
+      <button style={{ ...base, background: '#18181b', color: '#fff', fontSize: 16, padding: '10px 24px' }}>大きい</button>
 
-      {/* 無効状態 */}
-      <Button disabled>無効</Button>
-
-      {/* asChild: 別の要素として描画 */}
-      <Button asChild>
-        <a href="/about">リンクとして描画</a>
-      </Button>
+      {/* 無効 */}
+      <button style={{ ...base, background: '#18181b', color: '#fff', opacity: 0.5, cursor: 'not-allowed' }} disabled>無効</button>
     </div>
   );
 }`}
@@ -169,49 +164,29 @@ function ButtonExamples() {
               Card は複数のサブコンポーネント（Header、Title、Content、Footer）を組み合わせて使います。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="Card の使い方"
-              code={`import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-
-function ProjectCard() {
+              previewHeight={250}
+              code={`function App() {
+  const card = { width: 320, border: '1px solid #e4e4e7', borderRadius: 12, overflow: 'hidden', background: '#fff' };
+  const btn = { border: 'none', borderRadius: 6, fontWeight: 500, cursor: 'pointer', fontSize: 14, padding: '8px 16px' };
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>プロジェクト名</CardTitle>
-        <CardDescription>
-          React と Tailwind CSS で作るポートフォリオサイト
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-2">
-          <span className="px-2 py-1 bg-blue-100 text-blue-700
-                           text-xs rounded-full">
-            React
-          </span>
-          <span className="px-2 py-1 bg-green-100 text-green-700
-                           text-xs rounded-full">
-            Tailwind
-          </span>
-          <span className="px-2 py-1 bg-purple-100 text-purple-700
-                           text-xs rounded-full">
-            TypeScript
-          </span>
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline">詳細</Button>
-        <Button>デモを見る</Button>
-      </CardFooter>
-    </Card>
+    <div style={card}>
+      <div style={{ padding: '20px 20px 0' }}>
+        <h3 style={{ margin: 0, fontWeight: 600, fontSize: 18 }}>プロジェクト名</h3>
+        <p style={{ margin: '4px 0 0', color: '#71717a', fontSize: 14 }}>React と Tailwind CSS で作るポートフォリオサイト</p>
+      </div>
+      <div style={{ padding: '12px 20px', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ padding: '2px 10px', background: '#dbeafe', color: '#1d4ed8', fontSize: 12, borderRadius: 9999 }}>React</span>
+        <span style={{ padding: '2px 10px', background: '#dcfce7', color: '#15803d', fontSize: 12, borderRadius: 9999 }}>Tailwind</span>
+        <span style={{ padding: '2px 10px', background: '#f3e8ff', color: '#7c3aed', fontSize: 12, borderRadius: 9999 }}>TypeScript</span>
+      </div>
+      <div style={{ padding: '12px 20px 20px', display: 'flex', justifyContent: 'space-between' }}>
+        <button style={{ ...btn, background: 'transparent', border: '1px solid #e4e4e7', color: '#18181b' }}>詳細</button>
+        <button style={{ ...btn, background: '#18181b', color: '#fff' }}>デモを見る</button>
+      </div>
+    </div>
   );
 }`}
             />
@@ -363,112 +338,64 @@ function DeleteConfirmDialog() {
               shadcn/ui のコンポーネントを組み合わせて、実用的な設定画面を作ってみましょう。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="SettingsPage.tsx"
-              showLineNumbers
-              code={`import { Button } from '@/components/ui/button';
-import {
-  Card, CardHeader, CardTitle,
-  CardDescription, CardContent, CardFooter,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select, SelectContent, SelectItem,
-  SelectTrigger, SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
+              previewHeight={400}
+              code={`function App() {
+  const [email, setEmail] = React.useState(false);
+  const [push, setPush] = React.useState(false);
+  const card = { border: '1px solid #e4e4e7', borderRadius: 12, background: '#fff', overflow: 'hidden' };
+  const input = { width: '100%', padding: '8px 12px', border: '1px solid #e4e4e7', borderRadius: 6, fontSize: 14, outline: 'none', boxSizing: 'border-box' };
+  const label = { fontSize: 14, fontWeight: 500, display: 'block', marginBottom: 4 };
+  const toggle = (on) => ({
+    width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer',
+    background: on ? '#18181b' : '#e4e4e7', position: 'relative', transition: 'background 0.2s',
+  });
+  const dot = (on) => ({
+    width: 20, height: 20, borderRadius: '50%', background: '#fff',
+    position: 'absolute', top: 2, left: on ? 22 : 2, transition: 'left 0.2s',
+  });
 
-export default function SettingsPage() {
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+    <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div>
-        <h1 className="text-3xl font-bold">設定</h1>
-        <p className="text-muted-foreground">
-          アカウントと通知の設定を管理します。
-        </p>
+        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>設定</h1>
+        <p style={{ color: '#71717a', margin: '4px 0 0', fontSize: 14 }}>アカウントと通知の設定を管理します。</p>
+      </div>
+      <hr style={{ border: 'none', borderTop: '1px solid #e4e4e7' }} />
+
+      <div style={card}>
+        <div style={{ padding: '16px 20px 0' }}>
+          <h3 style={{ margin: 0, fontWeight: 600 }}>プロフィール</h3>
+          <p style={{ color: '#71717a', fontSize: 14, margin: '2px 0 0' }}>公開される情報を編集します。</p>
+        </div>
+        <div style={{ padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div><span style={label}>表示名</span><input style={input} placeholder="田中 太郎" /></div>
+          <div><span style={label}>メールアドレス</span><input style={input} placeholder="taro@example.com" /></div>
+        </div>
+        <div style={{ padding: '8px 20px 16px' }}>
+          <button style={{ background: '#18181b', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 500, cursor: 'pointer' }}>保存する</button>
+        </div>
       </div>
 
-      <Separator />
-
-      {/* プロフィール設定 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>プロフィール</CardTitle>
-          <CardDescription>
-            公開される情報を編集します。
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">表示名</Label>
-            <Input id="name" placeholder="田中 太郎" />
+      <div style={card}>
+        <div style={{ padding: '16px 20px 0' }}>
+          <h3 style={{ margin: 0, fontWeight: 600 }}>通知</h3>
+          <p style={{ color: '#71717a', fontSize: 14, margin: '2px 0 0' }}>通知の受け取り方を設定します。</p>
+        </div>
+        <div style={{ padding: '12px 20px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div><p style={{ fontWeight: 500, margin: 0 }}>メール通知</p><p style={{ color: '#71717a', fontSize: 13, margin: '2px 0 0' }}>重要な更新をメールで受け取る</p></div>
+            <button onClick={() => setEmail(!email)} style={toggle(email)}><div style={dot(email)} /></button>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">メールアドレス</Label>
-            <Input id="email" type="email" placeholder="taro@example.com" />
+          <hr style={{ border: 'none', borderTop: '1px solid #f4f4f5' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div><p style={{ fontWeight: 500, margin: 0 }}>プッシュ通知</p><p style={{ color: '#71717a', fontSize: 13, margin: '2px 0 0' }}>ブラウザのプッシュ通知を有効にする</p></div>
+            <button onClick={() => setPush(!push)} style={toggle(push)}><div style={dot(push)} /></button>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="role">役職</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="選択してください" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="designer">デザイナー</SelectItem>
-                <SelectItem value="engineer">エンジニア</SelectItem>
-                <SelectItem value="manager">マネージャー</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button>保存する</Button>
-        </CardFooter>
-      </Card>
-
-      {/* 通知設定 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>通知</CardTitle>
-          <CardDescription>
-            通知の受け取り方を設定します。
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">メール通知</p>
-              <p className="text-sm text-muted-foreground">
-                重要な更新をメールで受け取る
-              </p>
-            </div>
-            <Switch />
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">プッシュ通知</p>
-              <p className="text-sm text-muted-foreground">
-                ブラウザのプッシュ通知を有効にする
-              </p>
-            </div>
-            <Switch />
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">マーケティング</p>
-              <p className="text-sm text-muted-foreground">
-                新機能やキャンペーン情報を受け取る
-              </p>
-            </div>
-            <Switch />
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }`}

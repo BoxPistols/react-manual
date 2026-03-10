@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function CssInJs() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 18</span>
+          <span className="step-badge">STEP 18</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">CSS-in-JS の考え方</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -38,35 +39,32 @@ export default function CssInJs() {
               スタイルはコンポーネントと同じファイル内に書かれ、JavaScript の力を使って動的にスタイルを生成します。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="CSS-in-JS の基本的なイメージ"
-              code={`import styled from 'styled-components';
+              code={`function App() {
+  const buttonBase = {
+    padding: '8px 16px',
+    border: 'none',
+    borderRadius: 6,
+    fontWeight: 600,
+    cursor: 'pointer',
+    fontSize: '0.875rem',
+    marginRight: 8,
+  };
 
-// JavaScript の中で CSS を書く
-const Button = styled.button\`
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  background-color: \${(props) => props.$primary ? '#3b82f6' : '#e2e8f0'};
-  color: \${(props) => props.$primary ? 'white' : '#334155'};
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.9;
-  }
-\`;
-
-// スタイル付きコンポーネントとして使う
-function App() {
   return (
-    <div>
-      <Button>通常ボタン</Button>
-      <Button $primary>プライマリボタン</Button>
+    <div style={{ display: 'flex', gap: 8 }}>
+      <button style={{ ...buttonBase, backgroundColor: '#e2e8f0', color: '#334155' }}>
+        通常ボタン
+      </button>
+      <button style={{ ...buttonBase, backgroundColor: '#3b82f6', color: 'white' }}>
+        プライマリボタン
+      </button>
     </div>
   );
 }`}
+              previewHeight={80}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">CSS-in-JS が生まれた背景</h3>
@@ -241,44 +239,42 @@ export default function CounterCard() {
               CSS だけでは実現が難しい条件分岐やアニメーションも自然に書けます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="props に基づく動的スタイル"
-              code={`import styled from 'styled-components';
-
-interface ProgressBarProps {
-  value: number;     // 0-100
-  color?: string;
-}
-
-const Track = styled.div\`
-  width: 100%;
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 4px;
-  overflow: hidden;
-\`;
-
-const Fill = styled.div<{ $value: number; $color: string }>\`
-  height: 100%;
-  width: \${(props) => props.$value}%;
-  background: \${(props) => props.$color};
-  border-radius: 4px;
-  transition: width 0.3s ease;
-\`;
-
-function ProgressBar({ value, color = '#3b82f6' }: ProgressBarProps) {
+              code={`function ProgressBar({ value, color }) {
   return (
-    <Track>
-      <Fill $value={Math.min(100, Math.max(0, value))} $color={color} />
-    </Track>
+    <div style={{ width: '100%', height: 8, background: '#e2e8f0', borderRadius: 4, overflow: 'hidden' }}>
+      <div style={{
+        height: '100%',
+        width: Math.min(100, Math.max(0, value)) + '%',
+        background: color || '#3b82f6',
+        borderRadius: 4,
+        transition: 'width 0.3s ease',
+      }} />
+    </div>
   );
 }
 
-// 使用例
-<ProgressBar value={75} />
-<ProgressBar value={30} color="#10b981" />
-<ProgressBar value={90} color="#f59e0b" />`}
+function App() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div>
+        <span style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 4, display: 'block' }}>75%</span>
+        <ProgressBar value={75} />
+      </div>
+      <div>
+        <span style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 4, display: 'block' }}>30%</span>
+        <ProgressBar value={30} color="#10b981" />
+      </div>
+      <div>
+        <span style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 4, display: 'block' }}>90%</span>
+        <ProgressBar value={90} color="#f59e0b" />
+      </div>
+    </div>
+  );
+}`}
+              previewHeight={140}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">3. テーミング</h3>
@@ -351,53 +347,49 @@ function App() {
               存在しない props を渡そうとするとコンパイルエラーになるため、安全です。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
-              title="型安全なスタイル props"
-              code={`import styled from 'styled-components';
+              title="型安全なスタイル props（プレビュー）"
+              code={`function App() {
+  var sizeMap = {
+    sm: { padding: '6px 12px', fontSize: '0.75rem' },
+    md: { padding: '8px 16px', fontSize: '0.875rem' },
+    lg: { padding: '12px 24px', fontSize: '1rem' },
+  };
+  var colorMap = {
+    primary: '#3b82f6',
+    secondary: '#6b7280',
+    danger: '#ef4444',
+  };
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger';
-type ButtonSize = 'sm' | 'md' | 'lg';
-
-interface ButtonStyleProps {
-  $variant: ButtonVariant;
-  $size: ButtonSize;
-  $fullWidth?: boolean;
-}
-
-const sizeMap: Record<ButtonSize, { padding: string; fontSize: string }> = {
-  sm: { padding: '6px 12px', fontSize: '0.75rem' },
-  md: { padding: '8px 16px', fontSize: '0.875rem' },
-  lg: { padding: '12px 24px', fontSize: '1rem' },
-};
-
-const colorMap: Record<ButtonVariant, { bg: string; hover: string }> = {
-  primary: { bg: '#3b82f6', hover: '#2563eb' },
-  secondary: { bg: '#6b7280', hover: '#4b5563' },
-  danger: { bg: '#ef4444', hover: '#dc2626' },
-};
-
-// TypeScript で props の型を定義
-const StyledButton = styled.button<ButtonStyleProps>\`
-  padding: \${(props) => sizeMap[props.$size].padding};
-  font-size: \${(props) => sizeMap[props.$size].fontSize};
-  background-color: \${(props) => colorMap[props.$variant].bg};
-  color: white;
-  border: none;
-  border-radius: 6px;
-  width: \${(props) => (props.$fullWidth ? '100%' : 'auto')};
-  cursor: pointer;
-
-  &:hover {
-    background-color: \${(props) => colorMap[props.$variant].hover};
+  function StyledButton({ variant, size, fullWidth, children }) {
+    return React.createElement('button', {
+      style: {
+        padding: sizeMap[size].padding,
+        fontSize: sizeMap[size].fontSize,
+        backgroundColor: colorMap[variant],
+        color: 'white',
+        border: 'none',
+        borderRadius: 6,
+        width: fullWidth ? '100%' : 'auto',
+        cursor: 'pointer',
+        fontWeight: 600,
+      }
+    }, children);
   }
-\`;
 
-// 使用時に型チェックが効く
-<StyledButton $variant="primary" $size="md">OK</StyledButton>
-<StyledButton $variant="danger" $size="lg" $fullWidth>削除</StyledButton>
-// TypeScript エラー: "huge" は ButtonSize に存在しない
-// <StyledButton $variant="primary" $size="huge">NG</StyledButton>`}
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <StyledButton variant="primary" size="sm">Small Primary</StyledButton>
+        <StyledButton variant="secondary" size="md">Medium Secondary</StyledButton>
+        <StyledButton variant="danger" size="lg">Large Danger</StyledButton>
+      </div>
+      <StyledButton variant="primary" size="md" fullWidth>全幅ボタン</StyledButton>
+    </div>
+  );
+}`}
+              previewHeight={120}
             />
           </section>
 

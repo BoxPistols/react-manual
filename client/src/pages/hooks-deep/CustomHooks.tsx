@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function CustomHooks() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 16</span>
+          <span className="step-badge">STEP 16</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">カスタム Hooks</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -37,46 +38,55 @@ export default function CustomHooks() {
               カスタム Hook は「<code className="text-sm bg-muted px-1.5 py-0.5 rounded">use</code> から始まる名前の関数」で、
               中で他の Hook を使っているものです。コンポーネントではなく、ロジックだけを切り出した関数です。
             </p>
-            <CodeBlock
-              language="tsx"
-              title="カスタム Hook の最小例"
-              code={`// カスタム Hook: use で始まる関数名
-function useToggle(initialValue = false) {
-  const [value, setValue] = useState(initialValue);
-
-  const toggle = () => setValue((prev) => !prev);
-  const setTrue = () => setValue(true);
-  const setFalse = () => setValue(false);
-
-  return { value, toggle, setTrue, setFalse };
+            <CodePreview
+              title="useToggle カスタム Hook → ボタンを押してみよう"
+              previewHeight={260}
+              code={`function useToggle(initialValue) {
+  const [value, setValue] = React.useState(initialValue || false)
+  const toggle = () => setValue((prev) => !prev)
+  const setTrue = () => setValue(true)
+  const setFalse = () => setValue(false)
+  return { value, toggle, setTrue, setFalse }
 }
 
-// 使い方: 複数のコンポーネントで再利用できる
 function Modal() {
-  const { value: isOpen, toggle, setFalse: close } = useToggle();
-
+  const { value: isOpen, toggle, setFalse: close } = useToggle()
   return (
-    <div>
-      <button onClick={toggle}>メニューを開く</button>
+    <div style={{ marginBottom: '16px' }}>
+      <button onClick={toggle} style={{ padding: '6px 16px', borderRadius: '6px', backgroundColor: '#3B82F6', color: 'white', border: 'none', cursor: 'pointer', fontSize: '14px' }}>
+        モーダルを{isOpen ? '閉じる' : '開く'}
+      </button>
       {isOpen && (
-        <div className="modal">
-          <p>モーダルの内容</p>
-          <button onClick={close}>閉じる</button>
+        <div style={{ marginTop: '8px', padding: '16px', border: '1px solid #D1D5DB', borderRadius: '8px', backgroundColor: '#F9FAFB' }}>
+          <p style={{ fontSize: '14px', marginBottom: '8px' }}>モーダルの内容です</p>
+          <button onClick={close} style={{ padding: '4px 12px', borderRadius: '6px', backgroundColor: '#6B7280', color: 'white', border: 'none', cursor: 'pointer', fontSize: '13px' }}>閉じる</button>
         </div>
       )}
     </div>
-  );
+  )
 }
 
 function DarkModeSwitch() {
-  const { value: isDark, toggle } = useToggle();
-
+  const { value: isDark, toggle } = useToggle()
   return (
-    <button onClick={toggle}>
-      {isDark ? 'ダーク' : 'ライト'}
-    </button>
-  );
-}`}
+    <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: isDark ? '#1F2937' : '#F9FAFB', color: isDark ? '#F9FAFB' : '#1F2937', display: 'inline-block' }}>
+      <button onClick={toggle} style={{ padding: '6px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '14px', backgroundColor: isDark ? '#3B82F6' : '#E5E7EB', color: isDark ? 'white' : '#374151' }}>
+        {isDark ? 'ダークモード ON' : 'ライトモード ON'}
+      </button>
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <div style={{ padding: '16px' }}>
+      <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '8px' }}>同じ useToggle を 2 箇所で使い回し:</p>
+      <Modal />
+      <DarkModeSwitch />
+    </div>
+  )
+}
+`}
             />
 
             <div className="mt-6 mb-6">
@@ -135,50 +145,52 @@ function useLocalStorage<T>(
 }`}
             />
 
-            <CodeBlock
-              language="tsx"
-              title="useLocalStorage の使い方"
-              code={`function Settings() {
-  // useState とまったく同じ使い勝手！
-  // ただし値がブラウザに永続化される
-  const [name, setName] = useLocalStorage('userName', '');
-  const [fontSize, setFontSize] = useLocalStorage('fontSize', 16);
-  const [darkMode, setDarkMode] = useLocalStorage('darkMode', false);
+            <CodePreview
+              title="useLocalStorage デモ → 値を変更してリロードしても保持されます"
+              previewHeight={220}
+              code={`function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = React.useState(() => {
+    try {
+      const item = localStorage.getItem(key)
+      return item ? JSON.parse(item) : initialValue
+    } catch { return initialValue }
+  })
+  React.useEffect(() => {
+    try { localStorage.setItem(key, JSON.stringify(storedValue)) } catch {}
+  }, [key, storedValue])
+  return [storedValue, setStoredValue]
+}
+
+function Settings() {
+  const [name, setName] = useLocalStorage('demo-userName', '')
+  const [fontSize, setFontSize] = useLocalStorage('demo-fontSize', 16)
+  const [darkMode, setDarkMode] = useLocalStorage('demo-darkMode', false)
 
   return (
-    <div style={{ fontSize }}>
-      <label>
-        名前:
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </label>
-
-      <label>
-        文字サイズ: {fontSize}px
-        <input
-          type="range"
-          min={12}
-          max={24}
-          value={fontSize}
-          onChange={(e) => setFontSize(Number(e.target.value))}
-        />
-      </label>
-
-      <label>
-        <input
-          type="checkbox"
-          checked={darkMode}
-          onChange={(e) => setDarkMode(e.target.checked)}
-        />
-        ダークモード
-      </label>
-
-      {/* ページをリロードしても値が保持される！ */}
+    <div style={{ padding: '16px', fontSize: fontSize + 'px', backgroundColor: darkMode ? '#1F2937' : '#fff', color: darkMode ? '#F9FAFB' : '#1F2937', borderRadius: '8px' }}>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>名前:</label>
+        <input value={name} onChange={(e) => setName(e.target.value)} style={{ border: '1px solid #D1D5DB', borderRadius: '6px', padding: '4px 8px', fontSize: '14px' }} />
+      </div>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>文字サイズ: {fontSize}px</label>
+        <input type="range" min={12} max={24} value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} />
+      </div>
+      <div>
+        <label style={{ fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(e.target.checked)} />
+          ダークモード
+        </label>
+      </div>
+      <p style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '12px' }}>localStorage に自動保存されます</p>
     </div>
-  );
-}`}
+  )
+}
+
+function App() {
+  return <Settings />
+}
+`}
             />
 
             <div className="mt-6 mb-6">
@@ -441,6 +453,46 @@ function useDebounce<T>(value: T, delay: number): T {
 }`}
             />
 
+            <CodePreview
+              title="useDebounce デモ → 入力してみよう（500ms 後に反映）"
+              previewHeight={180}
+              code={`function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = React.useState(value)
+  React.useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay)
+    return () => clearTimeout(timer)
+  }, [value, delay])
+  return debouncedValue
+}
+
+function SearchDemo() {
+  const [query, setQuery] = React.useState('')
+  const debouncedQuery = useDebounce(query, 500)
+  const updateCount = React.useRef(0)
+  const prevDebounced = React.useRef('')
+
+  if (prevDebounced.current !== debouncedQuery) {
+    updateCount.current += 1
+    prevDebounced.current = debouncedQuery
+  }
+
+  return (
+    <div style={{ padding: '16px' }}>
+      <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="何か入力してみてください..." style={{ width: '100%', border: '1px solid #D1D5DB', borderRadius: '6px', padding: '8px 12px', fontSize: '14px', marginBottom: '12px' }} />
+      <div style={{ fontSize: '14px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <p><span style={{ color: '#6B7280' }}>入力中の値:</span> <strong>{query || '(空)'}</strong></p>
+        <p><span style={{ color: '#6B7280' }}>デバウンス後の値:</span> <strong style={{ color: '#3B82F6' }}>{debouncedQuery || '(空)'}</strong></p>
+        <p style={{ fontSize: '12px', color: '#9CA3AF' }}>デバウンス更新回数: {updateCount.current}</p>
+      </div>
+    </div>
+  )
+}
+
+function App() {
+  return <SearchDemo />
+}
+`}
+            />
             <CodeBlock
               language="tsx"
               title="useDebounce + useFetch を組み合わせた検索"

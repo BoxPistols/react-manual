@@ -1,14 +1,15 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
 
 export default function MuiIntro() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 25</span>
+          <span className="step-badge">STEP 25</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">MUI 7 入門</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -175,51 +176,37 @@ createRoot(document.getElementById('root')!).render(
               クリック時のリップルエフェクトも自動的に適用されます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="Button の使い方"
-              code={`import Button from '@mui/material/Button';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SendIcon from '@mui/icons-material/Send';
-
-function ButtonExamples() {
+              previewHeight={240}
+              code={`function App() {
+  const contained = (bg) => ({ background: bg, color: '#fff', border: 'none', borderRadius: 4, padding: '6px 16px', fontSize: 14, fontWeight: 500, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: 0.5 });
+  const outlined = (c) => ({ background: 'transparent', color: c, border: '1px solid ' + c, borderRadius: 4, padding: '5px 15px', fontSize: 14, fontWeight: 500, cursor: 'pointer' });
   return (
-    <div>
-      {/* バリアント */}
-      <Button variant="contained">塗りつぶし</Button>
-      <Button variant="outlined">アウトライン</Button>
-      <Button variant="text">テキスト</Button>
-
-      {/* カラー */}
-      <Button variant="contained" color="primary">プライマリ</Button>
-      <Button variant="contained" color="secondary">セカンダリ</Button>
-      <Button variant="contained" color="success">成功</Button>
-      <Button variant="contained" color="error">エラー</Button>
-      <Button variant="contained" color="warning">警告</Button>
-      <Button variant="contained" color="info">情報</Button>
-
-      {/* サイズ */}
-      <Button variant="contained" size="small">小</Button>
-      <Button variant="contained" size="medium">中</Button>
-      <Button variant="contained" size="large">大</Button>
-
-      {/* アイコン付き */}
-      <Button variant="contained" startIcon={<SendIcon />}>
-        送信
-      </Button>
-      <Button variant="outlined" startIcon={<DeleteIcon />} color="error">
-        削除
-      </Button>
-
-      {/* 無効状態 */}
-      <Button variant="contained" disabled>
-        無効なボタン
-      </Button>
-
-      {/* 全幅 */}
-      <Button variant="contained" fullWidth>
-        全幅ボタン
-      </Button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+        <button style={contained('#1976d2')}>塗りつぶし</button>
+        <button style={outlined('#1976d2')}>アウトライン</button>
+        <button style={{ background: 'transparent', border: 'none', color: '#1976d2', padding: '6px 8px', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>テキスト</button>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <button style={contained('#1976d2')}>プライマリ</button>
+        <button style={contained('#9c27b0')}>セカンダリ</button>
+        <button style={contained('#2e7d32')}>成功</button>
+        <button style={contained('#d32f2f')}>エラー</button>
+        <button style={contained('#ed6c02')}>警告</button>
+        <button style={contained('#0288d1')}>情報</button>
+      </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button style={{ ...contained('#1976d2'), padding: '4px 10px', fontSize: 13 }}>小</button>
+        <button style={contained('#1976d2')}>中</button>
+        <button style={{ ...contained('#1976d2'), padding: '8px 22px', fontSize: 15 }}>大</button>
+      </div>
+      <div>
+        <button style={{ ...contained('#1976d2'), opacity: 0.5, cursor: 'not-allowed' }} disabled>無効なボタン</button>
+      </div>
+      <button style={{ ...contained('#1976d2'), width: '100%', textAlign: 'center' }}>全幅ボタン</button>
     </div>
   );
 }`}
@@ -234,45 +221,26 @@ function ButtonExamples() {
               見出しから本文まで、一貫したタイポグラフィスケールを提供します。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="Typography の使い方"
-              code={`import Typography from '@mui/material/Typography';
-
-function TypographyExamples() {
+              previewHeight={340}
+              code={`function App() {
   return (
-    <div>
-      {/* 見出し */}
-      <Typography variant="h1">h1 見出し</Typography>
-      <Typography variant="h2">h2 見出し</Typography>
-      <Typography variant="h3">h3 見出し</Typography>
-      <Typography variant="h4">h4 見出し</Typography>
-      <Typography variant="h5">h5 見出し</Typography>
-      <Typography variant="h6">h6 見出し</Typography>
-
-      {/* 本文 */}
-      <Typography variant="body1">
-        body1 - 標準の本文テキスト（16px）
-      </Typography>
-      <Typography variant="body2">
-        body2 - 少し小さい本文（14px）
-      </Typography>
-
-      {/* その他 */}
-      <Typography variant="subtitle1">サブタイトル 1</Typography>
-      <Typography variant="subtitle2">サブタイトル 2</Typography>
-      <Typography variant="caption">キャプション（小さいテキスト）</Typography>
-      <Typography variant="overline">オーバーライン</Typography>
-
-      {/* 色の変更 */}
-      <Typography color="primary">プライマリカラー</Typography>
-      <Typography color="text.secondary">セカンダリテキスト</Typography>
-      <Typography color="error">エラーカラー</Typography>
-
-      {/* HTML 要素の変更 */}
-      <Typography variant="h1" component="h2">
-        h1 の見た目だが HTML は h2
-      </Typography>
+    <div style={{ fontFamily: 'Roboto, sans-serif', display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <h1 style={{ fontSize: 40, fontWeight: 300, margin: 0 }}>h1 見出し</h1>
+      <h2 style={{ fontSize: 32, fontWeight: 300, margin: 0 }}>h2 見出し</h2>
+      <h3 style={{ fontSize: 26, fontWeight: 400, margin: 0 }}>h3 見出し</h3>
+      <h4 style={{ fontSize: 22, fontWeight: 400, margin: 0 }}>h4 見出し</h4>
+      <h5 style={{ fontSize: 18, fontWeight: 400, margin: 0 }}>h5 見出し</h5>
+      <h6 style={{ fontSize: 16, fontWeight: 500, margin: 0 }}>h6 見出し</h6>
+      <p style={{ fontSize: 16, margin: '8px 0 0' }}>body1 - 標準の本文テキスト（16px）</p>
+      <p style={{ fontSize: 14, margin: 0 }}>body2 - 少し小さい本文（14px）</p>
+      <span style={{ fontSize: 12, color: '#666', display: 'block', marginTop: 8 }}>caption（小さいテキスト）</span>
+      <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, color: '#666', display: 'block' }}>overline</span>
+      <p style={{ color: '#1976d2', margin: '8px 0 0' }}>プライマリカラー</p>
+      <p style={{ color: '#666', margin: 0 }}>セカンダリテキスト</p>
+      <p style={{ color: '#d32f2f', margin: 0 }}>エラーカラー</p>
     </div>
   );
 }`}

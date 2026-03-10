@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function MemoCallback() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 15</span>
+          <span className="step-badge">STEP 15</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">useMemo / useCallback</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -110,6 +111,47 @@ function Parent() {
   );
 }`}
             />
+
+            <CodePreview
+              title="React.memo の効果 → +1を押してレンダー回数を比較"
+              previewHeight={240}
+              code={`function NormalChild({ name }) {
+  const renderCount = React.useRef(0)
+  renderCount.current += 1
+  return (
+    <div style={{ padding: '8px 12px', border: '1px solid #FCA5A5', borderRadius: '6px', marginBottom: '6px', backgroundColor: '#FEF2F2' }}>
+      <span style={{ fontSize: '13px' }}>通常の子 (memo なし): こんにちは、{name}さん</span>
+      <span style={{ float: 'right', fontSize: '12px', color: '#EF4444', fontWeight: 'bold' }}>レンダー: {renderCount.current}回</span>
+    </div>
+  )
+}
+
+const MemoChild = React.memo(function MemoChild({ name }) {
+  const renderCount = React.useRef(0)
+  renderCount.current += 1
+  return (
+    <div style={{ padding: '8px 12px', border: '1px solid #86EFAC', borderRadius: '6px', marginBottom: '6px', backgroundColor: '#F0FDF4' }}>
+      <span style={{ fontSize: '13px' }}>memo 付きの子: こんにちは、{name}さん</span>
+      <span style={{ float: 'right', fontSize: '12px', color: '#22C55E', fontWeight: 'bold' }}>レンダー: {renderCount.current}回</span>
+    </div>
+  )
+})
+
+function App() {
+  const [count, setCount] = React.useState(0)
+  return (
+    <div style={{ padding: '16px' }}>
+      <button onClick={() => setCount(count + 1)} style={{ padding: '6px 16px', borderRadius: '8px', backgroundColor: '#3B82F6', color: 'white', border: 'none', cursor: 'pointer', fontSize: '14px', marginBottom: '12px' }}>
+        親のカウント: {count}（+1）
+      </button>
+      <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '8px' }}>name props は変わらないのに...</p>
+      <NormalChild name="太郎" />
+      <MemoChild name="太郎" />
+    </div>
+  )
+}
+`}
+            />
             <div className="mt-6 mb-6">
               <InfoBox type="warning" title="memo の落とし穴: オブジェクトと関数">
                 <p>
@@ -167,66 +209,62 @@ const memoizedValue = useMemo(
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">実例 1: 重いフィルター処理</h3>
-            <CodeBlock
-              language="tsx"
-              title="大量データのフィルタリング"
-              showLineNumbers
-              code={`import { useState, useMemo } from 'react';
+            <CodePreview
+              title="useMemo でフィルタリング → 検索・ソートしてみよう"
+              previewHeight={280}
+              code={`const sampleProducts = [
+  { id: 1, name: 'ワイヤレスマウス', category: 'PC周辺機器', price: 3980 },
+  { id: 2, name: 'メカニカルキーボード', category: 'PC周辺機器', price: 12800 },
+  { id: 3, name: 'USB-C ハブ', category: 'PC周辺機器', price: 4500 },
+  { id: 4, name: 'モニターアーム', category: 'デスク', price: 8900 },
+  { id: 5, name: 'デスクマット', category: 'デスク', price: 2480 },
+  { id: 6, name: 'ウェブカメラ', category: 'PC周辺機器', price: 6800 },
+  { id: 7, name: 'スタンディングデスク', category: 'デスク', price: 45000 },
+  { id: 8, name: 'ヘッドセット', category: 'オーディオ', price: 15800 },
+]
 
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-}
+function ProductList() {
+  const [query, setQuery] = React.useState('')
+  const [sortBy, setSortBy] = React.useState('name')
+  const computeCount = React.useRef(0)
 
-function ProductList({ products }: { products: Product[] }) {
-  const [query, setQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'name' | 'price'>('name');
-
-  // products が 10,000 件あると、
-  // 入力のたびにフィルター + ソートが走って重い
-  // → useMemo でキャッシュする
-  const filteredProducts = useMemo(() => {
-    console.log('フィルター処理を実行');
-
-    const filtered = products.filter((p) =>
+  const filteredProducts = React.useMemo(() => {
+    computeCount.current += 1
+    const filtered = sampleProducts.filter((p) =>
       p.name.toLowerCase().includes(query.toLowerCase())
-    );
-
+    )
     return filtered.sort((a, b) => {
-      if (sortBy === 'price') return a.price - b.price;
-      return a.name.localeCompare(b.name);
-    });
-  }, [products, query, sortBy]);
-  // products, query, sortBy のいずれかが変わったときだけ再計算
+      if (sortBy === 'price') return a.price - b.price
+      return a.name.localeCompare(b.name)
+    })
+  }, [query, sortBy])
 
   return (
-    <div>
-      <input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="商品を検索..."
-      />
-      <select
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value as 'name' | 'price')}
-      >
-        <option value="name">名前順</option>
-        <option value="price">価格順</option>
-      </select>
-
-      <p>{filteredProducts.length} 件の商品</p>
-      <ul>
+    <div style={{ padding: '16px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="商品を検索..." style={{ flex: 1, minWidth: '120px', border: '1px solid #D1D5DB', borderRadius: '6px', padding: '6px 10px', fontSize: '13px' }} />
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{ border: '1px solid #D1D5DB', borderRadius: '6px', padding: '6px 8px', fontSize: '13px' }}>
+          <option value="name">名前順</option>
+          <option value="price">価格順</option>
+        </select>
+      </div>
+      <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '8px' }}>{filteredProducts.length} 件の商品 | useMemo 計算回数: {computeCount.current}</p>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {filteredProducts.map((p) => (
-          <li key={p.id}>
-            {p.name} - {p.price.toLocaleString()}円
+          <li key={p.id} style={{ padding: '6px 0', borderBottom: '1px solid #F3F4F6', fontSize: '14px', display: 'flex', justifyContent: 'space-between' }}>
+            <span>{p.name}</span>
+            <span style={{ color: '#6B7280' }}>{p.price.toLocaleString()}円</span>
           </li>
         ))}
       </ul>
     </div>
-  );
-}`}
+  )
+}
+
+function App() {
+  return <ProductList />
+}
+`}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">実例 2: オブジェクト props のメモ化</h3>

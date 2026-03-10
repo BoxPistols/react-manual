@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function UseEffect() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 12</span>
+          <span className="step-badge">STEP 12</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">useEffect</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -155,23 +156,35 @@ function MyComponent() {
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">パターン 2: 特定の値を監視</h3>
-            <CodeBlock
-              language="tsx"
-              title="count が変わるたびに実行"
+            <CodePreview
+              title="count が変わるたびに実行 → ボタンをクリックしてみよう"
+              previewHeight={100}
               code={`function PageTitle() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = React.useState(0)
 
-  useEffect(() => {
-    // count が変わるたびにブラウザのタブタイトルを更新
-    document.title = \`クリック数: \${count}\`;
-  }, [count]); // ← count が変わったら再実行
+  React.useEffect(() => {
+    document.title = \`クリック数: \${count}\`
+  }, [count])
 
   return (
-    <button onClick={() => setCount(count + 1)}>
-      クリック: {count}
-    </button>
-  );
-}`}
+    <div style={{ textAlign: 'center', padding: '16px' }}>
+      <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '12px' }}>
+        タブタイトルが「クリック数: {count}」に変わります
+      </p>
+      <button
+        onClick={() => setCount(count + 1)}
+        style={{ padding: '8px 20px', backgroundColor: '#3B82F6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '15px' }}
+      >
+        クリック: {count}
+      </button>
+    </div>
+  )
+}
+
+function App() {
+  return <PageTitle />
+}
+`}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">パターン 3: 複数の依存値</h3>
@@ -238,41 +251,39 @@ function MyComponent() {
             </div>
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">実例: ウィンドウリサイズの監視</h3>
-            <CodeBlock
-              language="tsx"
-              title="リサイズイベントの監視とクリーンアップ"
-              code={`import { useState, useEffect } from 'react';
-
-function WindowSize() {
-  const [size, setSize] = useState({
+            <CodePreview
+              title="リサイズイベントの監視 → ブラウザ幅を変えてみよう"
+              previewHeight={100}
+              code={`function WindowSize() {
+  const [size, setSize] = React.useState({
     width: window.innerWidth,
     height: window.innerHeight,
-  });
+  })
 
-  useEffect(() => {
-    // リサイズイベントのハンドラー
+  React.useEffect(() => {
     const handleResize = () => {
-      setSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    // イベントリスナーを登録
-    window.addEventListener('resize', handleResize);
-
-    // クリーンアップ: イベントリスナーを解除
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []); // マウント時に登録、アンマウント時に解除
+      setSize({ width: window.innerWidth, height: window.innerHeight })
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   return (
-    <p>
-      ウィンドウサイズ: {size.width} x {size.height}
-    </p>
-  );
-}`}
+    <div style={{ padding: '16px', textAlign: 'center' }}>
+      <p style={{ fontSize: '18px', fontWeight: 'bold' }}>
+        ウィンドウサイズ: {size.width} x {size.height}
+      </p>
+      <p style={{ fontSize: '13px', color: '#6B7280', marginTop: '8px' }}>
+        ブラウザのウィンドウサイズを変えるとリアルタイムで更新されます
+      </p>
+    </div>
+  )
+}
+
+function App() {
+  return <WindowSize />
+}
+`}
             />
           </section>
 
@@ -633,68 +644,55 @@ function SearchPosts() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               useEffect とクリーンアップを組み合わせた、実用的なカウントダウンタイマーの例です。
             </p>
-            <CodeBlock
-              language="tsx"
-              title="カウントダウンタイマー"
-              showLineNumbers
-              code={`import { useState, useEffect } from 'react';
+            <CodePreview
+              title="カウントダウンタイマー → スタートを押してみよう"
+              previewHeight={200}
+              code={`function CountdownTimer() {
+  const [seconds, setSeconds] = React.useState(60)
+  const [isRunning, setIsRunning] = React.useState(false)
 
-function CountdownTimer() {
-  const [seconds, setSeconds] = useState(60);
-  const [isRunning, setIsRunning] = useState(false);
-
-  useEffect(() => {
-    // タイマーが動いていないなら何もしない
-    if (!isRunning) return;
-
-    // 0 になったら停止
+  React.useEffect(() => {
+    if (!isRunning) return
     if (seconds <= 0) {
-      setIsRunning(false);
-      return;
+      setIsRunning(false)
+      return
     }
-
-    // 1秒ごとにカウントダウン
     const timer = setInterval(() => {
-      setSeconds((prev) => prev - 1);
-    }, 1000);
+      setSeconds((prev) => prev - 1)
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [isRunning, seconds])
 
-    // クリーンアップ
-    return () => clearInterval(timer);
-  }, [isRunning, seconds]);
-
-  // 時間のフォーマット
-  const minutes = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+  const minutes = Math.floor(seconds / 60)
+  const secs = seconds % 60
 
   return (
-    <div className="text-center p-8">
-      {/* 大きな時計表示 */}
-      <p className="text-6xl font-mono font-bold mb-6">
-        {String(minutes).padStart(2, '0')}:
-        {String(secs).padStart(2, '0')}
+    <div style={{ textAlign: 'center', padding: '24px' }}>
+      <p style={{ fontSize: '48px', fontFamily: 'monospace', fontWeight: 'bold', marginBottom: '20px' }}>
+        {String(minutes).padStart(2, '0')}:{String(secs).padStart(2, '0')}
       </p>
-
-      {/* 操作ボタン */}
-      <div className="flex gap-3 justify-center">
+      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
         <button
           onClick={() => setIsRunning(!isRunning)}
-          className="px-6 py-2 rounded bg-blue-500 text-white"
+          style={{ padding: '8px 24px', borderRadius: '8px', backgroundColor: '#3B82F6', color: 'white', border: 'none', cursor: 'pointer', fontSize: '15px' }}
         >
           {isRunning ? '一時停止' : 'スタート'}
         </button>
         <button
-          onClick={() => {
-            setIsRunning(false);
-            setSeconds(60);
-          }}
-          className="px-6 py-2 rounded bg-gray-200"
+          onClick={() => { setIsRunning(false); setSeconds(60) }}
+          style={{ padding: '8px 24px', borderRadius: '8px', backgroundColor: '#E5E7EB', color: '#374151', border: 'none', cursor: 'pointer', fontSize: '15px' }}
         >
           リセット
         </button>
       </div>
     </div>
-  );
-}`}
+  )
+}
+
+function App() {
+  return <CountdownTimer />
+}
+`}
             />
           </section>
 

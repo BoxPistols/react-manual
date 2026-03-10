@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function UseReducer() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 14</span>
+          <span className="step-badge">STEP 14</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">useReducer</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -153,6 +154,46 @@ function Counter() {
     </div>
   );
 }`}
+            />
+
+            <CodePreview
+              title="useReducer カウンター → ボタンを押してみよう"
+              previewHeight={160}
+              code={`function counterReducer(state, action) {
+  switch (action.type) {
+    case 'increment': return { count: state.count + 1 }
+    case 'decrement': return { count: state.count - 1 }
+    case 'reset': return { count: 0 }
+    case 'set': return { count: action.payload }
+    default: return state
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = React.useReducer(counterReducer, { count: 0 })
+
+  const btnStyle = (bg) => ({
+    padding: '6px 16px', borderRadius: '8px', border: 'none',
+    cursor: 'pointer', color: 'white', backgroundColor: bg, fontSize: '14px',
+  })
+
+  return (
+    <div style={{ textAlign: 'center', padding: '16px' }}>
+      <p style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '16px' }}>{state.count}</p>
+      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <button onClick={() => dispatch({ type: 'decrement' })} style={btnStyle('#EF4444')}>-1</button>
+        <button onClick={() => dispatch({ type: 'reset' })} style={btnStyle('#6B7280')}>リセット</button>
+        <button onClick={() => dispatch({ type: 'increment' })} style={btnStyle('#3B82F6')}>+1</button>
+        <button onClick={() => dispatch({ type: 'set', payload: 100 })} style={btnStyle('#8B5CF6')}>100にセット</button>
+      </div>
+    </div>
+  )
+}
+
+function App() {
+  return <Counter />
+}
+`}
             />
 
             <div className="mt-6 mb-6">
@@ -465,120 +506,81 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">2. コンポーネント</h3>
-            <CodeBlock
-              language="tsx"
-              title="TodoApp.tsx"
-              showLineNumbers
-              code={`import { useReducer, useState } from 'react';
+            <CodePreview
+              title="Todo アプリ → タスクを追加・完了・削除してみよう"
+              previewHeight={380}
+              code={`function todoReducer(state, action) {
+  switch (action.type) {
+    case 'add':
+      return { ...state, todos: [...state.todos, { id: state.nextId, text: action.payload, completed: false }], nextId: state.nextId + 1 }
+    case 'toggle':
+      return { ...state, todos: state.todos.map((t) => t.id === action.payload ? { ...t, completed: !t.completed } : t) }
+    case 'delete':
+      return { ...state, todos: state.todos.filter((t) => t.id !== action.payload) }
+    case 'setFilter':
+      return { ...state, filter: action.payload }
+    case 'clearCompleted':
+      return { ...state, todos: state.todos.filter((t) => !t.completed) }
+    default: return state
+  }
+}
 
 function TodoApp() {
-  const [state, dispatch] = useReducer(todoReducer, initialState);
-  const [input, setInput] = useState('');
+  const [state, dispatch] = React.useReducer(todoReducer, { todos: [], filter: 'all', nextId: 1 })
+  const [input, setInput] = React.useState('')
 
-  // フィルターに応じた Todo リストを計算
   const filteredTodos = state.todos.filter((todo) => {
-    if (state.filter === 'active') return !todo.completed;
-    if (state.filter === 'completed') return todo.completed;
-    return true; // 'all'
-  });
+    if (state.filter === 'active') return !todo.completed
+    if (state.filter === 'completed') return todo.completed
+    return true
+  })
+  const activeTodoCount = state.todos.filter((t) => !t.completed).length
 
-  const activeTodoCount = state.todos.filter(
-    (t) => !t.completed
-  ).length;
-
-  // 追加処理
   const handleAdd = () => {
-    if (!input.trim()) return;
-    dispatch({ type: 'add', payload: input.trim() });
-    setInput('');
-  };
+    if (!input.trim()) return
+    dispatch({ type: 'add', payload: input.trim() })
+    setInput('')
+  }
+
+  const filterBtn = (f, label) => (
+    <button key={f} onClick={() => dispatch({ type: 'setFilter', payload: f })} style={{
+      padding: '4px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '13px',
+      backgroundColor: state.filter === f ? '#3B82F6' : '#E5E7EB',
+      color: state.filter === f ? 'white' : '#374151',
+    }}>{label}</button>
+  )
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Todo リスト</h1>
-
-      {/* 入力フォーム */}
-      <div className="flex gap-2 mb-4">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          placeholder="新しいタスクを入力..."
-          className="flex-1 border rounded px-3 py-2"
-        />
-        <button
-          onClick={handleAdd}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          追加
-        </button>
+    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '16px' }}>
+      <h1 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>Todo リスト</h1>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+        <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAdd()} placeholder="新しいタスクを入力..." style={{ flex: 1, border: '1px solid #D1D5DB', borderRadius: '6px', padding: '6px 10px', fontSize: '14px' }} />
+        <button onClick={handleAdd} style={{ padding: '6px 16px', borderRadius: '6px', backgroundColor: '#3B82F6', color: 'white', border: 'none', cursor: 'pointer', fontSize: '14px' }}>追加</button>
       </div>
-
-      {/* フィルターボタン */}
-      <div className="flex gap-2 mb-4">
-        {(['all', 'active', 'completed'] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => dispatch({ type: 'setFilter', payload: f })}
-            className={
-              state.filter === f
-                ? 'px-3 py-1 rounded bg-blue-500 text-white'
-                : 'px-3 py-1 rounded bg-gray-200'
-            }
-          >
-            {f === 'all' ? 'すべて' : f === 'active' ? '未完了' : '完了済み'}
-          </button>
-        ))}
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
+        {filterBtn('all', 'すべて')}{filterBtn('active', '未完了')}{filterBtn('completed', '完了済み')}
       </div>
-
-      {/* Todo リスト */}
-      <ul className="space-y-2 mb-4">
+      <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 12px 0' }}>
         {filteredTodos.map((todo) => (
-          <li
-            key={todo.id}
-            className="flex items-center gap-3 p-3 border rounded"
-          >
-            <input
-              type="checkbox"
-              checked={todo.completed}
-              onChange={() =>
-                dispatch({ type: 'toggle', payload: todo.id })
-              }
-            />
-            <span
-              className={
-                todo.completed
-                  ? 'flex-1 line-through text-gray-400'
-                  : 'flex-1'
-              }
-            >
-              {todo.text}
-            </span>
-            <button
-              onClick={() =>
-                dispatch({ type: 'delete', payload: todo.id })
-              }
-              className="text-red-500 text-sm"
-            >
-              削除
-            </button>
+          <li key={todo.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: '1px solid #E5E7EB', borderRadius: '6px', marginBottom: '6px' }}>
+            <input type="checkbox" checked={todo.completed} onChange={() => dispatch({ type: 'toggle', payload: todo.id })} />
+            <span style={{ flex: 1, textDecoration: todo.completed ? 'line-through' : 'none', color: todo.completed ? '#9CA3AF' : '#1F2937', fontSize: '14px' }}>{todo.text}</span>
+            <button onClick={() => dispatch({ type: 'delete', payload: todo.id })} style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}>削除</button>
           </li>
         ))}
       </ul>
-
-      {/* フッター */}
-      <div className="flex justify-between text-sm text-gray-500">
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#6B7280' }}>
         <span>残り {activeTodoCount} 件</span>
-        <button
-          onClick={() => dispatch({ type: 'clearCompleted' })}
-          className="text-red-500 hover:underline"
-        >
-          完了済みを削除
-        </button>
+        <button onClick={() => dispatch({ type: 'clearCompleted' })} style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}>完了済みを削除</button>
       </div>
     </div>
-  );
-}`}
+  )
+}
+
+function App() {
+  return <TodoApp />
+}
+`}
             />
           </section>
 

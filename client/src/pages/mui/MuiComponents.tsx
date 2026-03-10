@@ -1,14 +1,15 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
 
 export default function MuiComponents() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 26</span>
+          <span className="step-badge">STEP 26</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">MUI コンポーネント活用</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -250,36 +251,29 @@ function FormControls() {
               操作の結果や確認のダイアログを適切に表示しましょう。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="Alert コンポーネント"
-              code={`import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-
-function AlertExamples() {
+              previewHeight={280}
+              code={`function App() {
+  const alert = (bg, border, color, icon) => ({
+    display: 'flex', alignItems: 'center', gap: 8,
+    padding: '8px 16px', borderRadius: 4,
+    background: bg, border: '1px solid ' + border, color: color, fontSize: 14,
+  });
   return (
-    <Stack spacing={2}>
-      {/* 基本的なアラート */}
-      <Alert severity="success">保存が完了しました。</Alert>
-      <Alert severity="info">新しいバージョンが利用可能です。</Alert>
-      <Alert severity="warning">ストレージの残量が少なくなっています。</Alert>
-      <Alert severity="error">ネットワークエラーが発生しました。</Alert>
-
-      {/* タイトル付き */}
-      <Alert severity="success">
-        <AlertTitle>成功</AlertTitle>
-        プロフィールの更新が完了しました。
-      </Alert>
-
-      {/* バリアント */}
-      <Alert variant="filled" severity="success">塗りつぶしスタイル</Alert>
-      <Alert variant="outlined" severity="info">アウトラインスタイル</Alert>
-
-      {/* 閉じるボタン付き */}
-      <Alert onClose={() => console.log('閉じた')}>
-        閉じることができるアラート
-      </Alert>
-    </Stack>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontFamily: 'Roboto, sans-serif' }}>
+      <div style={alert('#edf7ed','#c3e6cb','#1e4620')}>✓ 保存が完了しました。</div>
+      <div style={alert('#e8f4fd','#b8daff','#0c5460')}>ℹ 新しいバージョンが利用可能です。</div>
+      <div style={alert('#fff8e1','#ffeeba','#856404')}>⚠ ストレージの残量が少なくなっています。</div>
+      <div style={alert('#fdecea','#f5c6cb','#8b0000')}>✕ ネットワークエラーが発生しました。</div>
+      <div style={{ ...alert('#edf7ed','#c3e6cb','#1e4620'), flexDirection: 'column', alignItems: 'flex-start' }}>
+        <strong>成功</strong>
+        <span>プロフィールの更新が完了しました。</span>
+      </div>
+      <div style={{ padding: '8px 16px', borderRadius: 4, background: '#2e7d32', color: '#fff', fontSize: 14 }}>✓ 塗りつぶしスタイル (filled)</div>
+      <div style={{ padding: '8px 16px', borderRadius: 4, background: 'transparent', border: '1px solid #0288d1', color: '#0288d1', fontSize: 14 }}>ℹ アウトラインスタイル (outlined)</div>
+    </div>
   );
 }`}
             />
@@ -493,43 +487,41 @@ function Sidebar() {
 
             <div className="mt-4" />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="Tabs（タブ切り替え）"
-              code={`import { useState } from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-
-function TabPanel({ children, value, index }: {
-  children: React.ReactNode;
-  value: number;
-  index: number;
-}) {
-  return value === index ? <Box sx={{ p: 3 }}>{children}</Box> : null;
-}
-
-function TabsExample() {
-  const [tab, setTab] = useState(0);
-
+              previewHeight={180}
+              code={`function App() {
+  const [tab, setTab] = React.useState(0);
+  const tabs = ['概要', 'スペック', 'レビュー'];
+  const contents = [
+    '商品の概要がここに表示されます。',
+    'スペック情報がここに表示されます。',
+    'レビューがここに表示されます。',
+  ];
   return (
-    <Box>
-      <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)}>
-        <Tab label="概要" />
-        <Tab label="スペック" />
-        <Tab label="レビュー" />
-      </Tabs>
-
-      <TabPanel value={tab} index={0}>
-        商品の概要がここに表示されます。
-      </TabPanel>
-      <TabPanel value={tab} index={1}>
-        スペック情報がここに表示されます。
-      </TabPanel>
-      <TabPanel value={tab} index={2}>
-        レビューがここに表示されます。
-      </TabPanel>
-    </Box>
+    <div style={{ fontFamily: 'Roboto, sans-serif' }}>
+      <div style={{ display: 'flex', borderBottom: '2px solid #e0e0e0' }}>
+        {tabs.map((label, i) => (
+          <button
+            key={i}
+            onClick={() => setTab(i)}
+            style={{
+              background: 'transparent', border: 'none', padding: '12px 24px',
+              fontSize: 14, fontWeight: 500, cursor: 'pointer',
+              color: tab === i ? '#1976d2' : '#666',
+              borderBottom: tab === i ? '2px solid #1976d2' : '2px solid transparent',
+              marginBottom: -2, transition: 'all 0.2s',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div style={{ padding: 24, fontSize: 14, color: '#333' }}>
+        {contents[tab]}
+      </div>
+    </div>
   );
 }`}
             />
@@ -599,41 +591,25 @@ function UserTable({ users }: { users: User[] }) {
 
             <div className="mt-4" />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="Card コンポーネント"
-              code={`import {
-  Card, CardContent, CardMedia, CardActions,
-  Typography, Button, CardActionArea,
-} from '@mui/material';
-
-function ArticleCard() {
+              previewHeight={280}
+              code={`function App() {
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      {/* 画像 */}
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          height="180"
-          image="/images/article.jpg"
-          alt="記事のサムネイル"
-        />
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            React 入門ガイド
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            React の基礎から実践までを解説する
-            初心者向けのガイドです。
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-
-      <CardActions>
-        <Button size="small" color="primary">もっと読む</Button>
-        <Button size="small">シェア</Button>
-      </CardActions>
-    </Card>
+    <div style={{ maxWidth: 345, borderRadius: 4, boxShadow: '0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)', overflow: 'hidden', background: '#fff', fontFamily: 'Roboto, sans-serif' }}>
+      <div style={{ height: 140, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 500 }}>
+        画像エリア
+      </div>
+      <div style={{ padding: 16 }}>
+        <h6 style={{ fontSize: 16, fontWeight: 500, margin: '0 0 8px' }}>React 入門ガイド</h6>
+        <p style={{ fontSize: 14, color: '#666', margin: 0, lineHeight: 1.5 }}>React の基礎から実践までを解説する初心者向けのガイドです。</p>
+      </div>
+      <div style={{ padding: '0 8px 8px', display: 'flex', gap: 8 }}>
+        <button style={{ background: 'transparent', border: 'none', color: '#1976d2', fontSize: 13, fontWeight: 500, cursor: 'pointer', padding: '6px 8px' }}>もっと読む</button>
+        <button style={{ background: 'transparent', border: 'none', color: '#666', fontSize: 13, fontWeight: 500, cursor: 'pointer', padding: '6px 8px' }}>シェア</button>
+      </div>
+    </div>
   );
 }`}
             />

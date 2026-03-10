@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,12 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function Forms() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
-            STEP 11
-          </span>
+          <span className="step-badge">STEP 11</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">
           フォーム入門
@@ -39,14 +38,12 @@ export default function Forms() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               React のフォームでは、入力要素の値を state で管理します。これを「制御コンポーネント」と呼びます。<code className="text-sm bg-muted px-1.5 py-0.5 rounded">value</code> と <code className="text-sm bg-muted px-1.5 py-0.5 rounded">onChange</code> のセットが基本パターンです。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-function ControlledInput() {
-  const [name, setName] = useState('');
+            <CodePreview
+              code={`function ControlledInput() {
+  const [name, setName] = React.useState('');
 
   return (
-    <div className="p-6 max-w-md">
+    <div style={{ padding: '24px', maxWidth: '400px' }}>
       {/*
         制御コンポーネントの仕組み:
         1. value={name} で state の値を input に反映
@@ -57,18 +54,26 @@ function ControlledInput() {
       */}
       <input
         type="text"
-        value={name}          // state の値を表示
-        onChange={(e) => setName(e.target.value)}  // 入力があるたびに state を更新
-        className="w-full px-3 py-2 border rounded-lg"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="ここに入力してみてください"
+        style={{
+          width: '100%', padding: '8px 12px',
+          border: '1px solid #d1d5db', borderRadius: '8px',
+          fontSize: '14px', outline: 'none',
+        }}
       />
-      <p className="mt-2 text-sm text-gray-500">
+      <p style={{ marginTop: '8px', fontSize: '13px', color: '#6b7280' }}>
         現在の値: 「{name}」({name.length}文字)
       </p>
     </div>
   );
-}`}
+}
+
+function App() { return <ControlledInput /> }`}
               language="tsx"
               title="制御コンポーネントの基本"
+              previewHeight={140}
             />
             <InfoBox type="info" title="なぜ制御コンポーネントを使うのか？">
               <p>
@@ -252,12 +257,10 @@ function TextInputs() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               HTML の select 要素も、value と onChange で制御します。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-function SelectExample() {
-  const [prefecture, setPrefecture] = useState('');
-  const [fontSize, setFontSize] = useState('16');
+            <CodePreview
+              code={`function SelectExample() {
+  const [prefecture, setPrefecture] = React.useState('');
+  const [fontSize, setFontSize] = React.useState('16');
 
   const prefectures = [
     { value: '', label: '選択してください' },
@@ -268,54 +271,48 @@ function SelectExample() {
     { value: 'fukuoka', label: '福岡県' },
   ];
 
+  const selectStyle = {
+    width: '100%', padding: '8px 12px',
+    border: '1px solid #d1d5db', borderRadius: '8px',
+    fontSize: '14px', backgroundColor: '#fff',
+  };
+
   return (
-    <div className="p-6 max-w-md space-y-4">
-      {/* 基本的な select */}
-      <div>
-        <label className="block text-sm font-medium mb-1">都道府県</label>
-        <select
-          value={prefecture}
-          onChange={(e) => setPrefecture(e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg bg-white"
-        >
+    <div style={{ padding: '24px', maxWidth: '400px' }}>
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '4px' }}>都道府県</label>
+        <select value={prefecture} onChange={(e) => setPrefecture(e.target.value)} style={selectStyle}>
           {prefectures.map((pref) => (
-            <option key={pref.value} value={pref.value}>
-              {pref.label}
-            </option>
+            <option key={pref.value} value={pref.value}>{pref.label}</option>
           ))}
         </select>
         {prefecture && (
-          <p className="text-sm text-green-600 mt-1">
+          <p style={{ fontSize: '13px', color: '#16a34a', marginTop: '4px' }}>
             選択中: {prefectures.find((p) => p.value === prefecture)?.label}
           </p>
         )}
       </div>
 
-      {/* 選択結果をリアルタイムに反映 */}
       <div>
-        <label className="block text-sm font-medium mb-1">フォントサイズ</label>
-        <select
-          value={fontSize}
-          onChange={(e) => setFontSize(e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg bg-white"
-        >
+        <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '4px' }}>フォントサイズ</label>
+        <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={selectStyle}>
           <option value="12">12px - 小さい</option>
           <option value="16">16px - 標準</option>
           <option value="20">20px - 大きめ</option>
           <option value="24">24px - 大きい</option>
         </select>
-        <p
-          className="mt-3 p-3 bg-gray-50 rounded-lg"
-          style={{ fontSize: \`\${fontSize}px\` }}
-        >
+        <p style={{ marginTop: '12px', padding: '12px', backgroundColor: '#f9fafb', borderRadius: '8px', fontSize: fontSize + 'px' }}>
           このテキストのサイズが変わります
         </p>
       </div>
     </div>
   );
-}`}
+}
+
+function App() { return <SelectExample /> }`}
               language="tsx"
               title="セレクトボックスの制御"
+              previewHeight={300}
             />
           </section>
 
@@ -325,22 +322,16 @@ function SelectExample() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               チェックボックスは <code className="text-sm bg-muted px-1.5 py-0.5 rounded">checked</code> + <code className="text-sm bg-muted px-1.5 py-0.5 rounded">onChange</code>、ラジオボタンは <code className="text-sm bg-muted px-1.5 py-0.5 rounded">checked</code> + <code className="text-sm bg-muted px-1.5 py-0.5 rounded">onChange</code> + 共通の state で制御します。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`function CheckboxRadio() {
+  const [interests, setInterests] = React.useState([]);
+  const [plan, setPlan] = React.useState('free');
 
-function CheckboxRadio() {
-  // チェックボックス: 複数選択可
-  const [interests, setInterests] = useState<string[]>([]);
-
-  // ラジオボタン: 1つだけ選択
-  const [plan, setPlan] = useState('free');
-
-  // チェックボックスの切り替え
-  const handleInterestChange = (interest: string) => {
+  const handleInterestChange = (interest) => {
     setInterests((prev) =>
       prev.includes(interest)
-        ? prev.filter((i) => i !== interest)  // 含まれていたら削除
-        : [...prev, interest]                  // 含まれていなければ追加
+        ? prev.filter((i) => i !== interest)
+        : [...prev, interest]
     );
   };
 
@@ -352,64 +343,63 @@ function CheckboxRadio() {
     { value: 'team', label: 'チームプラン', price: '¥2,980/月' },
   ];
 
+  const labelStyle = {
+    display: 'flex', alignItems: 'center', gap: '10px',
+    cursor: 'pointer', marginBottom: '6px',
+  };
+
   return (
-    <div className="p-6 max-w-md space-y-8">
-      {/* チェックボックス: 複数選択 */}
-      <div>
-        <p className="text-sm font-medium mb-3">興味のある分野（複数選択可）</p>
-        <div className="space-y-2">
+    <div style={{ padding: '24px', maxWidth: '400px' }}>
+      <div style={{ marginBottom: '24px' }}>
+        <p style={{ fontSize: '13px', fontWeight: 500, marginBottom: '10px' }}>興味のある分野（複数選択可）</p>
+        <div>
           {interestOptions.map((interest) => (
-            <label key={interest} className="flex items-center gap-3 cursor-pointer">
+            <label key={interest} style={labelStyle}>
               <input
                 type="checkbox"
                 checked={interests.includes(interest)}
                 onChange={() => handleInterestChange(interest)}
-                className="w-4 h-4 rounded"
               />
-              <span className="text-sm">{interest}</span>
+              <span style={{ fontSize: '14px' }}>{interest}</span>
             </label>
           ))}
         </div>
-        <p className="text-sm text-gray-500 mt-2">
+        <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px' }}>
           選択中: {interests.length > 0 ? interests.join(', ') : 'なし'}
         </p>
       </div>
 
-      {/* ラジオボタン: 単一選択 */}
       <div>
-        <p className="text-sm font-medium mb-3">プランを選択</p>
-        <div className="space-y-2">
-          {plans.map((p) => (
-            <label
-              key={p.value}
-              className={\`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors
-                \${plan === p.value
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:bg-gray-50'
-                }\`}
-            >
-              <input
-                type="radio"
-                name="plan"
-                value={p.value}
-                checked={plan === p.value}
-                onChange={(e) => setPlan(e.target.value)}
-                className="w-4 h-4"
-              />
-              <div className="flex-1">
-                <span className="font-medium text-sm">{p.label}</span>
-              </div>
-              <span className="text-sm text-gray-500">{p.price}</span>
-            </label>
-          ))}
-        </div>
+        <p style={{ fontSize: '13px', fontWeight: 500, marginBottom: '10px' }}>プランを選択</p>
+        {plans.map((p) => (
+          <label
+            key={p.value}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '10px',
+              padding: '12px', marginBottom: '6px',
+              border: plan === p.value ? '2px solid #3b82f6' : '1px solid #e5e7eb',
+              borderRadius: '8px', cursor: 'pointer',
+              backgroundColor: plan === p.value ? '#eff6ff' : '#fff',
+            }}
+          >
+            <input
+              type="radio" name="plan" value={p.value}
+              checked={plan === p.value}
+              onChange={(e) => setPlan(e.target.value)}
+            />
+            <span style={{ flex: 1, fontWeight: 500, fontSize: '14px' }}>{p.label}</span>
+            <span style={{ fontSize: '13px', color: '#6b7280' }}>{p.price}</span>
+          </label>
+        ))}
       </div>
     </div>
   );
-}`}
+}
+
+function App() { return <CheckboxRadio /> }`}
               language="tsx"
               title="チェックボックスとラジオボタン"
-              showLineNumbers
+              previewHeight={380}
             />
           </section>
 

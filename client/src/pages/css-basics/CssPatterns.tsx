@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function CssPatterns() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 21</span>
+          <span className="step-badge">STEP 21</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">CSS 設計パターン</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -97,31 +98,58 @@ export default function CssPatterns() {
 
             <div className="mt-4" />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
-              title="BEM を React で使う"
-              code={`import './Card.css';
-
-function Card({ featured, title, children }: {
-  featured?: boolean;
-  title: string;
-  children: React.ReactNode;
-}) {
+              title="BEM を React で使う（プレビュー）"
+              code={`function App() {
   return (
-    <div className={\`card \${featured ? 'card--featured' : ''}\`}>
-      <div className="card__header">
-        <h3 className="card__title">{title}</h3>
+    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+      <div className="card">
+        <div className="card__header">
+          <h3 className="card__title">通常カード</h3>
+        </div>
+        <div className="card__body">カードの内容です</div>
+        <div className="card__footer">
+          <button className="card__action card__action--primary">詳細</button>
+          <button className="card__action card__action--secondary">共有</button>
+        </div>
       </div>
-      <div className="card__body">
-        {children}
-      </div>
-      <div className="card__footer">
-        <button className="card__action card__action--primary">詳細</button>
-        <button className="card__action card__action--secondary">共有</button>
+      <div className="card card--featured">
+        <div className="card__header">
+          <h3 className="card__title">特集カード</h3>
+        </div>
+        <div className="card__body">card--featured で強調表示</div>
+        <div className="card__footer">
+          <button className="card__action card__action--primary">詳細</button>
+          <button className="card__action card__action--secondary">共有</button>
+        </div>
       </div>
     </div>
   );
 }`}
+              css={`
+.card {
+  background: white; border-radius: 12px; padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08); flex: 1; min-width: 200px;
+}
+.card--featured {
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 16px rgba(59,130,246,0.15);
+}
+.card__title { font-size: 1.25rem; font-weight: 600; color: #1e293b; margin-bottom: 8px; }
+.card__body { color: #64748b; line-height: 1.6; margin-bottom: 16px; font-size: 0.875rem; }
+.card__footer {
+  display: flex; gap: 12px; padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+.card__action {
+  padding: 6px 16px; border: none; border-radius: 6px;
+  font-size: 0.8rem; font-weight: 500; cursor: pointer;
+}
+.card__action--primary { background: #3b82f6; color: white; }
+.card__action--secondary { background: #f1f5f9; color: #334155; }
+`}
+              previewHeight={220}
             />
 
             <InfoBox type="info" title="CSS Modules を使うなら BEM は不要？">
@@ -763,27 +791,44 @@ function Layout() {
 
             <div className="mt-4" />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
-              title="React でテーマを切り替える"
-              code={`import { useState, useEffect } from 'react';
+              title="CSS 変数でテーマを切り替える（プレビュー）"
+              code={`function App() {
+  var _s = React.useState('light');
+  var theme = _s[0];
+  var setTheme = _s[1];
+  var isLight = theme === 'light';
 
-function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    // data-theme 属性を変更すると CSS 変数が切り替わる
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+  var colors = isLight
+    ? { bg: '#f8fafc', surface: '#ffffff', text: '#1e293b', muted: '#64748b', primary: '#3b82f6', border: '#e2e8f0' }
+    : { bg: '#0f172a', surface: '#1e293b', text: '#f1f5f9', muted: '#94a3b8', primary: '#60a5fa', border: '#334155' };
 
   return (
-    <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
-      {theme === 'light' ? 'ダークモード' : 'ライトモード'}に切り替え
-    </button>
+    <div style={{ background: colors.bg, padding: 24, borderRadius: 12, transition: 'all 0.3s ease' }}>
+      <div style={{
+        background: colors.surface, borderRadius: 12, padding: 20,
+        border: '1px solid ' + colors.border, marginBottom: 16,
+      }}>
+        <h3 style={{ color: colors.text, fontWeight: 700, marginBottom: 8 }}>カード</h3>
+        <p style={{ color: colors.muted, fontSize: '0.875rem', lineHeight: 1.6 }}>
+          CSS 変数でテーマを切り替えると、ランタイムコストなしでテーマ変更が実現できます。
+        </p>
+      </div>
+      <button
+        onClick={function() { setTheme(isLight ? 'dark' : 'light'); }}
+        style={{
+          padding: '10px 20px', border: 'none', borderRadius: 8,
+          background: colors.primary, color: 'white',
+          fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem',
+        }}
+      >
+        {isLight ? 'ダークモード' : 'ライトモード'}に切り替え
+      </button>
+    </div>
   );
-}
-
-// CSS カスタムプロパティなら、CSS-in-JS のランタイムコストなしでテーマ切替が実現できる！`}
+}`}
+              previewHeight={220}
             />
 
             <InfoBox type="info" title="Figma との連携">
@@ -803,53 +848,46 @@ function ThemeToggle() {
               モバイルファースト設計が現在の標準です。
             </p>
 
-            <CodeBlock
-              language="css"
-              title="よく使うレスポンシブパターン"
-              code={`/* パターン1: Fluid Typography（流動的なフォントサイズ） */
+            <CodePreview
+              language="tsx"
+              title="よく使うレスポンシブパターン（プレビュー）"
+              code={`function App() {
+  var items = ['カード 1', 'カード 2', 'カード 3', 'カード 4'];
+  return (
+    <div>
+      <h2 className="fluid-title">Fluid Typography</h2>
+      <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 16 }}>
+        clamp() でフォントサイズが滑らかに変化します
+      </p>
+      <div className="auto-grid">
+        {items.map(function(item) {
+          return React.createElement('div', {
+            key: item,
+            style: {
+              background: 'white', borderRadius: 12, padding: 20,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              textAlign: 'center', fontSize: '0.875rem', color: '#334155',
+            }
+          }, item);
+        })}
+      </div>
+    </div>
+  );
+}`}
+              css={`
 .fluid-title {
-  /* clamp(最小値, 推奨値, 最大値) */
-  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(1.2rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 4px;
 }
-
-/* パターン2: Auto-fit Grid（自動調整グリッド） */
 .auto-grid {
   display: grid;
-  /* メディアクエリ不要！コンテンツに応じて自動調整 */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
 }
-
-/* パターン3: モバイルファースト */
-.container {
-  padding: 16px;
-}
-
-@media (min-width: 768px) {
-  .container {
-    padding: 24px;
-    max-width: 768px;
-    margin: 0 auto;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container {
-    padding: 32px;
-    max-width: 1200px;
-  }
-}
-
-/* パターン4: レスポンシブスペーシング */
-.section {
-  padding: var(--spacing-4);  /* モバイル: 16px */
-}
-
-@media (min-width: 768px) {
-  .section {
-    padding: var(--spacing-8);  /* タブレット: 32px */
-  }
-}`}
+`}
+              previewHeight={200}
             />
           </section>
 

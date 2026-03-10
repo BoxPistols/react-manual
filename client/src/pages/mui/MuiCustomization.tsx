@@ -1,14 +1,15 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
 
 export default function MuiCustomization() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 27</span>
+          <span className="step-badge">STEP 27</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">MUI カスタマイズ</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -68,92 +69,71 @@ export default theme;`}
               primary、secondary、error などのカラーを設定すると、すべてのコンポーネントに反映されます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="パレットの設定"
-              showLineNumbers
-              code={`import { createTheme } from '@mui/material/styles';
-
-const theme = createTheme({
-  palette: {
-    // プライマリカラー
-    primary: {
-      main: '#6366f1',       // インディゴ
-      light: '#818cf8',      // 自動生成も可能
-      dark: '#4f46e5',       // 自動生成も可能
-      contrastText: '#fff',  // ボタンのテキスト色
-    },
-
-    // セカンダリカラー
-    secondary: {
-      main: '#ec4899',       // ピンク
-    },
-
-    // エラー / 警告 / 成功 / 情報
-    error: { main: '#ef4444' },
-    warning: { main: '#f59e0b' },
-    success: { main: '#10b981' },
-    info: { main: '#3b82f6' },
-
-    // 背景色
-    background: {
-      default: '#f8fafc',   // ページ全体の背景
-      paper: '#ffffff',      // Card や Paper の背景
-    },
-
-    // テキストカラー
-    text: {
-      primary: '#1e293b',
-      secondary: '#64748b',
-    },
-
-    // ボーダー色
-    divider: '#e2e8f0',
-  },
-});`}
+              previewHeight={260}
+              code={`function App() {
+  const palette = {
+    primary: { main: '#6366f1', light: '#818cf8', dark: '#4f46e5' },
+    secondary: { main: '#ec4899' },
+    error: '#ef4444', warning: '#f59e0b', success: '#10b981', info: '#3b82f6',
+  };
+  const swatch = (color, label) => (
+    React.createElement('div', { key: label, style: { display: 'flex', alignItems: 'center', gap: 8 } },
+      React.createElement('div', { style: { width: 32, height: 32, borderRadius: 6, background: color, border: '1px solid rgba(0,0,0,0.08)' } }),
+      React.createElement('span', { style: { fontSize: 13 } }, label),
+      React.createElement('code', { style: { fontSize: 11, color: '#64748b', marginLeft: 4 } }, color)
+    )
+  );
+  return (
+    <div style={{ fontFamily: 'sans-serif', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <strong style={{ fontSize: 14 }}>Primary</strong>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        {swatch(palette.primary.light, 'light')}
+        {swatch(palette.primary.main, 'main')}
+        {swatch(palette.primary.dark, 'dark')}
+      </div>
+      <strong style={{ fontSize: 14, marginTop: 8 }}>Secondary & Semantic</strong>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        {swatch(palette.secondary.main, 'secondary')}
+        {swatch(palette.error, 'error')}
+        {swatch(palette.warning, 'warning')}
+        {swatch(palette.success, 'success')}
+        {swatch(palette.info, 'info')}
+      </div>
+    </div>
+  );
+}`}
             />
 
             <div className="mt-4" />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="ダークモードのパレット"
-              code={`const darkTheme = createTheme({
-  palette: {
-    mode: 'dark', // ダークモードを有効化
-
-    primary: {
-      main: '#818cf8', // ダークモードでは少し明るめに
-    },
-    background: {
-      default: '#0f172a',
-      paper: '#1e293b',
-    },
-  },
-});
-
-// ダークモードの切り替え
-function App() {
-  const [mode, setMode] = useState<'light' | 'dark'>('light');
-
-  const theme = useMemo(() =>
-    createTheme({
-      palette: {
-        mode,
-        primary: { main: '#6366f1' },
-      },
-    }),
-    [mode]
-  );
+              previewHeight={200}
+              code={`function App() {
+  const [isDark, setIsDark] = React.useState(false);
+  const bg = isDark ? '#0f172a' : '#f8fafc';
+  const paper = isDark ? '#1e293b' : '#ffffff';
+  const text = isDark ? '#f1f5f9' : '#1e293b';
+  const sub = isDark ? '#94a3b8' : '#64748b';
+  const primary = isDark ? '#818cf8' : '#6366f1';
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <button onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
-        テーマ切替
+    <div style={{ background: bg, padding: 20, borderRadius: 8, transition: 'all 0.3s', fontFamily: 'sans-serif' }}>
+      <button
+        onClick={() => setIsDark(!isDark)}
+        style={{ background: primary, color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 600, cursor: 'pointer', marginBottom: 16, transition: 'background 0.3s' }}
+      >
+        {isDark ? '🌙 ダークモード' : '☀️ ライトモード'}
       </button>
-      {/* アプリの中身 */}
-    </ThemeProvider>
+      <div style={{ background: paper, padding: 16, borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', transition: 'all 0.3s' }}>
+        <h3 style={{ margin: '0 0 4px', color: text, fontSize: 18, fontWeight: 600 }}>MUI テーマ切替</h3>
+        <p style={{ margin: 0, color: sub, fontSize: 14 }}>palette.mode で全コンポーネントがダークモードに対応します。</p>
+      </div>
+    </div>
   );
 }`}
             />
@@ -327,44 +307,42 @@ function App() {
               MUI には複数のスタイリング方法があります。それぞれの特徴と適切な使い分けを理解しましょう。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="3つのスタイリング手法"
-              showLineNumbers
-              code={`// 1. styleOverrides（テーマ設定）
-// → 全体に適用したいデフォルトスタイル
-// → 「すべての Button の角丸を 8px にする」
-const theme = createTheme({
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: { borderRadius: 8 },
-      },
-    },
-  },
-});
-
-// 2. sx prop（インライン）
-// → 個別のコンポーネントに1回だけ適用するスタイル
-// → 「このボタンだけマージンを追加する」
-<Button sx={{ mt: 2, mb: 1 }}>送信</Button>
-
-// 3. styled()（再利用可能なスタイル付きコンポーネント）
-// → 同じスタイルを複数箇所で使い回す場合
-import { styled } from '@mui/material/styles';
-
-const GradientButton = styled(Button)(({ theme }) => ({
-  background: 'linear-gradient(45deg, #6366f1, #ec4899)',
-  color: 'white',
-  padding: '12px 32px',
-  '&:hover': {
-    background: 'linear-gradient(45deg, #4f46e5, #db2777)',
-    boxShadow: theme.shadows[4],
-  },
-}));
-
-// 使い方
-<GradientButton>グラデーションボタン</GradientButton>`}
+              previewHeight={180}
+              code={`function App() {
+  const baseBtn = { border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 15, fontWeight: 600, cursor: 'pointer', color: '#fff' };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, fontFamily: 'sans-serif' }}>
+      <div>
+        <span style={{ fontSize: 12, color: '#64748b', fontWeight: 500 }}>1. styleOverrides（全ボタン共通）</span>
+        <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+          <button style={{ ...baseBtn, background: '#6366f1' }}>角丸 8px</button>
+          <button style={{ ...baseBtn, background: '#6366f1' }}>統一スタイル</button>
+        </div>
+      </div>
+      <div>
+        <span style={{ fontSize: 12, color: '#64748b', fontWeight: 500 }}>2. sx prop（個別調整: mt, mb）</span>
+        <div style={{ marginTop: 16, marginBottom: 8 }}>
+          <button style={{ ...baseBtn, background: '#6366f1' }}>送信（mt:2, mb:1 相当）</button>
+        </div>
+      </div>
+      <div>
+        <span style={{ fontSize: 12, color: '#64748b', fontWeight: 500 }}>3. styled()（再利用コンポーネント）</span>
+        <div style={{ marginTop: 4 }}>
+          <button
+            style={{ ...baseBtn, background: 'linear-gradient(45deg, #6366f1, #ec4899)', padding: '12px 32px', transition: 'all 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)'}
+            onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+          >
+            グラデーションボタン
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}`}
             />
 
             <div className="overflow-x-auto mt-4">

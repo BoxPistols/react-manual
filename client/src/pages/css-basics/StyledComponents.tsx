@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function StyledComponents() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 19</span>
+          <span className="step-badge">STEP 19</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">styled-components</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -110,77 +111,32 @@ export default defineConfig({
               テンプレートリテラルで CSS を渡してコンポーネントを作ります。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="基本的なスタイルコンポーネント"
-              code={`import styled from 'styled-components';
-
-// styled.div でスタイル付き <div> を作成
-const Container = styled.div\`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-\`;
-
-// styled.h1 でスタイル付き <h1> を作成
-const Title = styled.h1\`
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: #1e293b;
-  margin-bottom: 16px;
-  line-height: 1.2;
-\`;
-
-// styled.p でスタイル付き <p> を作成
-const Description = styled.p\`
-  font-size: 1.125rem;
-  color: #64748b;
-  line-height: 1.8;
-  max-width: 640px;
-\`;
-
-// styled.button でスタイル付き <button> を作成
-const Button = styled.button\`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  background-color: #3b82f6;
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #2563eb;
-  }
-
-  &:active {
-    background-color: #1d4ed8;
-  }
-
-  &:disabled {
-    background-color: #94a3b8;
-    cursor: not-allowed;
-  }
-\`;
-
-// 使い方：通常のコンポーネントと同じ
-function HeroSection() {
+              code={`function App() {
   return (
-    <Container>
-      <Title>React でスタイリングを学ぼう</Title>
-      <Description>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+      <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1e293b', marginBottom: 16, lineHeight: 1.2 }}>
+        React でスタイリングを学ぼう
+      </h1>
+      <p style={{ fontSize: '1.125rem', color: '#64748b', lineHeight: 1.8, maxWidth: 640 }}>
         styled-components を使えば、CSS の知識をそのまま活かして
         コンポーネントにスタイルを適用できます。
-      </Description>
-      <Button>はじめる</Button>
-    </Container>
+      </p>
+      <button style={{
+        display: 'inline-flex', alignItems: 'center', gap: 8,
+        padding: '12px 24px', border: 'none', borderRadius: 8,
+        backgroundColor: '#3b82f6', color: 'white',
+        fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
+        marginTop: 16,
+      }}>
+        はじめる
+      </button>
+    </div>
   );
 }`}
+              previewHeight={200}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">ネストと擬似要素</h3>
@@ -479,59 +435,25 @@ const Input = styled.input.attrs(() => ({
               CSS のカスケードのように、ベースのスタイルを継承しつつ追加・上書きができます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="スタイルの拡張"
-              code={`import styled from 'styled-components';
+              code={`function App() {
+  var base = {
+    padding: '10px 20px', border: 'none', borderRadius: 8,
+    fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer',
+  };
 
-// ベースボタン
-const BaseButton = styled.button\`
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-\`;
-
-// BaseButton を拡張してプライマリボタンを作成
-const PrimaryButton = styled(BaseButton)\`
-  background-color: #3b82f6;
-  color: white;
-
-  &:hover {
-    background-color: #2563eb;
-  }
-\`;
-
-// BaseButton を拡張してデンジャーボタンを作成
-const DangerButton = styled(BaseButton)\`
-  background-color: #ef4444;
-  color: white;
-
-  &:hover {
-    background-color: #dc2626;
-  }
-\`;
-
-// PrimaryButton をさらに拡張してラウンドボタンを作成
-const RoundPrimaryButton = styled(PrimaryButton)\`
-  border-radius: 9999px;
-  padding: 10px 24px;
-\`;
-
-// 使用例
-function App() {
   return (
-    <div style={{ display: 'flex', gap: '12px' }}>
-      <BaseButton>ベース</BaseButton>
-      <PrimaryButton>プライマリ</PrimaryButton>
-      <DangerButton>デンジャー</DangerButton>
-      <RoundPrimaryButton>ラウンド</RoundPrimaryButton>
+    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <button style={{ ...base, backgroundColor: '#e2e8f0', color: '#334155' }}>ベース</button>
+      <button style={{ ...base, backgroundColor: '#3b82f6', color: 'white' }}>プライマリ</button>
+      <button style={{ ...base, backgroundColor: '#ef4444', color: 'white' }}>デンジャー</button>
+      <button style={{ ...base, backgroundColor: '#3b82f6', color: 'white', borderRadius: 9999, padding: '10px 24px' }}>ラウンド</button>
     </div>
   );
 }`}
+              previewHeight={80}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">as prop でタグを変更</h3>
@@ -1032,65 +954,64 @@ function ProgressBar({ value }: { value: number }) {
               CSS アニメーションを定義できます。自動的にユニークな名前が生成されるため、衝突の心配がありません。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="アニメーションの定義と使用"
-              code={`import styled, { keyframes } from 'styled-components';
-
-// フェードイン
-const fadeIn = keyframes\`
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-\`;
-
-// スピナー回転
-const spin = keyframes\`
+              code={`function App() {
+  return (
+    <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div>
+        <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 8 }}>スピナー</p>
+        <div className="spinner" />
+      </div>
+      <div>
+        <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 8 }}>フェードインカード</p>
+        <div className="fade-card" style={{
+          padding: 24, background: 'white', borderRadius: 12,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)', maxWidth: 200,
+        }}>
+          カード内容
+        </div>
+      </div>
+      <div style={{ flex: 1, minWidth: 200 }}>
+        <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 8 }}>スケルトン</p>
+        <div className="skeleton" style={{ width: '100%', height: 20, borderRadius: 4, marginBottom: 8 }} />
+        <div className="skeleton" style={{ width: '70%', height: 20, borderRadius: 4, marginBottom: 8 }} />
+        <div className="skeleton" style={{ width: '50%', height: 20, borderRadius: 4 }} />
+      </div>
+    </div>
+  );
+}`}
+              css={`
+@keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-\`;
-
-// スケルトンシマー
-const shimmer = keyframes\`
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
-\`;
-
-// フェードインするカード
-const AnimatedCard = styled.div\`
-  padding: 24px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  animation: \${fadeIn} 0.3s ease-out;
-\`;
-
-// ローディングスピナー
-const Spinner = styled.div\`
-  width: 32px;
-  height: 32px;
+}
+.spinner {
+  width: 32px; height: 32px;
   border: 3px solid #e2e8f0;
   border-top-color: #3b82f6;
   border-radius: 50%;
-  animation: \${spin} 0.8s linear infinite;
-\`;
-
-// スケルトンローディング
-const Skeleton = styled.div<{ $width?: string; $height?: string }>\`
-  width: \${(props) => props.$width || '100%'};
-  height: \${(props) => props.$height || '20px'};
-  border-radius: 4px;
-  background: linear-gradient(
-    90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%
-  );
+  animation: spin 0.8s linear infinite;
+}
+.fade-card {
+  animation: fadeIn 0.6s ease-out;
+}
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
   background-size: 200% 100%;
-  animation: \${shimmer} 1.5s ease-in-out infinite;
-\`;`}
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+`}
+              previewHeight={140}
             />
           </section>
 

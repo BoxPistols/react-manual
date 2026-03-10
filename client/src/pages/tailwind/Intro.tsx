@@ -1,14 +1,15 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
 
 export default function TailwindIntro() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 22</span>
+          <span className="step-badge">STEP 22</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">Tailwind CSS 入門</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -167,26 +168,29 @@ export default defineConfig({
               各色は 50〜950 までの階調があり、デザインシステムで使いやすい構成です。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="テキストと背景の色"
-              code={`// テキスト色
-<p className="text-gray-900">ほぼ黒のテキスト</p>
-<p className="text-blue-600">青いテキスト</p>
-<p className="text-red-500">赤いテキスト</p>
+              previewHeight={280}
+              code={`function App() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {/* テキスト色 */}
+      <p style={{ color: '#111827', margin: 0 }}>ほぼ黒のテキスト (text-gray-900)</p>
+      <p style={{ color: '#2563eb', margin: 0 }}>青いテキスト (text-blue-600)</p>
+      <p style={{ color: '#ef4444', margin: 0 }}>赤いテキスト (text-red-500)</p>
 
-// 背景色
-<div className="bg-white">白い背景</div>
-<div className="bg-gray-100">薄いグレーの背景</div>
-<div className="bg-blue-500">青い背景</div>
+      {/* 背景色 */}
+      <div style={{ background: '#fff', padding: '8px 12px', borderRadius: 4 }}>白い背景 (bg-white)</div>
+      <div style={{ background: '#f3f4f6', padding: '8px 12px', borderRadius: 4 }}>薄いグレーの背景 (bg-gray-100)</div>
+      <div style={{ background: '#3b82f6', color: '#fff', padding: '8px 12px', borderRadius: 4 }}>青い背景 (bg-blue-500)</div>
 
-// 透明度付き
-<div className="bg-black/50">50% 透過の黒背景</div>
-<div className="text-white/80">80% 透過の白テキスト</div>
-
-// ボーダー色
-<div className="border border-gray-200">グレーのボーダー</div>
-<div className="border-2 border-blue-500">太い青ボーダー</div>`}
+      {/* ボーダー色 */}
+      <div style={{ border: '1px solid #e5e7eb', padding: '8px 12px', borderRadius: 4 }}>グレーのボーダー</div>
+      <div style={{ border: '2px solid #3b82f6', padding: '8px 12px', borderRadius: 4 }}>太い青ボーダー</div>
+    </div>
+  );
+}`}
             />
 
             <InfoBox type="info" title="カラーの数値ルール">
@@ -247,34 +251,34 @@ export default defineConfig({
               レイアウトに不可欠な Flexbox と Grid も、Tailwind ならクラス名だけで表現できます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="Flexbox レイアウト"
-              code={`// 横並び（中央揃え）
-<div className="flex items-center gap-4">
-  <img className="w-10 h-10 rounded-full" src="avatar.jpg" />
-  <span className="font-medium">ユーザー名</span>
-</div>
+              previewHeight={240}
+              code={`function App() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* 横並び（中央揃え） */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#c4b5fd' }} />
+        <span style={{ fontWeight: 500 }}>ユーザー名</span>
+      </div>
 
-// 両端揃え
-<div className="flex justify-between items-center">
-  <h1>ロゴ</h1>
-  <nav>ナビ</nav>
-</div>
+      {/* 両端揃え */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#f3f4f6', borderRadius: 8 }}>
+        <span style={{ fontWeight: 700, fontSize: 18 }}>ロゴ</span>
+        <span style={{ color: '#6b7280' }}>ナビ</span>
+      </div>
 
-// 縦並び（中央揃え）
-<div className="flex flex-col items-center gap-2">
-  <p>アイテム 1</p>
-  <p>アイテム 2</p>
-  <p>アイテム 3</p>
-</div>
-
-// 折り返し
-<div className="flex flex-wrap gap-2">
-  <span className="px-3 py-1 bg-blue-100 rounded-full">タグ1</span>
-  <span className="px-3 py-1 bg-blue-100 rounded-full">タグ2</span>
-  <span className="px-3 py-1 bg-blue-100 rounded-full">タグ3</span>
-</div>`}
+      {/* 折り返しタグ */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <span style={{ padding: '4px 12px', background: '#dbeafe', borderRadius: 9999, fontSize: 14 }}>タグ1</span>
+        <span style={{ padding: '4px 12px', background: '#dbeafe', borderRadius: 9999, fontSize: 14 }}>タグ2</span>
+        <span style={{ padding: '4px 12px', background: '#dbeafe', borderRadius: 9999, fontSize: 14 }}>タグ3</span>
+      </div>
+    </div>
+  );
+}`}
             />
 
             <div className="mt-4" />
@@ -312,44 +316,35 @@ export default defineConfig({
               インタラクティブな UI を直感的に作れます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="状態のプレフィックス"
-              code={`// ホバー時にスタイル変更
-<button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-  ホバーで暗くなるボタン
-</button>
+              previewHeight={200}
+              code={`function App() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <button
+        style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', transition: 'background 0.2s' }}
+        onMouseEnter={e => e.currentTarget.style.background = '#2563eb'}
+        onMouseLeave={e => e.currentTarget.style.background = '#3b82f6'}
+      >
+        ホバーで暗くなるボタン
+      </button>
 
-// フォーカス時のリング表示
-<input
-  className="border border-gray-300 rounded px-3 py-2
-             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-  placeholder="フォーカスするとリングが表示"
-/>
+      <button
+        style={{ background: '#22c55e', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 6, cursor: 'pointer', transition: 'background 0.2s' }}
+        onMouseEnter={e => e.currentTarget.style.background = '#16a34a'}
+        onMouseLeave={e => e.currentTarget.style.background = '#22c55e'}
+      >
+        押すと更に暗くなるボタン
+      </button>
 
-// アクティブ（クリック中）
-<button className="bg-green-500 hover:bg-green-600 active:bg-green-700 text-white px-4 py-2 rounded">
-  押すと更に暗くなるボタン
-</button>
-
-// 無効状態
-<button className="bg-gray-300 text-gray-500 cursor-not-allowed disabled:opacity-50" disabled>
-  無効なボタン
-</button>
-
-// トランジション
-<button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg
-                   transition-colors duration-200">
-  スムーズに色が変わるボタン
-</button>
-
-// グループホバー（親のホバーで子を変更）
-<div className="group p-4 border rounded-lg hover:border-blue-500 transition-colors">
-  <h3 className="font-bold group-hover:text-blue-500 transition-colors">
-    親をホバーすると色が変わる
-  </h3>
-  <p className="text-gray-500">説明テキスト</p>
-</div>`}
+      <button style={{ background: '#d1d5db', color: '#6b7280', border: 'none', padding: '8px 16px', borderRadius: 6, cursor: 'not-allowed', opacity: 0.5 }} disabled>
+        無効なボタン
+      </button>
+    </div>
+  );
+}`}
             />
 
             <InfoBox type="info" title="よく使うステートプレフィックス">

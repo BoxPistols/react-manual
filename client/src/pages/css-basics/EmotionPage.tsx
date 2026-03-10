@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function EmotionPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 20</span>
+          <span className="step-badge">STEP 20</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">Emotion</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -182,55 +183,26 @@ function App() {
               </ul>
             </div>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
-              title="混在パターンの実例"
-              code={`/** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-
-// 共通コンポーネントは styled で定義
-const Button = styled.button<{ $variant: 'primary' | 'secondary' }>\`
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  background: \${(p) => p.$variant === 'primary' ? '#3b82f6' : '#f1f5f9'};
-  color: \${(p) => p.$variant === 'primary' ? 'white' : '#334155'};
-\`;
-
-const Badge = styled.span\`
-  padding: 2px 8px;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  background: #eff6ff;
-  color: #3b82f6;
-\`;
-
-// ページ固有のレイアウトは css prop で直接
-function ProfilePage() {
+              title="混在パターンの実例（プレビュー）"
+              code={`function App() {
   return (
-    <div css={css\`
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 32px;
-    \`}>
-      <header css={css\`
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-      \`}>
-        <h1 css={{ fontSize: '2rem', fontWeight: 800 }}>
-          プロフィール <Badge>Pro</Badge>
+    <div style={{ maxWidth: 800, margin: '0 auto', padding: 32 }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: 0 }}>
+          プロフィール{' '}
+          <span style={{ padding: '2px 8px', borderRadius: 9999, fontSize: '0.75rem', background: '#eff6ff', color: '#3b82f6', verticalAlign: 'middle' }}>Pro</span>
         </h1>
-        <Button $variant="primary">編集</Button>
+        <button style={{ padding: '10px 20px', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', background: '#3b82f6', color: 'white' }}>編集</button>
       </header>
-      {/* ... */}
+      <div style={{ background: '#f8fafc', borderRadius: 12, padding: 24 }}>
+        <p style={{ color: '#64748b', lineHeight: 1.6 }}>styled API と css prop を1つのページで混在して使えます。</p>
+      </div>
     </div>
   );
 }`}
+              previewHeight={160}
             />
           </section>
 
@@ -244,47 +216,25 @@ function ProfilePage() {
             </p>
 
             <h3 className="text-lg font-semibold text-foreground mb-3">テンプレートリテラル記法</h3>
-            <CodeBlock
+            <CodePreview
               language="tsx"
-              title="css prop + テンプレートリテラル"
-              code={`/** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react';
-
-function Card() {
+              title="css prop + テンプレートリテラル（プレビュー）"
+              code={`function App() {
   return (
-    <div
-      css={css\`
-        background: white;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-        &:hover {
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-      \`}
-    >
-      <h3
-        css={css\`
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: #1e293b;
-          margin-bottom: 8px;
-        \`}
-      >
+    <div style={{
+      background: 'white', borderRadius: 12, padding: 24,
+      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    }}>
+      <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1e293b', marginBottom: 8 }}>
         カードタイトル
       </h3>
-      <p
-        css={css\`
-          color: #64748b;
-          line-height: 1.6;
-        \`}
-      >
-        カードの説明文です。
+      <p style={{ color: '#64748b', lineHeight: 1.6 }}>
+        カードの説明文です。Emotion の css prop で直接スタイルを適用しています。
       </p>
     </div>
   );
 }`}
+              previewHeight={140}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">オブジェクト記法</h3>
@@ -443,73 +393,40 @@ const Badge = styled.span({
               複数のスタイルを組み合わせて、新しいスタイルを作れます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
-              title="配列でスタイルを合成"
-              code={`/** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react';
+              title="配列でスタイルを合成（プレビュー）"
+              code={`function App() {
+  var base = {
+    border: 'none', borderRadius: 8, fontWeight: 600,
+    cursor: 'pointer', marginRight: 8, marginBottom: 8,
+  };
+  var variants = {
+    primary: { background: '#3b82f6', color: 'white' },
+    secondary: { background: '#f1f5f9', color: '#334155' },
+    outline: { background: 'transparent', color: '#3b82f6', border: '2px solid #3b82f6' },
+  };
+  var sizes = {
+    sm: { padding: '6px 12px', fontSize: '0.8rem' },
+    md: { padding: '10px 20px', fontSize: '0.875rem' },
+    lg: { padding: '14px 28px', fontSize: '1rem' },
+  };
 
-// ベーススタイル
-const baseButton = css\`
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-\`;
+  function Btn({ variant, size, children }) {
+    var s = Object.assign({}, base, variants[variant || 'primary'], sizes[size || 'md']);
+    return React.createElement('button', { style: s }, children);
+  }
 
-// バリアントスタイル
-const primaryStyle = css\`
-  background: #3b82f6;
-  color: white;
-  &:hover { background: #2563eb; }
-\`;
-
-const secondaryStyle = css\`
-  background: #f1f5f9;
-  color: #334155;
-  &:hover { background: #e2e8f0; }
-\`;
-
-const outlineStyle = css\`
-  background: transparent;
-  color: #3b82f6;
-  border: 2px solid #3b82f6;
-  &:hover { background: #eff6ff; }
-\`;
-
-// サイズスタイル
-const smallSize = css\`
-  padding: 6px 12px;
-  font-size: 0.8rem;
-\`;
-
-const largeSize = css\`
-  padding: 14px 28px;
-  font-size: 1rem;
-\`;
-
-// 配列で合成！後のスタイルが優先される
-type Variant = 'primary' | 'secondary' | 'outline';
-type Size = 'sm' | 'md' | 'lg';
-
-const variantMap = { primary: primaryStyle, secondary: secondaryStyle, outline: outlineStyle };
-const sizeMap = { sm: smallSize, md: css\`\`, lg: largeSize };
-
-interface ButtonProps {
-  variant?: Variant;
-  size?: Size;
-  children: React.ReactNode;
-}
-
-function Button({ variant = 'primary', size = 'md', children }: ButtonProps) {
   return (
-    <button css={[baseButton, variantMap[variant], sizeMap[size]]}>
-      {children}
-    </button>
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+      <Btn variant="primary" size="sm">Primary SM</Btn>
+      <Btn variant="secondary" size="md">Secondary MD</Btn>
+      <Btn variant="outline" size="lg">Outline LG</Btn>
+      <Btn variant="primary" size="lg">Primary LG</Btn>
+    </div>
   );
 }`}
+              previewHeight={80}
             />
 
             <InfoBox type="success" title="合成の利点">

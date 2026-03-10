@@ -1,14 +1,15 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
 
 export default function ResponsiveDark() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">STEP 23</span>
+          <span className="step-badge">STEP 23</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">レスポンシブとダークモード</h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -64,15 +65,19 @@ export default function ResponsiveDark() {
               実際の UI でよく使うレスポンシブパターンを見ていきましょう。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="レスポンシブなグリッドレイアウト"
-              code={`// モバイル: 1列 → タブレット: 2列 → PC: 3列
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-  <div className="bg-white p-4 rounded-lg shadow">カード 1</div>
-  <div className="bg-white p-4 rounded-lg shadow">カード 2</div>
-  <div className="bg-white p-4 rounded-lg shadow">カード 3</div>
-</div>`}
+              previewHeight={120}
+              code={`function App() {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+      <div style={{ background: '#fff', padding: 16, borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>カード 1</div>
+      <div style={{ background: '#fff', padding: 16, borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>カード 2</div>
+      <div style={{ background: '#fff', padding: 16, borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>カード 3</div>
+    </div>
+  );
+}`}
             />
 
             <div className="mt-4" />
@@ -146,25 +151,35 @@ export default function ResponsiveDark() {
               ライトモードとダークモードのスタイルを1つの要素に同時に記述できます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="ダークモードの基本"
-              code={`// ライトモード → ダークモード
-<div className="bg-white dark:bg-gray-900">
-  <h1 className="text-gray-900 dark:text-white">
-    タイトル
-  </h1>
-  <p className="text-gray-600 dark:text-gray-400">
-    説明テキスト
-  </p>
-</div>
+              previewHeight={220}
+              code={`function App() {
+  const [isDark, setIsDark] = React.useState(false);
+  const bg = isDark ? '#111827' : '#ffffff';
+  const text = isDark ? '#ffffff' : '#111827';
+  const sub = isDark ? '#9ca3af' : '#4b5563';
+  const border = isDark ? '#374151' : '#e5e7eb';
 
-// ボーダーも対応
-<div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-  <p className="text-gray-800 dark:text-gray-200">
-    ボーダー付きカード
-  </p>
-</div>`}
+  return (
+    <div style={{ padding: 16 }}>
+      <button
+        onClick={() => setIsDark(!isDark)}
+        style={{ marginBottom: 12, padding: '6px 16px', borderRadius: 8, border: '1px solid ' + border, background: isDark ? '#1f2937' : '#f3f4f6', color: text, cursor: 'pointer' }}
+      >
+        {isDark ? '🌙 ダーク' : '☀️ ライト'}
+      </button>
+      <div style={{ background: bg, padding: 16, borderRadius: 8, transition: 'all 0.3s' }}>
+        <h1 style={{ color: text, fontSize: 20, fontWeight: 700, margin: '0 0 4px' }}>タイトル</h1>
+        <p style={{ color: sub, margin: 0 }}>説明テキスト</p>
+      </div>
+      <div style={{ border: '1px solid ' + border, borderRadius: 8, padding: 16, marginTop: 12, background: bg, transition: 'all 0.3s' }}>
+        <p style={{ color: text, margin: 0 }}>ボーダー付きカード</p>
+      </div>
+    </div>
+  );
+}`}
             />
 
             <div className="mt-4" />
@@ -297,41 +312,38 @@ function ThemeToggle() {
               マイクロインタラクションの実装に便利です。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="トランジションとアニメーション"
-              code={`// トランジション
-<button className="bg-blue-500 hover:bg-blue-600
-                   transition-colors duration-200 ease-in-out">
-  色のトランジション
-</button>
+              previewHeight={220}
+              css={`
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+@keyframes bounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+`}
+              code={`function App() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <button
+        style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 20px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s' }}
+        onMouseEnter={e => { e.currentTarget.style.background = '#2563eb'; e.currentTarget.style.transform = 'scale(1.05)'; }}
+        onMouseLeave={e => { e.currentTarget.style.background = '#3b82f6'; e.currentTarget.style.transform = 'scale(1)'; }}
+      >
+        ホバーで色とサイズが変化
+      </button>
 
-<div className="hover:scale-105 transition-transform duration-300">
-  ホバーで拡大
-</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ width: 24, height: 24, border: '3px solid #3b82f6', borderTop: '3px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+        <span style={{ color: '#4b5563' }}>読み込み中...</span>
+      </div>
 
-<div className="opacity-0 hover:opacity-100 transition-opacity duration-500">
-  フェードイン
-</div>
-
-// 複数のプロパティをトランジション
-<div className="hover:scale-105 hover:shadow-xl
-                transition-all duration-300 ease-out">
-  すべてのプロパティが滑らかに変化
-</div>
-
-// 組み込みアニメーション
-<div className="animate-spin">回転</div>
-<div className="animate-ping">ピン</div>
-<div className="animate-pulse">パルス</div>
-<div className="animate-bounce">バウンス</div>
-
-// 読み込みインジケーターの例
-<div className="flex items-center gap-2">
-  <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent
-                  rounded-full animate-spin" />
-  <span className="text-gray-600">読み込み中...</span>
-</div>`}
+      <div style={{ display: 'flex', gap: 24 }}>
+        <span style={{ animation: 'pulse 2s ease-in-out infinite' }}>パルス</span>
+        <span style={{ animation: 'bounce 1s ease-in-out infinite' }}>バウンス</span>
+      </div>
+    </div>
+  );
+}`}
             />
 
             <div className="mt-4" />
