@@ -43,6 +43,24 @@ export default function KeyboardNav() {
         return;
       }
 
+      // Cmd/Ctrl + ← → ページ送り
+      if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowRight') {
+        const next = getNextPage(location);
+        if (next) {
+          e.preventDefault();
+          navigate(next.path, `→ ${next.title}`);
+        }
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowLeft') {
+        const prev = getPreviousPage(location);
+        if (prev) {
+          e.preventDefault();
+          navigate(prev.path, `← ${prev.title}`);
+        }
+        return;
+      }
+
       // Home → トップへ戻る
       if (e.key === 'Home' || (e.key === 'ArrowUp' && e.metaKey)) {
         e.preventDefault();
@@ -73,7 +91,7 @@ export default function KeyboardNav() {
           onClick={() => prevPage && navigate(prevPage.path, `← ${prevPage.title}`)}
           disabled={!prevPage}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          title="前のステップ"
+          title={`前のステップ (${isMac ? '⌘' : 'Ctrl'}+←)`}
         >
           <ChevronLeft size={14} />
           <span className="hidden lg:inline max-w-[120px] truncate">{prevPage?.title ?? '---'}</span>
@@ -99,7 +117,7 @@ export default function KeyboardNav() {
           onClick={() => nextPage && navigate(nextPage.path, `→ ${nextPage.title}`)}
           disabled={!nextPage}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          title="次のステップ"
+          title={`次のステップ (${isMac ? '⌘' : 'Ctrl'}+→)`}
         >
           <span className="hidden lg:inline max-w-[120px] truncate">{nextPage?.title ?? '---'}</span>
           <ChevronRight size={14} />
@@ -110,6 +128,10 @@ export default function KeyboardNav() {
 
         {/* ショートカット一覧 */}
         <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60">
+          <span className="flex items-center gap-0.5">
+            <kbd className="px-1 py-0.5 rounded bg-muted/60 border border-border/50 font-mono">{mod}+←→</kbd>
+            <span className="ml-0.5">ページ</span>
+          </span>
           <span className="flex items-center gap-0.5">
             <kbd className="px-1 py-0.5 rounded bg-muted/60 border border-border/50 font-mono">{mod}+K</kbd>
             <span className="ml-0.5">検索</span>
