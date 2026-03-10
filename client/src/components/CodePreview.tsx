@@ -34,10 +34,10 @@ export default function CodePreview({
   const [isExpanded, setIsExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<'both' | 'code' | 'preview'>('both');
   const [splitRatio, setSplitRatio] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
   const highlightRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     setEditableCode(code);
@@ -83,10 +83,10 @@ export default function CodePreview({
   // ドラッグリサイズ
   const handleDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
-    isDraggingRef.current = true;
+    setIsDragging(true);
 
     const handleMove = (ev: MouseEvent | TouchEvent) => {
-      if (!isDraggingRef.current || !containerRef.current) return;
+      if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const clientX = 'touches' in ev ? ev.touches[0].clientX : ev.clientX;
       const ratio = ((clientX - rect.left) / rect.width) * 100;
@@ -94,7 +94,7 @@ export default function CodePreview({
     };
 
     const handleUp = () => {
-      isDraggingRef.current = false;
+      setIsDragging(false);
       document.removeEventListener('mousemove', handleMove);
       document.removeEventListener('mouseup', handleUp);
       document.removeEventListener('touchmove', handleMove);
@@ -195,13 +195,15 @@ export default function CodePreview({
         <Eye size={11} className="text-muted-foreground" />
         <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Result</span>
       </div>
-      <div className="bg-white flex-1" style={{ height: editorHeight }}>
+      <div className="bg-white flex-1 relative" style={{ height: editorHeight }}>
         <iframe
           src={blobUrl}
           sandbox="allow-scripts"
           title="プレビュー"
           className="w-full h-full border-0"
         />
+        {/* ドラッグ中は iframe がマウスイベントを奪うのを防止 */}
+        {isDragging && <div className="absolute inset-0" />}
       </div>
     </div>
   ) : null;
