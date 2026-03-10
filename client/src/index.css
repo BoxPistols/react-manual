@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-poppins: 'Poppins', sans-serif;
+  --font-sans: 'Inter', sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  /* React ブルー テーマ */
+  /* プライマリ: ブルー（#2563EB）- React のブランドカラーに近い */
+  /* セカンダリ: エメラルドグリーン（#10B981）- 成功・完了・成長 */
+  /* アクセント: バイオレット（#7C3AED）- 重要・Next.js 系 */
+
+  --primary: #2563EB;
+  --primary-foreground: #F9FAFB;
+  --sidebar-primary: #2563EB;
+  --sidebar-primary-foreground: #F9FAFB;
+  --chart-1: #10B981;
+  --chart-2: #2563EB;
+  --chart-3: #7C3AED;
+  --chart-4: #3B82F6;
+  --chart-5: #8B5CF6;
+  --radius: 0.75rem;
+  --background: #FAFBFC;
+  --foreground: #1F2937;
+  --card: #FFFFFF;
+  --card-foreground: #1F2937;
+  --popover: #FFFFFF;
+  --popover-foreground: #1F2937;
+  --secondary: #10B981;
+  --secondary-foreground: #F0FDF4;
+  --muted: #E5E7EB;
+  --muted-foreground: #4B5563;
+  --accent: #7C3AED;
+  --accent-foreground: #F5F3FF;
+  --destructive: #EF4444;
+  --destructive-foreground: #FEE2E2;
+  --border: #E5E7EB;
+  --input: #F3F4F6;
+  --ring: #2563EB;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1F2937;
+  --sidebar-accent: #F3F4F6;
+  --sidebar-accent-foreground: #1F2937;
+  --sidebar-border: #E5E7EB;
+  --sidebar-ring: #2563EB;
+}
+
+.dark {
+  --primary: #60A5FA;
+  --primary-foreground: #1E3A5F;
+  --sidebar-primary: #60A5FA;
+  --sidebar-primary-foreground: #1E3A5F;
+  --chart-1: #10B981;
+  --chart-2: #3B82F6;
+  --chart-3: #A78BFA;
+  --chart-4: #60A5FA;
+  --chart-5: #8B5CF6;
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+  --card: #1E293B;
+  --card-foreground: #F1F5F9;
+  --popover: #1E293B;
+  --popover-foreground: #F1F5F9;
+  --secondary: #10B981;
+  --secondary-foreground: #0F172A;
+  --muted: #334155;
+  --muted-foreground: #CBD5E1;
+  --accent: #A78BFA;
+  --accent-foreground: #1F2937;
+  --destructive: #EF4444;
+  --destructive-foreground: #FEE2E2;
+  --border: #334155;
+  --input: #1E293B;
+  --ring: #60A5FA;
+  --sidebar: #1E293B;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #F1F5F9;
+  --sidebar-border: #334155;
+  --sidebar-ring: #60A5FA;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-poppins font-bold;
+  }
+  h1 {
+    @apply text-4xl md:text-5xl tracking-tight;
+  }
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+  h3 {
+    @apply text-2xl;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+}
