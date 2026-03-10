@@ -328,7 +328,7 @@ export const metadata: Metadata = {
     default: 'マイサイト',           // デフォルトのタイトル
     template: '%s | マイサイト',     // 子ページ: "ブログ | マイサイト"
   },
-  description: 'デザイナーのためのポートフォリオサイト',
+  description: 'ポートフォリオサイト',
   keywords: ['デザイン', 'ポートフォリオ', 'Web制作'],
   authors: [{ name: '山田太郎' }],
   openGraph: {

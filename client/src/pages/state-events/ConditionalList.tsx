@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function ConditionalList() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+          <span className="step-badge">
             STEP 10
           </span>
         </div>
@@ -41,41 +42,43 @@ export default function ConditionalList() {
             </p>
 
             <h3 className="text-lg font-semibold text-foreground mb-3">方法1: 三項演算子（A か B か）</h3>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-function LoginStatus() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+            <CodePreview
+              code={`function LoginStatus() {
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false)
 
   return (
-    <div className="p-6">
-      {/* 三項演算子: 条件 ? trueのとき : falseのとき */}
+    <div style={{ padding: '16px' }}>
       {isLoggedIn ? (
         <div>
-          <p className="text-lg">ようこそ、田中さん！</p>
+          <p style={{ fontSize: '18px', marginBottom: '8px' }}>ようこそ、田中さん！</p>
           <button
             onClick={() => setIsLoggedIn(false)}
-            className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg"
+            style={{ padding: '8px 16px', backgroundColor: '#EF4444', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
           >
             ログアウト
           </button>
         </div>
       ) : (
         <div>
-          <p className="text-lg text-gray-500">ログインしてください</p>
+          <p style={{ fontSize: '18px', color: '#6B7280', marginBottom: '8px' }}>ログインしてください</p>
           <button
             onClick={() => setIsLoggedIn(true)}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
+            style={{ padding: '8px 16px', backgroundColor: '#3B82F6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
           >
             ログイン
           </button>
         </div>
       )}
     </div>
-  );
-}`}
-              language="tsx"
-              title="三項演算子: 2つのパターンを切り替え"
+  )
+}
+
+function App() {
+  return <LoginStatus />
+}
+`}
+              title="三項演算子で切り替え → ボタンをクリックしてみよう"
+              previewHeight={100}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">方法2: && 演算子（表示するかしないか）</h3>
@@ -266,62 +269,63 @@ function TabPanel() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               アコーディオンは「開く/閉じる」の条件分岐を配列の各項目に適用したパターンです。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`function Accordion() {
+  const [openId, setOpenId] = React.useState(null)
 
-interface AccordionItem {
-  id: number;
-  title: string;
-  content: string;
-}
+  const ITEMS = [
+    { id: 1, title: '返品はできますか？', content: '商品到着後7日以内であれば返品可能です。' },
+    { id: 2, title: '送料はいくらですか？', content: '全国一律 500円です。5,000円以上で送料無料。' },
+    { id: 3, title: '届くまでどれくらい？', content: '通常2-3営業日でお届けします。' },
+  ]
 
-const ITEMS: AccordionItem[] = [
-  { id: 1, title: '返品はできますか？', content: '商品到着後7日以内であれば返品可能です。' },
-  { id: 2, title: '送料はいくらですか？', content: '全国一律 ¥500 です。¥5,000 以上のお買い上げで送料無料。' },
-  { id: 3, title: '届くまでどれくらいかかりますか？', content: '通常2-3営業日でお届けします。' },
-];
-
-function Accordion() {
-  // null = すべて閉じている、number = 開いているアイテムの id
-  const [openId, setOpenId] = useState<number | null>(null);
-
-  const handleToggle = (id: number) => {
-    // 同じアイテムをクリックしたら閉じる、別のアイテムなら開く
-    setOpenId((prev) => (prev === id ? null : id));
-  };
+  const handleToggle = (id) => {
+    setOpenId(openId === id ? null : id)
+  }
 
   return (
-    <div className="max-w-lg space-y-2">
+    <div style={{ maxWidth: '400px' }}>
       {ITEMS.map((item) => {
-        const isOpen = openId === item.id;
-
+        const isOpen = openId === item.id
         return (
-          <div key={item.id} className="border rounded-lg overflow-hidden">
+          <div key={item.id} style={{ border: '1px solid #E5E7EB', borderRadius: '8px', overflow: 'hidden', marginBottom: '8px' }}>
             <button
               onClick={() => handleToggle(item.id)}
-              className="w-full flex justify-between items-center px-4 py-3 text-left hover:bg-gray-50"
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '12px 16px',
+                textAlign: 'left',
+                fontWeight: 'bold',
+                fontSize: '14px',
+                border: 'none',
+                cursor: 'pointer',
+                backgroundColor: '#F9FAFB',
+              }}
             >
-              <span className="font-medium text-sm">{item.title}</span>
-              <span className={\`transition-transform \${isOpen ? 'rotate-180' : ''}\`}>
-                &#x25BC;
-              </span>
+              <span>{item.title}</span>
+              <span>{isOpen ? '▲' : '▼'}</span>
             </button>
-
-            {/* isOpen のときだけコンテンツを表示 */}
             {isOpen && (
-              <div className="px-4 pb-3 text-sm text-gray-600 border-t">
-                <p className="pt-3">{item.content}</p>
+              <div style={{ padding: '12px 16px', borderTop: '1px solid #E5E7EB', fontSize: '14px', color: '#4B5563' }}>
+                {item.content}
               </div>
             )}
           </div>
-        );
+        )
       })}
     </div>
-  );
-}`}
-              language="tsx"
-              title="アコーディオン UI"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <Accordion />
+}
+`}
+              title="アコーディオン UI → クリックして開閉してみよう"
+              previewHeight={220}
             />
           </section>
 
@@ -677,106 +681,98 @@ function IndexKeyProblem() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               <code className="text-sm bg-muted px-1.5 py-0.5 rounded">.filter()</code> で条件に合う要素だけを抽出し、<code className="text-sm bg-muted px-1.5 py-0.5 rounded">.sort()</code> で並び替えができます。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-interface Task {
-  id: number;
-  title: string;
-  priority: 'high' | 'medium' | 'low';
-  done: boolean;
-}
-
-function TaskBoard() {
-  const [tasks] = useState<Task[]>([
+            <CodePreview
+              code={`function TaskBoard() {
+  const tasks = [
     { id: 1, title: 'デザインレビュー', priority: 'high', done: false },
     { id: 2, title: 'ミーティング資料作成', priority: 'medium', done: true },
     { id: 3, title: 'バグ修正', priority: 'high', done: false },
     { id: 4, title: 'ドキュメント更新', priority: 'low', done: false },
     { id: 5, title: 'テスト実行', priority: 'medium', done: true },
-  ]);
+  ]
 
-  const [filter, setFilter] = useState<'all' | 'active' | 'done'>('all');
-  const [sortBy, setSortBy] = useState<'default' | 'priority'>('default');
+  const [filter, setFilter] = React.useState('all')
 
-  // フィルタリング
   const filteredTasks = tasks.filter((task) => {
-    if (filter === 'active') return !task.done;
-    if (filter === 'done') return task.done;
-    return true; // 'all'
-  });
-
-  // ソート
-  const priorityOrder = { high: 0, medium: 1, low: 2 };
-  const sortedTasks = [...filteredTasks].sort((a, b) => {
-    if (sortBy === 'priority') {
-      return priorityOrder[a.priority] - priorityOrder[b.priority];
-    }
-    return 0; // デフォルトは元の順番
-  });
+    if (filter === 'active') return !task.done
+    if (filter === 'done') return task.done
+    return true
+  })
 
   const priorityColors = {
-    high: 'bg-red-100 text-red-700',
-    medium: 'bg-yellow-100 text-yellow-700',
-    low: 'bg-green-100 text-green-700',
-  };
+    high: { bg: '#FEE2E2', color: '#B91C1C' },
+    medium: { bg: '#FEF3C7', color: '#92400E' },
+    low: { bg: '#D1FAE5', color: '#065F46' },
+  }
+
+  const filters = [
+    { key: 'all', label: 'すべて' },
+    { key: 'active', label: '未完了' },
+    { key: 'done', label: '完了' },
+  ]
 
   return (
-    <div className="p-6 max-w-lg">
-      {/* フィルターボタン */}
-      <div className="flex gap-2 mb-4">
-        {(['all', 'active', 'done'] as const).map((f) => (
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+        {filters.map((f) => (
           <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={\`px-3 py-1 rounded-full text-sm
-              \${filter === f
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }\`}
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            style={{
+              padding: '4px 12px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              border: 'none',
+              cursor: 'pointer',
+              backgroundColor: filter === f.key ? '#3B82F6' : '#F3F4F6',
+              color: filter === f.key ? 'white' : '#4B5563',
+            }}
           >
-            {f === 'all' ? 'すべて' : f === 'active' ? '未完了' : '完了'}
+            {f.label}
           </button>
         ))}
-
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as 'default' | 'priority')}
-          className="ml-auto px-2 py-1 border rounded text-sm"
-        >
-          <option value="default">デフォルト順</option>
-          <option value="priority">優先度順</option>
-        </select>
       </div>
-
-      {/* タスクリスト */}
-      <ul className="space-y-2">
-        {sortedTasks.map((task) => (
-          <li
-            key={task.id}
-            className={\`p-3 border rounded-lg flex items-center gap-3
-              \${task.done ? 'opacity-50' : ''}\`}
-          >
-            <span className={\`px-2 py-0.5 rounded text-xs font-medium \${priorityColors[task.priority]}\`}>
+      <div>
+        {filteredTasks.map((task) => (
+          <div key={task.id} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 12px',
+            border: '1px solid #E5E7EB',
+            borderRadius: '8px',
+            marginBottom: '6px',
+            opacity: task.done ? 0.5 : 1,
+          }}>
+            <span style={{
+              padding: '2px 8px',
+              borderRadius: '4px',
+              fontSize: '11px',
+              fontWeight: 'bold',
+              backgroundColor: priorityColors[task.priority].bg,
+              color: priorityColors[task.priority].color,
+            }}>
               {task.priority}
             </span>
-            <span className={\`flex-1 \${task.done ? 'line-through' : ''}\`}>
+            <span style={{ textDecoration: task.done ? 'line-through' : 'none', fontSize: '14px' }}>
               {task.title}
             </span>
-          </li>
+          </div>
         ))}
-      </ul>
-
-      {/* 件数表示 */}
-      <p className="mt-3 text-sm text-gray-500">
-        {sortedTasks.length} 件表示中（全 {tasks.length} 件）
+      </div>
+      <p style={{ marginTop: '8px', fontSize: '13px', color: '#6B7280' }}>
+        {filteredTasks.length} 件表示中（全 {tasks.length} 件）
       </p>
     </div>
-  );
-}`}
-              language="tsx"
-              title="フィルタリングとソートの実装"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <TaskBoard />
+}
+`}
+              title="フィルタリング → ボタンで切り替えてみよう"
+              previewHeight={280}
             />
           </section>
 

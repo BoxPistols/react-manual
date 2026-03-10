@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function Props() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+          <span className="step-badge">
             STEP 6
           </span>
         </div>
@@ -164,28 +165,30 @@ function ProfileCard({ user }: { user: { name: string; role: string } }) {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               Props にはさまざまな型のデータを渡せます。文字列はそのまま、数値や真偽値は波括弧 <code className="text-sm bg-muted px-1.5 py-0.5 rounded">{'{}'}</code> で囲んで渡します。
             </p>
-            <CodeBlock
-              code={`function UserBadge({ name, age, isOnline }: {
-  name: string;
-  age: number;
-  isOnline: boolean;
-}) {
+            <CodePreview
+              code={`function UserBadge({ name, age, isOnline }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className={isOnline ? 'text-green-500' : 'text-gray-400'}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0' }}>
+      <span style={{ color: isOnline ? '#22C55E' : '#9CA3AF' }}>
         ●
       </span>
-      <span>{name}</span>
-      <span className="text-sm text-gray-500">({age}歳)</span>
+      <span style={{ fontWeight: 'bold' }}>{name}</span>
+      <span style={{ fontSize: '14px', color: '#6B7280' }}>({age}歳)</span>
     </div>
-  );
+  )
 }
 
-// 使い方
-<UserBadge name="佐藤花子" age={28} isOnline={true} />
-<UserBadge name="鈴木太郎" age={32} isOnline={false} />`}
-              language="tsx"
-              title="さまざまな型の Props"
+function App() {
+  return (
+    <div>
+      <UserBadge name="佐藤花子" age={28} isOnline={true} />
+      <UserBadge name="鈴木太郎" age={32} isOnline={false} />
+    </div>
+  )
+}
+`}
+              title="さまざまな型の Props → 右がブラウザ表示"
+              previewHeight={100}
             />
             <InfoBox type="warning" title="文字列以外は波括弧で囲む">
               <p>
@@ -341,43 +344,47 @@ function PageLayout({
             <p className="text-muted-foreground mb-4 leading-relaxed">
               Props にデフォルト値を設定しておくと、値が渡されなかったときに自動的にその値が使われます。JavaScript のデフォルト引数と同じ仕組みです。
             </p>
-            <CodeBlock
-              code={`function Button({
-  label,
-  variant = 'primary',  // デフォルト値
-  size = 'md',           // デフォルト値
-}: {
-  label: string;
-  variant?: 'primary' | 'secondary' | 'ghost';  // ? をつけてオプショナルに
-  size?: 'sm' | 'md' | 'lg';
-}) {
-  const sizeClasses = {
-    sm: 'px-3 py-1 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
-  };
+            <CodePreview
+              code={`function Button({ label, variant = 'primary', size = 'md' }) {
+  const sizeStyles = {
+    sm: { padding: '4px 12px', fontSize: '13px' },
+    md: { padding: '8px 16px', fontSize: '15px' },
+    lg: { padding: '12px 24px', fontSize: '17px' },
+  }
 
-  const variantClasses = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-    ghost: 'bg-transparent text-blue-600 hover:bg-blue-50',
-  };
+  const variantStyles = {
+    primary: { backgroundColor: '#2563EB', color: 'white', border: 'none' },
+    secondary: { backgroundColor: '#E5E7EB', color: '#1F2937', border: 'none' },
+    ghost: { backgroundColor: 'transparent', color: '#2563EB', border: '1px solid #2563EB' },
+  }
 
   return (
-    <button className={\`rounded-lg \${sizeClasses[size]} \${variantClasses[variant]}\`}>
+    <button style={{
+      ...sizeStyles[size],
+      ...variantStyles[variant],
+      borderRadius: '8px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      marginRight: '8px',
+      marginBottom: '8px',
+    }}>
       {label}
     </button>
-  );
+  )
 }
 
-// variant と size を省略するとデフォルト値が使われる
-<Button label="送信" />
-// variant="primary", size="md" として表示される
-
-// 個別に上書きもできる
-<Button label="キャンセル" variant="ghost" size="sm" />`}
-              language="tsx"
-              title="デフォルト値の設定"
+function App() {
+  return (
+    <div>
+      <div><Button label="送信" /></div>
+      <div><Button label="キャンセル" variant="ghost" size="sm" /></div>
+      <div><Button label="保存" variant="secondary" size="lg" /></div>
+    </div>
+  )
+}
+`}
+              title="デフォルト値の設定 → 右がブラウザ表示"
+              previewHeight={160}
             />
           </section>
 

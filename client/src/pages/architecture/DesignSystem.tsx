@@ -414,7 +414,7 @@ module.exports = {
 // → build/css/variables.css と build/js/tokens.ts が自動生成`}
             />
 
-            <InfoBox type="info" title="デザイナー向け: Figma Variables との連携">
+            <InfoBox type="info" title="Figma Variables との連携">
               <p>
                 Figma の Variables 機能を使えば、Figma 上でデザイントークンを定義し、
                 プラグイン（Token Studio for Figma など）で JSON に出力できます。

@@ -71,7 +71,7 @@ function SidebarItem({ theme, setTheme }: SidebarItemProps) {
             />
 
             <div className="mt-6 mb-6">
-              <InfoBox type="info" title="デザイナー向けのたとえ">
+              <InfoBox type="info" title="身近なたとえ">
                 <p>
                   Figma でたとえると、Props Drilling はマスターコンポーネントの色をインスタンスに変更するために、
                   途中の全フレームにひとつずつ変数を設定しているような状態です。

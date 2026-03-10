@@ -750,7 +750,7 @@ onCLS(console.log);   // CLS の計測結果`}
                   <p><strong>「プロを目指す人のための TypeScript 入門」</strong> ― TypeScript を深く学ぶなら</p>
                   <p><strong>Josh Comeau のブログ</strong> ― CSS と React の深い理解。視覚的な解説が秀逸</p>
                   <p><strong>Kent C. Dodds の EpicReact.dev</strong> ― React のパターンと実践を体系的に</p>
-                  <p><strong>「Refactoring UI」</strong> ― デザイナー向け、UI デザインの実践的なティップス</p>
+                  <p><strong>「Refactoring UI」</strong> ― UI デザインの実践的なティップス</p>
                 </div>
               </div>
 

@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,11 +10,11 @@ import Faq from '@/components/Faq';
 
 export default function Jsx() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         {/* STEP バッジ */}
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+          <span className="step-badge">
             STEP 4
           </span>
         </div>
@@ -382,7 +383,7 @@ function Profile() {
               JavaScript の式（値を返す表現）を埋め込めることです。
             </p>
 
-            <CodeBlock
+            <CodePreview
               code={`function Profile() {
   const name = "田中太郎"
   const age = 28
@@ -403,10 +404,14 @@ function Profile() {
       <p>{name}さんは{skills.length}つのスキルを持っています</p>
     </div>
   )
-}`}
-              language="tsx"
-              title="式の埋め込み例"
-              showLineNumbers
+}
+
+function App() {
+  return <Profile />
+}
+`}
+              title="式の埋め込み例 → 右がブラウザ表示"
+              previewHeight={180}
             />
 
             <h3 className="text-xl font-bold text-foreground mt-8 mb-4">波括弧が使える場所</h3>
@@ -475,7 +480,7 @@ function Profile() {
             <p className="text-muted-foreground mb-3 leading-relaxed">
               「条件がtrue のときだけ表示する」パターンに使います。false の場合は何も表示されません。
             </p>
-            <CodeBlock
+            <CodePreview
               code={`function Notification() {
   const hasNewMessage = true
   const messageCount = 3
@@ -486,16 +491,20 @@ function Profile() {
 
       {/* hasNewMessage が true のときだけ表示 */}
       {hasNewMessage && (
-        <div className="notification">
+        <div style={{ padding: '8px 16px', backgroundColor: '#EFF6FF', borderRadius: '8px', color: '#1D4ED8', marginTop: '8px' }}>
           {messageCount}件の新しいメッセージがあります
         </div>
       )}
     </div>
   )
-}`}
-              language="tsx"
-              title="&& による条件付き表示"
-              showLineNumbers
+}
+
+function App() {
+  return <Notification />
+}
+`}
+              title="&& による条件付き表示 → 右がブラウザ表示"
+              previewHeight={120}
             />
 
             <div className="mt-4">
@@ -549,7 +558,7 @@ function Profile() {
               配列の <code className="bg-muted px-1 py-0.5 rounded text-xs">map</code> メソッドを使います。
             </p>
 
-            <CodeBlock
+            <CodePreview
               code={`function SkillList() {
   const skills = ["Figma", "Photoshop", "Illustrator", "React", "TypeScript"]
 
@@ -563,10 +572,14 @@ function Profile() {
       </ul>
     </div>
   )
-}`}
-              language="tsx"
-              title="map によるリストレンダリング"
-              showLineNumbers
+}
+
+function App() {
+  return <SkillList />
+}
+`}
+              title="map によるリストレンダリング → 右がブラウザ表示"
+              previewHeight={200}
             />
 
             <p className="text-muted-foreground mt-4 leading-relaxed">

@@ -36,7 +36,7 @@ export default function UseEffect() {
               それ以外の処理――たとえばネットワーク通信、DOM の直接操作、タイマーの設定など――はすべて「副作用」と呼ばれます。
             </p>
             <div className="mb-6">
-              <InfoBox type="info" title="デザイナー向けのたとえ">
+              <InfoBox type="info" title="身近なたとえ">
                 <p>
                   Figma で言えば、コンポーネントが「見た目を返す」のが本業、プラグインを動かしたり外部データを読み込んだりするのが副作用です。
                   useEffect は「コンポーネントにプラグインを接続するしくみ」と考えてください。

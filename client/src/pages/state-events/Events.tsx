@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function Events() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+          <span className="step-badge">
             STEP 9
           </span>
         </div>
@@ -39,42 +40,43 @@ export default function Events() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               最も基本的なイベントです。ボタンやリンク、カードなど、クリック可能な要素に使います。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`function ClickExample() {
+  const [message, setMessage] = React.useState('ボタンをクリックしてください')
+  const [count, setCount] = React.useState(0)
 
-function ClickExample() {
-  const [message, setMessage] = useState('ボタンをクリックしてください');
-
-  // 方法1: インラインで書く（短い処理のとき）
-  // <button onClick={() => setMessage('クリックされました！')}>
-
-  // 方法2: 関数を定義して渡す（推奨）
   const handleClick = () => {
-    setMessage('クリックされました！');
-  };
-
-  // 方法3: イベントオブジェクトを受け取る
-  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log('クリック位置:', e.clientX, e.clientY);
-    setMessage(\`座標 (\${e.clientX}, \${e.clientY}) でクリック\`);
-  };
+    setCount(count + 1)
+    setMessage('クリックされました！（' + (count + 1) + '回目）')
+  }
 
   return (
-    <div className="p-6 space-y-4">
-      <p className="text-lg">{message}</p>
-      <div className="flex gap-3">
-        <button onClick={handleClick} className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+    <div style={{ padding: '16px' }}>
+      <p style={{ fontSize: '16px', marginBottom: '12px' }}>{message}</p>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button
+          onClick={handleClick}
+          style={{ padding: '8px 16px', backgroundColor: '#3B82F6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+        >
           クリック
         </button>
-        <button onClick={handleButtonClick} className="px-4 py-2 bg-purple-500 text-white rounded-lg">
-          座標を取得
+        <button
+          onClick={() => { setMessage('ボタンをクリックしてください'); setCount(0) }}
+          style={{ padding: '8px 16px', backgroundColor: '#6B7280', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+        >
+          リセット
         </button>
       </div>
     </div>
-  );
-}`}
-              language="tsx"
-              title="onClick の基本的な使い方"
+  )
+}
+
+function App() {
+  return <ClickExample />
+}
+`}
+              title="onClick の基本 → ボタンをクリックしてみよう"
+              previewHeight={120}
             />
             <InfoBox type="warning" title="よくある間違い: 関数の呼び出しを渡してしまう">
               <p>
@@ -254,80 +256,48 @@ function Card({ onDelete, onClick }: CardProps) {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               テキスト入力、セレクトボックス、チェックボックスなど、フォーム要素の値が変わったときに発火するイベントです。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-function InputEvents() {
-  const [text, setText] = useState('');
-  const [color, setColor] = useState('red');
-  const [agree, setAgree] = useState(false);
-
-  // テキスト入力: e.target.value で入力値を取得
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setText(e.target.value);
-  };
-
-  // セレクト: 同じく e.target.value
-  const handleColorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setColor(e.target.value);
-  };
-
-  // チェックボックス: e.target.checked で真偽値を取得
-  const handleAgreeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAgree(e.target.checked);
-  };
+            <CodePreview
+              code={`function InputEvents() {
+  const [text, setText] = React.useState('')
+  const [color, setColor] = React.useState('red')
 
   return (
-    <div className="p-6 space-y-4 max-w-md">
-      {/* テキスト入力 */}
-      <div>
-        <label className="block text-sm font-medium mb-1">テキスト</label>
+    <div style={{ padding: '16px', maxWidth: '300px' }}>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>テキスト</label>
         <input
           type="text"
           value={text}
-          onChange={handleTextChange}
-          className="w-full px-3 py-2 border rounded-lg"
+          onChange={(e) => setText(e.target.value)}
+          placeholder="入力してみよう"
+          style={{ width: '100%', padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px', boxSizing: 'border-box' }}
         />
-        <p className="text-sm text-gray-500 mt-1">入力値: {text}</p>
+        <p style={{ fontSize: '13px', color: '#6B7280', marginTop: '4px' }}>入力値: {text || '(なし)'}</p>
       </div>
 
-      {/* セレクトボックス */}
       <div>
-        <label className="block text-sm font-medium mb-1">色を選択</label>
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>色を選択</label>
         <select
           value={color}
-          onChange={handleColorChange}
-          className="w-full px-3 py-2 border rounded-lg"
+          onChange={(e) => setColor(e.target.value)}
+          style={{ width: '100%', padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px' }}
         >
           <option value="red">赤</option>
           <option value="blue">青</option>
           <option value="green">緑</option>
         </select>
-        <div
-          className="mt-2 w-8 h-8 rounded-full"
-          style={{ backgroundColor: color }}
-        />
+        <div style={{ marginTop: '8px', width: '32px', height: '32px', borderRadius: '50%', backgroundColor: color }} />
       </div>
-
-      {/* チェックボックス */}
-      <label className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={agree}
-          onChange={handleAgreeChange}
-          className="w-4 h-4"
-        />
-        <span>利用規約に同意する</span>
-      </label>
-      <p className="text-sm text-gray-500">
-        同意: {agree ? 'はい' : 'いいえ'}
-      </p>
     </div>
-  );
-}`}
-              language="tsx"
-              title="onChange でフォーム入力を処理する"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <InputEvents />
+}
+`}
+              title="onChange でフォーム入力 → 操作してみよう"
+              previewHeight={240}
             />
           </section>
 

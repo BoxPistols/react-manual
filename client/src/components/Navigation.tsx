@@ -56,16 +56,16 @@ export default function Navigation() {
 
       {/* サイドバー */}
       <nav
-        className={`fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto transition-transform duration-300 z-40 md:translate-x-0 ${
+        className={`fixed left-0 top-0 h-screen w-64 bg-sidebar glass-sidebar border-r border-sidebar-border overflow-y-auto transition-transform duration-300 z-40 md:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="p-6">
           <Link href="/" className="flex items-center gap-2 mb-6">
             <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-poppins font-bold text-lg">R</span>
+              <span className="text-primary-foreground font-heading font-bold text-lg">R</span>
             </div>
-            <span className="font-poppins font-bold text-lg text-foreground">React 入門</span>
+            <span className="font-heading font-bold text-lg text-foreground">React 入門</span>
           </Link>
 
           {/* 検索 */}
@@ -170,7 +170,7 @@ export default function Navigation() {
                                 onClick={() => setIsOpen(false)}
                                 className={`block px-4 py-2 text-sm rounded-lg transition-colors ${
                                   location === sub.href
-                                    ? 'bg-primary/10 text-primary font-medium'
+                                    ? 'nav-active'
                                     : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
                                 }`}
                               >

@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,10 +10,10 @@ import Faq from '@/components/Faq';
 
 export default function UseState() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+          <span className="step-badge">
             STEP 8
           </span>
         </div>
@@ -70,44 +71,43 @@ export default function UseState() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               useState は React が提供する「Hook（フック）」の一つです。使い方はシンプルで、初期値を渡すと「現在の値」と「更新関数」のペアを返します。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-function Counter() {
-  // useState の戻り値を分割代入で受け取る
-  // count: 現在の値（初期値は 0）
-  // setCount: 値を更新する関数
-  const [count, setCount] = useState(0);
+            <CodePreview
+              code={`function Counter() {
+  const [count, setCount] = React.useState(0)
 
   return (
-    <div className="p-6 text-center">
-      <p className="text-6xl font-bold mb-6">{count}</p>
-      <div className="flex gap-3 justify-center">
+    <div style={{ padding: '24px', textAlign: 'center' }}>
+      <p style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '16px' }}>{count}</p>
+      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
         <button
           onClick={() => setCount(count - 1)}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          style={{ padding: '8px 16px', backgroundColor: '#EF4444', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
         >
           - 減らす
         </button>
         <button
           onClick={() => setCount(0)}
-          className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+          style={{ padding: '8px 16px', backgroundColor: '#6B7280', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
         >
           リセット
         </button>
         <button
           onClick={() => setCount(count + 1)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          style={{ padding: '8px 16px', backgroundColor: '#3B82F6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
         >
           + 増やす
         </button>
       </div>
     </div>
-  );
-}`}
-              language="tsx"
-              title="最も基本的な useState の例: カウンター"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <Counter />
+}
+`}
+              title="カウンター → ボタンをクリックしてみよう"
+              previewHeight={180}
             />
             <CodeBlock
               code={`// useState の構造を分解して理解する
@@ -182,47 +182,71 @@ function NamePreview() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               真偽値（boolean）の state は、表示/非表示の切り替え、モーダルの開閉、ダークモードの切り替えなどに使います。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-function TogglePanel() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+            <CodePreview
+              code={`function TogglePanel() {
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [isDark, setIsDark] = React.useState(false)
 
   return (
-    <div className={isDark ? 'bg-gray-900 text-white p-6' : 'bg-white text-gray-900 p-6'}>
-      {/* ダークモード切り替え */}
+    <div style={{
+      backgroundColor: isDark ? '#111827' : '#fff',
+      color: isDark ? '#fff' : '#111827',
+      padding: '16px',
+      borderRadius: '8px',
+      transition: 'all 0.3s',
+    }}>
       <button
         onClick={() => setIsDark(!isDark)}
-        className="mb-6 px-4 py-2 rounded-lg border"
+        style={{
+          marginBottom: '16px',
+          padding: '8px 16px',
+          borderRadius: '8px',
+          border: '1px solid #ccc',
+          cursor: 'pointer',
+          backgroundColor: isDark ? '#374151' : '#F9FAFB',
+          color: isDark ? '#fff' : '#111',
+        }}
       >
-        {isDark ? '☀️ ライトモード' : '🌙 ダークモード'}
+        {isDark ? 'ライトモード' : 'ダークモード'}
       </button>
 
-      {/* アコーディオン */}
-      <div className="border rounded-lg overflow-hidden">
+      <div style={{ border: '1px solid #ccc', borderRadius: '8px', overflow: 'hidden' }}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-4 py-3 text-left font-medium flex justify-between items-center"
+          style={{
+            width: '100%',
+            padding: '12px 16px',
+            textAlign: 'left',
+            fontWeight: 'bold',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            justifyContent: 'space-between',
+            backgroundColor: isDark ? '#1F2937' : '#F9FAFB',
+            color: isDark ? '#fff' : '#111',
+          }}
         >
           <span>詳細情報を見る</span>
-          <span className={\`transform transition-transform \${isOpen ? 'rotate-180' : ''}\`}>
-            ▼
-          </span>
+          <span>{isOpen ? '▲' : '▼'}</span>
         </button>
 
         {isOpen && (
-          <div className="px-4 py-3 border-t">
+          <div style={{ padding: '12px 16px', borderTop: '1px solid #ccc' }}>
             <p>ここに詳細な情報が表示されます。</p>
-            <p>isOpen の値が true のときだけ、このパネルが見えます。</p>
+            <p>isOpen が true のときだけ見えます。</p>
           </div>
         )}
       </div>
     </div>
-  );
-}`}
-              language="tsx"
-              title="真偽値でトグル・アコーディオンを実装"
+  )
+}
+
+function App() {
+  return <TogglePanel />
+}
+`}
+              title="トグル・アコーディオン → クリックしてみよう"
+              previewHeight={220}
             />
           </section>
 

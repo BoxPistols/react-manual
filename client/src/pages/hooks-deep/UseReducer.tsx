@@ -84,7 +84,7 @@ export default function UseReducer() {
             </ol>
 
             <div className="mb-6">
-              <InfoBox type="info" title="デザイナー向けのたとえ">
+              <InfoBox type="info" title="身近なたとえ">
                 <p>
                   Figma のバージョン履歴に似ています。各変更（Action）が「テキスト色を赤に変更」「フォントサイズを 16px に変更」のように記録され、
                   Reducer がそれを受け取って新しいデザイン（State）を生成します。何がどう変わったかが明確で、やり直し（undo）もしやすいのが特徴です。

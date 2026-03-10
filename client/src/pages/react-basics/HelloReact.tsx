@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,13 +10,11 @@ import Faq from '@/components/Faq';
 
 export default function HelloReact() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         {/* STEP バッジ */}
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
-            STEP 3
-          </span>
+          <span className="step-badge">STEP 3</span>
         </div>
 
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6">
@@ -383,7 +382,7 @@ export default App`}
               <code className="bg-muted px-1 py-0.5 rounded text-xs">src/App.tsx</code> を開き、内容を以下のように書き換えてください。
             </p>
 
-            <CodeBlock
+            <CodePreview
               code={`function App() {
   return (
     <div>
@@ -392,11 +391,10 @@ export default App`}
     </div>
   )
 }
-
-export default App`}
+`}
               language="tsx"
-              title="src/App.tsx（書き換え後）"
-              showLineNumbers
+              title="src/App.tsx（書き換え後）→ 右がブラウザ表示"
+              previewHeight={160}
             />
 
             <p className="text-muted-foreground mt-4 leading-relaxed">
@@ -507,24 +505,23 @@ export default App`}
               以下のように App.tsx を編集してみてください。
             </p>
 
-            <CodeBlock
+            <CodePreview
               code={`function App() {
   const name = "あなたの名前"
   const today = new Date().toLocaleDateString('ja-JP')
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '100px' }}>
+    <div style={{ textAlign: 'center', marginTop: '24px' }}>
       <h1>こんにちは、{name} さん！</h1>
       <p>今日は {today} です。</p>
       <p>React の学習をはじめましょう。</p>
     </div>
   )
 }
-
-export default App`}
+`}
               language="tsx"
-              title="src/App.tsx"
-              showLineNumbers
+              title="変数を JSX に埋め込む → 右が結果"
+              previewHeight={180}
             />
 
             <p className="text-muted-foreground mt-4 leading-relaxed">

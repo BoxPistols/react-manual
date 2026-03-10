@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import CodePreview from '@/components/CodePreview';
 import InfoBox from '@/components/InfoBox';
 import WhyNowBox from '@/components/WhyNowBox';
 import PageNavigation from '@/components/PageNavigation';
@@ -9,11 +10,11 @@ import Faq from '@/components/Faq';
 
 export default function Components() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-enter">
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         {/* STEP バッジ */}
         <div className="mb-4">
-          <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+          <span className="step-badge">
             STEP 5
           </span>
         </div>
@@ -335,13 +336,30 @@ export default MyButton`}
 
               <div>
                 <p className="text-sm font-medium text-foreground mb-2">2. App.tsx でインポートして使う</p>
-                <CodeBlock
-                  code={`// src/App.tsx
-import MyButton from './MyButton'
+                <CodePreview
+                  code={`function MyButton() {
+  return (
+    <button
+      style={{
+        backgroundColor: '#2563EB',
+        color: 'white',
+        padding: '10px 24px',
+        borderRadius: '8px',
+        border: 'none',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        marginRight: '8px',
+      }}
+    >
+      クリック
+    </button>
+  )
+}
 
 function App() {
   return (
-    <div style={{ textAlign: 'center', marginTop: '100px' }}>
+    <div style={{ textAlign: 'center', marginTop: '24px' }}>
       <h1>コンポーネントのテスト</h1>
       <MyButton />
       <MyButton />
@@ -349,11 +367,9 @@ function App() {
     </div>
   )
 }
-
-export default App`}
-                  language="tsx"
-                  title="src/App.tsx"
-                  showLineNumbers
+`}
+                  title="同じボタンが3つ表示される → 右がブラウザ表示"
+                  previewHeight={140}
                 />
               </div>
             </div>
@@ -597,10 +613,8 @@ export default App`}
               コンポーネントの構造を理解するには十分です。
             </p>
 
-            <CodeBlock
-              code={`// src/components/Card.tsx
-
-function Card() {
+            <CodePreview
+              code={`function Card() {
   return (
     <div style={{
       borderRadius: '16px',
@@ -612,7 +626,7 @@ function Card() {
       {/* カード画像 */}
       <div style={{
         width: '100%',
-        height: '200px',
+        height: '120px',
         backgroundColor: '#F3F4F6',
         display: 'flex',
         alignItems: 'center',
@@ -624,7 +638,7 @@ function Card() {
       </div>
 
       {/* カード本文 */}
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: '16px' }}>
         <p style={{
           fontSize: '12px',
           color: '#2563EB',
@@ -634,30 +648,31 @@ function Card() {
           カテゴリ
         </p>
         <h3 style={{
-          fontSize: '18px',
+          fontSize: '16px',
           fontWeight: 'bold',
-          marginBottom: '8px',
+          marginBottom: '6px',
           color: '#1F2937',
         }}>
           カードのタイトル
         </h3>
         <p style={{
-          fontSize: '14px',
+          fontSize: '13px',
           color: '#6B7280',
           lineHeight: 1.6,
         }}>
           ここにカードの説明文が入ります。
-          コンポーネントとして作ることで、同じデザインのカードを何度でも使い回せます。
         </p>
       </div>
     </div>
   )
 }
 
-export default Card`}
-              language="tsx"
-              title="src/components/Card.tsx"
-              showLineNumbers
+function App() {
+  return <Card />
+}
+`}
+              title="Card コンポーネント → 右がブラウザ表示"
+              previewHeight={300}
             />
 
             <div className="mt-4">

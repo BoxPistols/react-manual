@@ -65,7 +65,7 @@ function App() {
   return (
     <ThemeProvider>
       <PlatformProvider>
-        <div className="flex min-h-screen bg-background text-foreground font-poppins">
+        <div className="flex min-h-screen bg-background text-foreground font-sans">
           <Navigation />
           <KeyboardNav />
           <main className="flex-1 md:ml-64 w-full">
