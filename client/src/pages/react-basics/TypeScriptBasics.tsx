@@ -19,310 +19,459 @@ export default function TypeScriptBasics() {
           TypeScript で型をつける
         </h1>
         <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-          TypeScript は JavaScript に「型」を追加した言語です。コードを書いている段階でミスを発見でき、エディタの補完も強力になります。デザイナーにとっても、コンポーネントの使い方が明確になる大きなメリットがあります。
+          Figma のプロパティパネルを思い出してください。ボタンコンポーネントに「テキスト」「バリアント（Primary / Secondary）」「サイズ（S / M / L）」「Disabled（ON / OFF）」と設定しますよね。TypeScript の型定義は、まさにコード版のプロパティパネルです。
         </p>
 
-        <WhyNowBox tags={['型安全', 'エディタ補完', 'バグ防止', '開発体験']}>
+        <WhyNowBox tags={['Figma × コード', 'デザインシステム', '型 = プロパティパネル', 'バリアント定義']}>
           <p>
-            Props を学んだ今こそ TypeScript の型を理解するベストタイミングです。型があると「このコンポーネントにはどんなデータを渡せばいいか」がエディタ上で一目瞭然になります。
+            Props を学んだ今こそ TypeScript の出番です。型があると「このコンポーネントには何を渡せるか」がエディタ上で一目瞭然になり、Figma のプロパティパネルと同じ役割を果たします。
           </p>
           <p>
-            デザインツールに例えると、Figma でコンポーネントのプロパティに「テキスト」「真偽値」「選択肢」などの型を設定するのと同じです。型があることで、正しい使い方が自然とガイドされます。
+            デザイナーが TypeScript を理解すると、エンジニアとの「このプロパティの型は？」という会話がスムーズになり、デザインシステムの品質が格段に上がります。
           </p>
         </WhyNowBox>
 
         <div className="space-y-12 mt-8">
-          {/* 基本の型 */}
+          {/* Figma → TypeScript の対応 */}
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">基本の型（プリミティブ型）</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Figma のプロパティ = TypeScript の型</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
-              TypeScript で最もよく使う基本的な型は4つです。変数名の後に <code className="text-sm bg-muted px-1.5 py-0.5 rounded">: 型名</code> を書いて型を指定します。
+              Figma でコンポーネントのプロパティを設定するとき、「テキスト」「真偽値（Boolean）」「バリアント」を選びます。TypeScript でも同じことをコードで表現します。
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="p-4 rounded-lg border border-border bg-card">
+                <h3 className="font-bold text-foreground mb-3 text-sm">Figma のプロパティパネル</h3>
+                <ul className="text-sm text-muted-foreground space-y-2">
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-blue-500" /> Label → <strong>テキスト</strong></li>
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500" /> Disabled → <strong>Boolean</strong></li>
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-purple-500" /> Size → <strong>バリアント (S / M / L)</strong></li>
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-orange-500" /> Icon → <strong>インスタンスの入れ替え</strong></li>
+                </ul>
+              </div>
+              <div className="p-4 rounded-lg border border-border bg-card">
+                <h3 className="font-bold text-foreground mb-3 text-sm">TypeScript の型定義</h3>
+                <ul className="text-sm text-muted-foreground space-y-2">
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-blue-500" /> label: <code className="text-xs bg-muted px-1 rounded">string</code></li>
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500" /> disabled: <code className="text-xs bg-muted px-1 rounded">boolean</code></li>
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-purple-500" /> size: <code className="text-xs bg-muted px-1 rounded">'sm' | 'md' | 'lg'</code></li>
+                  <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-orange-500" /> icon: <code className="text-xs bg-muted px-1 rounded">ReactNode</code></li>
+                </ul>
+              </div>
+            </div>
+            <InfoBox type="info" title="型があると何が嬉しい？">
+              <p>
+                Figma で Boolean プロパティに「テキスト」を入力しようとしてもできないように、TypeScript でも <code>disabled</code> に文字列を渡そうとするとエラーになります。間違った使い方をコードを書いている段階で防いでくれるのが型の力です。
+              </p>
+            </InfoBox>
+          </section>
+
+          {/* Badge コンポーネントで体験する基本の型 */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Badge で型を体験しよう</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              まずはシンプルな Badge コンポーネントで、型がどう使われるか体験しましょう。<strong>コードを編集して</strong>、label や variant の値を変えてみてください。
+            </p>
+            <CodePreview
+              code={`// interface = Figma のプロパティパネルの定義
+// 「このコンポーネントに何を渡せるか」を宣言する
+
+function Badge({ label, variant = 'default', size = 'md' }) {
+  const colors = {
+    default: { bg: '#e5e7eb', text: '#374151' },
+    primary: { bg: '#dbeafe', text: '#1d4ed8' },
+    success: { bg: '#dcfce7', text: '#15803d' },
+    warning: { bg: '#fef3c7', text: '#92400e' },
+    danger:  { bg: '#fee2e2', text: '#991b1b' },
+  };
+  const sizes = {
+    sm: { padding: '2px 8px', fontSize: '11px' },
+    md: { padding: '4px 12px', fontSize: '13px' },
+    lg: { padding: '6px 16px', fontSize: '15px' },
+  };
+  const c = colors[variant] || colors.default;
+  const s = sizes[size] || sizes.md;
+
+  return (
+    <span style={{
+      ...s, backgroundColor: c.bg, color: c.text,
+      borderRadius: '9999px', fontWeight: 600,
+      display: 'inline-block', fontFamily: 'system-ui',
+    }}>
+      {label}
+    </span>
+  );
+}
+
+function App() {
+  return (
+    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+      <Badge label="デフォルト" />
+      <Badge label="新着" variant="primary" />
+      <Badge label="公開中" variant="success" />
+      <Badge label="確認待ち" variant="warning" />
+      <Badge label="エラー" variant="danger" />
+      <Badge label="小さい" variant="primary" size="sm" />
+      <Badge label="大きい" variant="success" size="lg" />
+    </div>
+  );
+}`}
+              language="tsx"
+              title="Badge - variant と size を変えてみよう"
+              previewHeight={80}
+            />
+            <CodeBlock
+              code={`// 上の Badge を TypeScript で型定義すると...
+
+// Figma の「バリアント」 = ユニオン型
+type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger';
+type BadgeSize = 'sm' | 'md' | 'lg';
+
+// Figma の「プロパティパネル」 = interface
+interface BadgeProps {
+  label: string;              // テキストプロパティ（必須）
+  variant?: BadgeVariant;     // バリアント（?でオプショナル = Figma のデフォルト値あり）
+  size?: BadgeSize;           // サイズ（省略可 → デフォルトは 'md'）
+}
+
+function Badge({ label, variant = 'default', size = 'md' }: BadgeProps) {
+  // ...
+}`}
+              language="tsx"
+              title="TypeScript の型定義 = Figma プロパティパネルのコード版"
+            />
+          </section>
+
+          {/* interface と type */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">interface と type の使い分け</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              型を定義する書き方は2種類あります。<strong>interface</strong>（コンポーネントの Props に使う）と <strong>type</strong>（バリアントやユニオン型に使う）です。
             </p>
             <CodeBlock
-              code={`// 文字列型
-const userName: string = '田中花子';
-const greeting: string = \`こんにちは、\${userName}さん\`;
+              code={`// ── type: 選択肢（バリアント）の定義 ──
+// Figma のバリアントプロパティに対応
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
-// 数値型
-const age: number = 28;
-const price: number = 1980;
-const ratio: number = 0.75;
+// ── interface: コンポーネントの Props 定義 ──
+// Figma のプロパティパネル全体に対応
+interface ButtonProps {
+  children: ReactNode;         // ボタンの中身（テキストやアイコン）
+  variant?: ButtonVariant;     // バリアント（省略可 → デフォルト 'primary'）
+  size?: ButtonSize;           // サイズ（省略可 → デフォルト 'md'）
+  disabled?: boolean;          // 無効状態（省略可 → デフォルト false）
+  fullWidth?: boolean;         // 全幅表示（省略可）
+  onClick?: () => void;        // クリック時の処理
+}
 
-// 真偽値型
-const isVisible: boolean = true;
-const hasError: boolean = false;
-
-// 配列型（2つの書き方）
-const colors: string[] = ['赤', '青', '緑'];
-const scores: Array<number> = [85, 92, 78];
-
-// 配列の中身の型が混在する場合はタプル
-const pair: [string, number] = ['田中', 28];`}
+// 使い分けルール:
+// 1. コンポーネントの Props → interface
+// 2. バリアントの選択肢 → type
+// 3. 迷ったら interface`}
               language="tsx"
-              title="基本の型"
+              title="type = 選択肢、interface = プロパティ全体"
+            />
+            <InfoBox type="success" title="プロジェクト内で統一が大事">
+              <p>
+                interface と type はほぼ同じことができます。大事なのはプロジェクト内で統一すること。このマニュアルでは「Props は interface、選択肢は type」で統一しています。
+              </p>
+            </InfoBox>
+          </section>
+
+          {/* Card コンポーネント */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Card コンポーネントで実践する</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              デザインシステムでよく見る Card コンポーネントを作ってみましょう。Props を変えてバリエーションが生まれる様子を確認してください。
+            </p>
+            <CodePreview
+              code={`function Card({ title, description, variant = 'elevated', image, tag }) {
+  const variants = {
+    elevated: {
+      boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.06)',
+      border: 'none',
+    },
+    outlined: {
+      boxShadow: 'none',
+      border: '1px solid #e5e7eb',
+    },
+    filled: {
+      boxShadow: 'none',
+      border: 'none',
+      backgroundColor: '#f3f4f6',
+    },
+  };
+  const v = variants[variant] || variants.elevated;
+
+  return (
+    <div style={{
+      ...v, borderRadius: '12px', overflow: 'hidden',
+      backgroundColor: v.backgroundColor || '#fff', maxWidth: '280px',
+    }}>
+      {image && (
+        <div style={{ height: '140px', background: image, backgroundSize: 'cover' }} />
+      )}
+      <div style={{ padding: '16px' }}>
+        {tag && (
+          <span style={{
+            fontSize: '11px', fontWeight: 600, color: '#2563eb',
+            backgroundColor: '#dbeafe', padding: '2px 8px', borderRadius: '9999px',
+          }}>{tag}</span>
+        )}
+        <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '8px 0 4px', color: '#111827' }}>{title}</h3>
+        {description && (
+          <p style={{ fontSize: '13px', color: '#6b7280', lineHeight: 1.5, margin: 0 }}>{description}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+      <Card
+        title="Elevated カード"
+        description="影で浮いて見えるスタイル。デフォルト。"
+        tag="デフォルト"
+        image="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      />
+      <Card
+        title="Outlined カード"
+        description="ボーダーで区切るスタイル。"
+        variant="outlined"
+        tag="outlined"
+        image="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+      />
+      <Card
+        title="Filled カード"
+        description="背景色で区切るスタイル。"
+        variant="filled"
+        tag="filled"
+        image="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+      />
+    </div>
+  );
+}`}
+              language="tsx"
+              title="Card - variant / image / tag を変えてみよう"
+              previewHeight={300}
+            />
+            <CodeBlock
+              code={`// この Card の TypeScript 型定義
+
+interface CardProps {
+  title: string;                                    // 必須: カードタイトル
+  description?: string;                             // 省略可: 説明文
+  variant?: 'elevated' | 'outlined' | 'filled';     // 省略可: スタイル
+  image?: string;                                   // 省略可: 背景画像（CSS gradient OK）
+  tag?: string;                                     // 省略可: タグラベル
+}
+
+// ? がついた Props = Figma でデフォルト値があるプロパティ
+// ? がない Props = Figma で「必須」マークがついているプロパティ`}
+              language="tsx"
+              title="Card の型定義"
             />
           </section>
 
           {/* 型推論 */}
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">型推論 ー 書かなくても型が付く</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">型推論 ー 全部書かなくていい</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
-              TypeScript は非常に賢く、多くの場面で型を自動的に推論してくれます。すべての変数に型を手書きする必要はありません。「書かなくても正しく推論される」場面と「明示的に書くべき」場面を理解しましょう。
+              TypeScript は賢いので、多くの場面で型を自動推論してくれます。「書かなくても推論できる場面」と「明示的に書くべき場面」を知っておきましょう。
             </p>
             <CodeBlock
-              code={`// 型推論が効く場面: 型を書かなくてOK
+              code={`// ✅ 型を書かなくてOK（自動推論される）
+const brandColor = '#2563eb';        // string と推論
+const spacing = 16;                   // number と推論
+const isVisible = true;               // boolean と推論
+const variants = ['sm', 'md', 'lg'];  // string[] と推論
 
-// 1. 変数の初期化 - 値から型が推論される
-const name = '田中';        // string と推論
-const age = 28;             // number と推論
-const isActive = true;      // boolean と推論
-const tags = ['React', 'TS']; // string[] と推論
-
-// 2. 関数の戻り値 - return 文から推論される
-function add(a: number, b: number) {
-  return a + b;  // 戻り値は number と推論される
+// ✅ 関数の戻り値も推論される
+function getLabel(count: number) {
+  return count === 0 ? 'なし' : \`\${count}件\`;  // string と推論
 }
 
-// 3. コールバック関数の引数 - 文脈から推論される
-const numbers = [1, 2, 3];
-numbers.map((n) => n * 2);
-//           ^ n は number と推論される（numbers が number[] だから）
+// ⚠️ 型を書くべき場面
+// 1. 関数の引数 → 推論できないので必須
+function Badge({ label, variant }: BadgeProps) { ... }
 
-// 4. 三項演算子やif文の結果
-const message = age >= 20 ? '成人' : '未成年';
-//    ^ string と推論される`}
+// 2. 空の配列 → 中身がわからない
+const items: string[] = [];
+
+// 3. useState で null から始める場合
+const [user, setUser] = useState<User | null>(null);`}
               language="tsx"
-              title="型推論が効くパターン"
+              title="型推論: 書く場面と書かない場面"
             />
-            <CodeBlock
-              code={`// 型を明示的に書くべき場面
-
-// 1. 関数の引数 - 推論できないので必須
-function greet(name: string): string {  // 引数の型は必須、戻り値は省略可
-  return \`こんにちは、\${name}\`;
-}
-
-// 2. 空の配列やオブジェクト - 中身がわからないので明示が必要
-const items: string[] = [];                    // [] だけだと never[] になる
-const user: { name: string; age: number } = {  // 明示しないと推論が不安定
-  name: '',
-  age: 0,
-};
-
-// 3. Props の型定義 - コンポーネントの「仕様書」として必須
-interface ButtonProps {
-  label: string;
-  variant?: 'primary' | 'secondary';
-}
-function Button({ label, variant = 'primary' }: ButtonProps) {
-  return <button>{label}</button>;
-}
-
-// 4. useState の型が推論できないとき
-const [data, setData] = useState<User | null>(null);
-//                               ^ 初期値 null だけでは User 型が推論できない`}
-              language="tsx"
-              title="型を明示すべきパターン"
-            />
-            <InfoBox type="info" title="迷ったらエディタに聞こう">
+            <InfoBox type="info" title="VS Code で確認しよう">
               <p>
-                VS Code で変数にマウスカーソルを合わせると、TypeScript が推論した型がツールチップに表示されます。「この変数の型は何？」と迷ったらエディタに聞くのが一番早いです。推論結果が意図と違う場合だけ、明示的に型を書きましょう。
+                変数にマウスカーソルを合わせると推論された型が表示されます。推論が正しければ型を書く必要はありません。「推論結果が意図と違う」場合だけ明示しましょう。
               </p>
             </InfoBox>
           </section>
 
-          {/* interface vs type */}
+          {/* Alert コンポーネント */}
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">interface と type</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Alert コンポーネントを作ろう</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
-              オブジェクトの形を定義するには <code className="text-sm bg-muted px-1.5 py-0.5 rounded">interface</code> と <code className="text-sm bg-muted px-1.5 py-0.5 rounded">type</code> の2つの方法があります。
-            </p>
-            <CodeBlock
-              code={`// interface で定義
-interface User {
-  name: string;
-  age: number;
-  email: string;
-}
-
-// type で定義（type alias）
-type Product = {
-  id: number;
-  title: string;
-  price: number;
-};
-
-// どちらも同じように使える
-const user: User = {
-  name: '田中花子',
-  age: 28,
-  email: 'tanaka@example.com',
-};
-
-const product: Product = {
-  id: 1,
-  title: 'デザインブック',
-  price: 2980,
-};`}
-              language="tsx"
-              title="interface と type の基本"
-            />
-            <CodeBlock
-              code={`// interface は拡張（extends）できる
-interface Animal {
-  name: string;
-  age: number;
-}
-
-interface Dog extends Animal {
-  breed: string;  // 犬種を追加
-}
-
-const myDog: Dog = {
-  name: 'ポチ',
-  age: 3,
-  breed: '柴犬',
-};
-
-// type は交差型（&）で合成する
-type BaseStyle = {
-  color: string;
-  fontSize: number;
-};
-
-type ButtonStyle = BaseStyle & {
-  borderRadius: number;
-  padding: string;
-};`}
-              language="tsx"
-              title="型の拡張と合成"
-            />
-            <InfoBox type="success" title="どちらを使うべき？">
-              <p>
-                React の Props 定義には <strong>interface</strong> を使うのが一般的です。拡張しやすく、エラーメッセージも読みやすいためです。ユニオン型（後述）を使うときは type を使います。プロジェクト内で統一されていれば、どちらでも問題ありません。
-              </p>
-            </InfoBox>
-          </section>
-
-          {/* Props に型をつける */}
-          <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">Props に型をつける</h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              コンポーネントの Props に型をつけることで、使うときにエディタが正しい Props を教えてくれます。間違ったデータを渡すとコンパイルエラーになるので、バグを未然に防げます。
+              type（種類）によって色とアイコンが変わる Alert コンポーネントです。<strong>type の値を "info" / "warning" / "error" / "success" に変えて</strong>、見た目の変化を確認してください。
             </p>
             <CodePreview
-              code={`function Alert({ title, message, type, onClose }) {
-  const colors = {
-    info: { bg: '#eff6ff', border: '#bfdbfe', text: '#1e40af' },
-    warning: { bg: '#fffbeb', border: '#fde68a', text: '#92400e' },
-    error: { bg: '#fef2f2', border: '#fecaca', text: '#991b1b' },
+              code={`function Alert({ title, message, type = 'info', closable = false }) {
+  const styles = {
+    info:    { bg: '#eff6ff', border: '#bfdbfe', text: '#1e40af', icon: 'ℹ️' },
+    success: { bg: '#f0fdf4', border: '#bbf7d0', text: '#166534', icon: '✓' },
+    warning: { bg: '#fffbeb', border: '#fde68a', text: '#92400e', icon: '⚠' },
+    error:   { bg: '#fef2f2', border: '#fecaca', text: '#991b1b', icon: '✕' },
   };
-  const c = colors[type] || colors.info;
+  const s = styles[type] || styles.info;
 
   return (
     <div style={{
-      padding: '16px', border: '1px solid ' + c.border,
-      borderRadius: '8px', backgroundColor: c.bg, color: c.text,
+      padding: '12px 16px', borderRadius: '8px', border: '1px solid ' + s.border,
+      backgroundColor: s.bg, display: 'flex', gap: '12px', alignItems: 'flex-start',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <h3 style={{ fontWeight: 'bold', margin: 0 }}>{title}</h3>
-          <p style={{ fontSize: '14px', marginTop: '4px' }}>{message}</p>
-        </div>
-        <button onClick={onClose} style={{
-          fontSize: '18px', lineHeight: 1, background: 'none',
-          border: 'none', cursor: 'pointer', color: c.text,
-        }}>&times;</button>
+      <span style={{ fontSize: '16px', lineHeight: '24px', flexShrink: 0 }}>{s.icon}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontWeight: 700, fontSize: '14px', color: s.text, margin: 0 }}>{title}</p>
+        <p style={{ fontSize: '13px', color: s.text, opacity: 0.85, margin: '2px 0 0' }}>{message}</p>
       </div>
+      {closable && (
+        <button style={{
+          background: 'none', border: 'none', color: s.text, opacity: 0.5,
+          cursor: 'pointer', fontSize: '16px', lineHeight: 1, padding: 0, flexShrink: 0,
+        }}>×</button>
+      )}
     </div>
   );
 }
 
 function App() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <Alert title="保存完了" message="変更が保存されました" type="info" onClose={() => {}} />
-      <Alert title="注意" message="入力内容を確認してください" type="warning" onClose={() => {}} />
-      <Alert title="エラー" message="送信に失敗しました" type="error" onClose={() => {}} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '480px' }}>
+      <Alert title="保存しました" message="変更内容が正常に保存されました。" type="success" />
+      <Alert title="ヒント" message="Cmd+S で素早く保存できます。" type="info" />
+      <Alert title="注意" message="この操作は取り消せません。" type="warning" closable />
+      <Alert title="エラー" message="ネットワーク接続を確認してください。" type="error" closable />
     </div>
   );
 }`}
               language="tsx"
-              title="Props に型を定義する"
-              previewHeight={220}
+              title="Alert - type と closable を変えてみよう"
+              previewHeight={240}
             />
           </section>
 
-          {/* オプショナル Props */}
+          {/* ジェネリクス（簡潔に） */}
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">オプショナル Props（?）</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">ジェネリクス ー 型の引数</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
-              プロパティ名の後に <code className="text-sm bg-muted px-1.5 py-0.5 rounded">?</code> をつけると、その Props は省略可能になります。省略された場合の値は <code className="text-sm bg-muted px-1.5 py-0.5 rounded">undefined</code> です。
+              ジェネリクスは「型の引数」です。難しく聞こえますが、日常で使う場面は限られています。<strong>useState で null から始める場合</strong> だけ覚えておけば最初は十分です。
             </p>
-            <CodePreview
-              code={`function Avatar({ name, size = 48, rounded = true, color = '#2563eb' }) {
-  const initials = name.split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase();
-  return (
-    <div style={{
-      width: size, height: size,
-      borderRadius: rounded ? '50%' : '8px',
-      backgroundColor: color,
-      color: '#fff',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.4, fontWeight: 700,
-      fontFamily: 'system-ui, sans-serif',
-    }}>
-      {initials}
-    </div>
-  );
-}
+            <CodeBlock
+              code={`// ジェネリクスを使う場面（ほぼこの2パターンだけ）
 
-function App() {
-  return (
-    <div style={{ display: 'flex', gap: '16px', alignItems: 'end', flexWrap: 'wrap' }}>
-      <div style={{ textAlign: 'center' }}>
-        <Avatar name="田中 花子" />
-        <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>デフォルト</p>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <Avatar name="佐藤 太郎" size={64} />
-        <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>size=64</p>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <Avatar name="鈴木 一" size={64} rounded={false} />
-        <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>rounded=false</p>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <Avatar name="山田 花" size={56} color="#7c3aed" />
-        <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>color指定</p>
-      </div>
-    </div>
-  );
-}`}
+// 1. useState で初期値が null のとき
+interface User {
+  id: number;
+  name: string;
+  avatar: string;
+}
+const [user, setUser] = useState<User | null>(null);
+//                                ^^^^^^^^^^^
+// 「User か null のどちらか」を明示
+
+// 2. 空配列の型を指定するとき
+interface TodoItem {
+  id: number;
+  text: string;
+  done: boolean;
+}
+const [todos, setTodos] = useState<TodoItem[]>([]);
+//                                 ^^^^^^^^^^
+// 「TodoItem の配列」を明示
+
+// 初期値がある場合は自動推論されるのでジェネリクス不要
+const [count, setCount] = useState(0);        // number と推論
+const [name, setName] = useState('');          // string と推論
+const [isOpen, setIsOpen] = useState(false);   // boolean と推論`}
               language="tsx"
-              title="オプショナル Props とデフォルト値"
-              previewHeight={120}
+              title="ジェネリクス: useState で使う2パターン"
             />
+            <InfoBox type="info" title="最初は覚えなくて大丈夫">
+              <p>
+                ジェネリクスは TypeScript の中でも難しい概念です。ライブラリのドキュメントで <code>{'<T>'}</code> が出てきたら「ここに具体的な型が入る」と理解できれば OK です。
+              </p>
+            </InfoBox>
           </section>
 
-          {/* ユニオン型 */}
+          {/* 便利な型ユーティリティ */}
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">ユニオン型でバリアントを定義する</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">便利な型ユーティリティ</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
-              ユニオン型（<code className="text-sm bg-muted px-1.5 py-0.5 rounded">|</code> で区切る）を使うと、「この中のどれか」という型を作れます。デザインシステムのバリアント（variant）やサイズ（size）を定義するのにぴったりです。
+              既存の型を変換して新しい型を作る仕組みがあります。デザインシステムの「すべて必須の Props」から「更新時は一部だけ渡す」型を作るときに便利です。
+            </p>
+            <CodeBlock
+              code={`interface UserProfile {
+  name: string;
+  email: string;
+  avatar: string;
+  bio: string;
+}
+
+// Partial<T> → 全プロパティを省略可にする
+// 使い道: プロフィール編集（一部だけ更新）
+type ProfileUpdate = Partial<UserProfile>;
+// { name?: string; email?: string; avatar?: string; bio?: string; }
+
+// Pick<T, K> → 必要なプロパティだけ取り出す
+// 使い道: ユーザー一覧では名前とアバターだけ表示
+type UserPreview = Pick<UserProfile, 'name' | 'avatar'>;
+// { name: string; avatar: string; }
+
+// Omit<T, K> → 不要なプロパティを除外する
+// 使い道: 新規作成時は ID 不要
+type CreateInput = Omit<UserProfile, 'id'>;`}
+              language="tsx"
+              title="Partial / Pick / Omit ー 型の変換"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+              <div className="p-4 rounded-lg border border-border bg-card">
+                <h3 className="font-bold text-foreground mb-2 text-sm">{'Partial<T>'}</h3>
+                <p className="text-xs text-muted-foreground">全プロパティを省略可に。部分更新やフォームの初期値に。</p>
+              </div>
+              <div className="p-4 rounded-lg border border-border bg-card">
+                <h3 className="font-bold text-foreground mb-2 text-sm">{'Pick<T, K>'}</h3>
+                <p className="text-xs text-muted-foreground">指定プロパティだけ抜き出す。一覧やサマリーに。</p>
+              </div>
+              <div className="p-4 rounded-lg border border-border bg-card">
+                <h3 className="font-bold text-foreground mb-2 text-sm">{'Omit<T, K>'}</h3>
+                <p className="text-xs text-muted-foreground">指定プロパティを除外。新規作成時の入力型に。</p>
+              </div>
+            </div>
+          </section>
+
+          {/* 実践: デザインシステム Button */}
+          <section>
+            <h2 className="text-2xl font-bold text-foreground mb-4">実践: デザインシステムの Button</h2>
+            <p className="text-muted-foreground mb-4 leading-relaxed">
+              ここまでの知識を使って、Figma で設計するようなバリアント・サイズ・状態を持つ Button を作ります。<strong>variant / size / disabled の値を変えて</strong>デザインバリエーションを確認してください。
             </p>
             <CodePreview
               code={`function Button({ children, variant = 'primary', size = 'md', disabled = false, onClick }) {
   const variantStyles = {
-    primary: { backgroundColor: '#2563eb', color: '#fff', border: 'none' },
-    secondary: { backgroundColor: '#4b5563', color: '#fff', border: 'none' },
-    outline: { backgroundColor: 'transparent', color: '#2563eb', border: '2px solid #2563eb' },
-    ghost: { backgroundColor: 'transparent', color: '#2563eb', border: 'none' },
+    primary:   { backgroundColor: '#2563eb', color: '#fff', border: 'none' },
+    secondary: { backgroundColor: '#f3f4f6', color: '#374151', border: 'none' },
+    outline:   { backgroundColor: 'transparent', color: '#2563eb', border: '1.5px solid #2563eb' },
+    ghost:     { backgroundColor: 'transparent', color: '#6b7280', border: 'none' },
+    danger:    { backgroundColor: '#ef4444', color: '#fff', border: 'none' },
   };
   const sizeStyles = {
-    sm: { padding: '6px 12px', fontSize: '13px' },
-    md: { padding: '8px 16px', fontSize: '15px' },
-    lg: { padding: '12px 24px', fontSize: '17px' },
+    sm: { padding: '6px 14px', fontSize: '13px', borderRadius: '6px' },
+    md: { padding: '8px 18px', fontSize: '14px', borderRadius: '8px' },
+    lg: { padding: '12px 24px', fontSize: '16px', borderRadius: '10px' },
   };
 
   return (
@@ -330,27 +479,24 @@ function App() {
       onClick={onClick}
       disabled={disabled}
       style={{
-        ...variantStyles[variant],
-        ...sizeStyles[size],
-        borderRadius: '8px',
-        fontWeight: 500,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
+        ...variantStyles[variant], ...sizeStyles[size],
+        fontWeight: 600, cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.45 : 1, fontFamily: 'system-ui',
+        transition: 'opacity 0.15s',
       }}
-    >
-      {children}
-    </button>
+    >{children}</button>
   );
 }
 
 function App() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="outline">Outline</Button>
         <Button variant="ghost">Ghost</Button>
+        <Button variant="danger">Danger</Button>
       </div>
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
         <Button size="sm">Small</Button>
@@ -359,425 +505,67 @@ function App() {
       </div>
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
         <Button disabled>Disabled</Button>
-        <Button variant="outline" onClick={() => alert('クリック！')}>Click me</Button>
+        <Button variant="outline" disabled>Disabled</Button>
       </div>
     </div>
   );
 }`}
               language="tsx"
-              title="ユニオン型でデザインバリアントを表現"
+              title="Button - デザインシステムのバリアント一覧"
               previewHeight={180}
             />
-            <InfoBox type="info" title="Record 型について">
-              <p>
-                <code>{'Record<Variant, string>'}</code> は「Variant のすべての値をキーに持ち、値が string であるオブジェクト」という型です。バリアントごとのスタイルマッピングを作るときに、すべてのバリアントを網羅しているかチェックしてくれます。
-              </p>
-            </InfoBox>
+            <CodeBlock
+              code={`// この Button の完全な TypeScript 型定義
+
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+type ButtonSize = 'sm' | 'md' | 'lg';
+
+interface ButtonProps {
+  children: ReactNode;           // ボタンの中身
+  variant?: ButtonVariant;       // バリアント（省略可 → 'primary'）
+  size?: ButtonSize;             // サイズ（省略可 → 'md'）
+  disabled?: boolean;            // 無効状態（省略可 → false）
+  onClick?: () => void;          // クリックハンドラ
+}
+
+// Figma のプロパティパネルと 1:1 で対応している
+// → デザイナーとエンジニアが同じ言葉で会話できる`}
+              language="tsx"
+              title="Button の型定義 = Figma プロパティパネルのコード版"
+            />
           </section>
 
-          {/* ジェネリクス */}
+          {/* React の組み込み型（簡潔に） */}
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">ジェネリクスの初歩</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">よく使う React の型</h2>
             <p className="text-muted-foreground mb-4 leading-relaxed">
-              ジェネリクス（Generics）は「型の引数」です。関数に値の引数があるように、型にも引数を渡して柔軟に再利用できます。日常的に使う場面を見てみましょう。
-            </p>
-
-            <CodeBlock
-              code={`// ジェネリクスの基本: Array<T>
-// T は「何でもいい型」を表すプレースホルダー
-
-// string の配列
-const names: Array<string> = ['田中', '佐藤', '鈴木'];
-
-// number の配列
-const scores: Array<number> = [85, 92, 78];
-
-// 自分で定義した型の配列
-interface User {
-  name: string;
-  age: number;
-}
-const users: Array<User> = [
-  { name: '田中', age: 28 },
-  { name: '佐藤', age: 32 },
-];
-
-// Array<string> は string[] と同じ意味
-// どちらを使ってもOK（短い string[] が一般的）`}
-              language="tsx"
-              title="ジェネリクスの基本: Array<T>"
-            />
-
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-// useState でジェネリクスを使う場面
-
-// 1. 初期値から推論できる場合 → ジェネリクス不要
-const [count, setCount] = useState(0);        // number と推論
-const [name, setName] = useState('');          // string と推論
-const [isOpen, setIsOpen] = useState(false);   // boolean と推論
-
-// 2. 初期値が null の場合 → ジェネリクスで型を指定
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-const [user, setUser] = useState<User | null>(null);
-//                               ^^^^^^^^^^^
-// 「User か null のどちらか」という型を明示
-
-// 後で API からデータを取得して設定する
-// setUser({ id: 1, name: '田中', email: 'tanaka@example.com' });
-// setUser(null);  // ログアウト時にリセット
-
-// 3. 空配列の場合 → ジェネリクスで中身の型を指定
-const [items, setItems] = useState<string[]>([]);
-const [todos, setTodos] = useState<Todo[]>([]);`}
-              language="tsx"
-              title="useState<T> でジェネリクスを使う"
-            />
-
-            <CodeBlock
-              code={`// Promise<T> - 非同期処理の結果の型
-// API からデータを取得する関数でよく使う
-
-interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message: string;
-}
-
-// User データを返す API
-async function fetchUser(id: number): Promise<ApiResponse<User>> {
-  const response = await fetch(\`/api/users/\${id}\`);
-  return response.json();
-}
-
-// Product データを返す API（同じ ApiResponse 構造を再利用）
-async function fetchProduct(id: number): Promise<ApiResponse<Product>> {
-  const response = await fetch(\`/api/products/\${id}\`);
-  return response.json();
-}
-
-// T の部分が User や Product に置き換わるだけ
-// ApiResponse の構造（data, status, message）は共通で使いまわせる`}
-              language="tsx"
-              title="ジェネリクスの実践例: API レスポンス"
-            />
-
-            <InfoBox type="info" title="ジェネリクスを最初から完璧に理解する必要はない">
-              <p>
-                ジェネリクスは TypeScript の中でも難しい概念です。最初は「useState{'<User | null>'}(null) のように、型を指定するときに使う」と覚えておけば十分です。ライブラリの型定義を読むときに {'<T>'} が出てきたら「ここに具体的な型が入る」と理解できれば OK です。
-              </p>
-            </InfoBox>
-          </section>
-
-          {/* 型ユーティリティ */}
-          <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">便利な型ユーティリティ</h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              TypeScript には、既存の型を変換して新しい型を作る「ユーティリティ型」が組み込まれています。中でもよく使う3つを紹介します。
-            </p>
-
-            <CodeBlock
-              code={`interface User {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-  bio: string;
-}
-
-// ── Partial<T>: すべてのプロパティをオプショナルにする ──
-type UserUpdate = Partial<User>;
-// 結果:
-// {
-//   id?: number;
-//   name?: string;
-//   email?: string;
-//   avatar?: string;
-//   bio?: string;
-// }
-
-// 使い道: ユーザー情報の部分更新
-function updateUser(id: number, updates: Partial<User>) {
-  // updates には一部のフィールドだけ渡せる
-  // updateUser(1, { name: '新しい名前' })       - OK
-  // updateUser(1, { email: 'new@example.com' }) - OK
-  // updateUser(1, { name: '新', bio: '自己紹介' }) - OK
-}`}
-              language="tsx"
-              title="Partial<T> - 全プロパティをオプショナルに"
-            />
-
-            <CodeBlock
-              code={`interface User {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-  bio: string;
-}
-
-// ── Pick<T, Keys>: 特定のプロパティだけ取り出す ──
-type UserPreview = Pick<User, 'name' | 'avatar'>;
-// 結果:
-// {
-//   name: string;
-//   avatar: string;
-// }
-
-// 使い道: 一覧画面では全情報が不要な場合
-function UserListItem({ name, avatar }: UserPreview) {
-  return (
-    <div className="flex items-center gap-2">
-      <img src={avatar} alt={name} className="w-8 h-8 rounded-full" />
-      <span>{name}</span>
-    </div>
-  );
-}
-
-// ── Omit<T, Keys>: 特定のプロパティを除外する ──
-type UserCreateInput = Omit<User, 'id'>;
-// 結果:
-// {
-//   name: string;
-//   email: string;
-//   avatar: string;
-//   bio: string;
-// }
-
-// 使い道: 新規作成時は id はサーバー側で付与されるので除外
-function createUser(data: Omit<User, 'id'>) {
-  // data.id にはアクセスできない（除外されている）
-  // fetch('/api/users', { body: JSON.stringify(data) })
-}`}
-              language="tsx"
-              title="Pick<T, K> と Omit<T, K>"
-              showLineNumbers
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
-              <div className="p-4 rounded-lg border border-border bg-card">
-                <h3 className="font-bold text-foreground mb-2 text-sm">{'Partial<T>'}</h3>
-                <p className="text-xs text-muted-foreground">全プロパティを ? に変換。部分更新やフォームの初期値に便利。</p>
-              </div>
-              <div className="p-4 rounded-lg border border-border bg-card">
-                <h3 className="font-bold text-foreground mb-2 text-sm">{'Pick<T, K>'}</h3>
-                <p className="text-xs text-muted-foreground">指定したプロパティだけ抜き出す。一覧表示やサマリーに便利。</p>
-              </div>
-              <div className="p-4 rounded-lg border border-border bg-card">
-                <h3 className="font-bold text-foreground mb-2 text-sm">{'Omit<T, K>'}</h3>
-                <p className="text-xs text-muted-foreground">指定したプロパティを除外。新規作成時の入力型など。</p>
-              </div>
-            </div>
-
-            <InfoBox type="success" title="実務でのユーティリティ型">
-              <p>
-                これらのユーティリティ型は、API のレスポンス型をそのまま使いつつ「この画面ではこのフィールドだけ使う」「更新時は全フィールド任意」といった場面で威力を発揮します。同じ型を何度も定義する代わりに、元の型を変換して使いまわしましょう。
-              </p>
-            </InfoBox>
-          </section>
-
-          {/* React の組み込み型 */}
-          <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">React の組み込み型</h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              React には、よく使う型があらかじめ用意されています。覚えておくと便利な型を紹介します。
+              React の型で覚えておくべきものは3つだけです。
             </p>
             <CodeBlock
-              code={`import { ReactNode, CSSProperties, MouseEvent, ChangeEvent } from 'react';
+              code={`import { ReactNode, CSSProperties } from 'react';
 
-// ReactNode - JSX として描画できるもの全般
-// string, number, JSX, null, undefined, 配列 すべて含む
+// 1. ReactNode → 子要素の型（最頻出）
+// テキスト、数値、JSX、null、配列すべて含む万能型
 interface CardProps {
-  children: ReactNode;   // 最もよく使う
+  children: ReactNode;
 }
 
-// CSSProperties - インラインスタイルの型
+// 2. CSSProperties → インラインスタイルの型
 interface BoxProps {
   style?: CSSProperties;
 }
-function Box({ style }: BoxProps) {
-  return <div style={style}>内容</div>;
-}
-<Box style={{ backgroundColor: 'blue', padding: 16 }} />
 
-// イベント関連の型
+// 3. イベントハンドラの型
 interface InputProps {
-  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}`}
-              language="tsx"
-              title="React の便利な組み込み型"
-            />
-            <CodeBlock
-              code={`// React.FC（関数コンポーネント型）について
-// 以前はよく使われていたが、現在は使わないのが主流
-
-// 非推奨: React.FC を使うパターン
-const Greeting: React.FC<{ name: string }> = ({ name }) => {
-  return <p>こんにちは、{name}さん</p>;
-};
-
-// 推奨: 普通の関数として定義する
-function Greeting({ name }: { name: string }) {
-  return <p>こんにちは、{name}さん</p>;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-// 理由:
-// 1. React.FC は暗黙的に children を含んでいた（React 18 で修正済み）
-// 2. デフォルトエクスポートとの相性が悪い
-// 3. 普通の関数の方がシンプルで読みやすい`}
+// おまけ: React.FC は使わない（旧式の書き方）
+// ❌ const Card: React.FC<CardProps> = ({ children }) => { ... }
+// ✅ function Card({ children }: CardProps) { ... }`}
               language="tsx"
-              title="React.FC は使わなくてOK"
-            />
-            <InfoBox type="warning" title="React.FC を使わない理由">
-              <p>
-                ネットの古い記事では <code>React.FC</code> や <code>React.FunctionComponent</code> を使う例が多いですが、現在の React + TypeScript 開発では普通の関数定義が推奨されています。このマニュアルでも普通の関数で統一しています。
-              </p>
-            </InfoBox>
-          </section>
-
-          {/* 実践例: 型付き Button コンポーネント */}
-          <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">実践例: 型付き Button コンポーネント</h2>
-            <p className="text-muted-foreground mb-4 leading-relaxed">
-              ここまでの知識を総動員して、実際のデザインシステムで使えるレベルの Button コンポーネントを作ります。
-            </p>
-            <CodeBlock
-              code={`import { ReactNode, ButtonHTMLAttributes } from 'react';
-
-// バリアントとサイズの型定義
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
-type ButtonSize = 'sm' | 'md' | 'lg';
-
-// Props 定義
-// ButtonHTMLAttributes を拡張して、HTML button の全属性を受け取れるようにする
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  fullWidth?: boolean;
-  loading?: boolean;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-}
-
-function Button({
-  children,
-  variant = 'primary',
-  size = 'md',
-  fullWidth = false,
-  loading = false,
-  leftIcon,
-  rightIcon,
-  disabled,
-  className = '',
-  ...rest  // 残りの HTML 属性をすべて受け取る
-}: ButtonProps) {
-  // バリアントごとのスタイル
-  const variantStyles: Record<ButtonVariant, string> = {
-    primary:
-      'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-300',
-    secondary:
-      'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300 focus:ring-gray-300',
-    danger:
-      'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-300',
-    ghost:
-      'bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-300',
-  };
-
-  // サイズごとのスタイル
-  const sizeStyles: Record<ButtonSize, string> = {
-    sm: 'px-3 py-1.5 text-sm gap-1.5',
-    md: 'px-4 py-2 text-base gap-2',
-    lg: 'px-6 py-3 text-lg gap-2.5',
-  };
-
-  const isDisabled = disabled || loading;
-
-  return (
-    <button
-      disabled={isDisabled}
-      className={\`
-        inline-flex items-center justify-center
-        rounded-lg font-medium
-        transition-colors duration-150
-        focus:outline-none focus:ring-2 focus:ring-offset-2
-        \${variantStyles[variant]}
-        \${sizeStyles[size]}
-        \${fullWidth ? 'w-full' : ''}
-        \${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        \${className}
-      \`}
-      {...rest}
-    >
-      {loading ? (
-        <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-      ) : (
-        leftIcon
-      )}
-      {children}
-      {!loading && rightIcon}
-    </button>
-  );
-}
-
-export default Button;`}
-              language="tsx"
-              title="Button.tsx - デザインシステム品質の型付きコンポーネント"
-              showLineNumbers
-            />
-            <CodeBlock
-              code={`// Button の使用例
-import Button from './Button';
-import { Send, Trash2, Plus } from 'lucide-react';
-
-function ButtonShowcase() {
-  return (
-    <div className="space-y-6 p-8">
-      {/* バリアント */}
-      <div className="flex gap-3">
-        <Button variant="primary">保存</Button>
-        <Button variant="secondary">キャンセル</Button>
-        <Button variant="danger">削除</Button>
-        <Button variant="ghost">スキップ</Button>
-      </div>
-
-      {/* サイズ */}
-      <div className="flex items-center gap-3">
-        <Button size="sm">小さいボタン</Button>
-        <Button size="md">通常ボタン</Button>
-        <Button size="lg">大きいボタン</Button>
-      </div>
-
-      {/* アイコン付き */}
-      <div className="flex gap-3">
-        <Button leftIcon={<Send size={16} />}>送信する</Button>
-        <Button variant="danger" leftIcon={<Trash2 size={16} />}>削除する</Button>
-        <Button variant="secondary" rightIcon={<Plus size={16} />}>追加</Button>
-      </div>
-
-      {/* 状態 */}
-      <div className="flex gap-3">
-        <Button loading>処理中...</Button>
-        <Button disabled>無効</Button>
-        <Button fullWidth>全幅ボタン</Button>
-      </div>
-
-      {/* HTML 属性もそのまま渡せる */}
-      <Button type="submit" form="myForm" aria-label="フォームを送信">
-        フォーム送信
-      </Button>
-    </div>
-  );
-}`}
-              language="tsx"
-              title="Button の使用例"
+              title="覚えるのは ReactNode / CSSProperties / イベント型の3つ"
             />
           </section>
 
@@ -786,76 +574,100 @@ function ButtonShowcase() {
             <h2 className="text-2xl font-bold text-foreground mb-4">理解度チェック</h2>
 
             <Quiz
-              question="次の TypeScript コードでエラーが起きる原因はどれですか？
-
-interface Props { name: string; age: number; }
-function Profile({ name, age }: Props) { ... }
-<Profile name='田中' age='28' />"
+              question="Figma で「バリアント: Primary / Secondary / Ghost」を設定しました。TypeScript ではどう書きますか？"
               options={[
-                { label: 'name が string なのに文字列を渡しているから' },
-                { label: 'age が number 型なのに文字列 "28" を渡しているから', correct: true },
-                { label: 'interface の書き方が間違っているから' },
-                { label: 'Props という名前は予約語だから使えない' },
+                { label: "variant: string" },
+                { label: "variant: 'Primary' | 'Secondary' | 'Ghost'", correct: true },
+                { label: "variant: boolean" },
+                { label: "variant: number" },
               ]}
-              explanation="age は number 型として定義されていますが、age='28' と書くと文字列の '28' になります。正しくは age={28} と波括弧で囲んで数値として渡します。TypeScript はこのような型の不一致をコンパイル時に検出してくれます。"
+              explanation="バリアントは「決まった選択肢の中から1つ」なので、ユニオン型（ | で区切る）で表現します。string だと何でも入ってしまうので、選択肢を限定するのが型の強みです。"
             />
 
             <Quiz
-              question="オプショナルな Props の書き方として正しいのはどれですか？"
+              question="次のうち、? をつけて省略可能にすべき Props はどれですか？"
               options={[
-                { label: 'interface Props { name: string; age: number | undefined; }' },
-                { label: 'interface Props { name: string; age?: number; }', correct: true },
-                { label: 'interface Props { name: string; optional age: number; }' },
-                { label: 'interface Props { name: string; age: number = 0; }' },
+                { label: "ボタンの label（テキスト）" },
+                { label: "カードの title（タイトル）" },
+                { label: "アバターの size（サイズ）。デフォルトは 48px", correct: true },
+                { label: "入力フォームの onChange（変更ハンドラ）" },
               ]}
-              explanation="プロパティ名の後に ? をつけると、その Props は省略可能（オプショナル）になります。age?: number は age: number | undefined と同じ意味ですが、? を使う方が簡潔で一般的です。interface の中でデフォルト値は設定できません（デフォルト値は関数の引数で設定します）。"
+              explanation="size はデフォルト値（48px）があるので省略可能です。省略された場合にデフォルト値が使われます。label や title のように「なければ表示できない」ものは必須（?なし）にします。"
             />
           </section>
 
           {/* CodingChallenge */}
           <section>
             <CodingChallenge
-              title="TypeScript 型定義付き Card コンポーネントを作ろう"
-              description="CardProps の interface を完成させ、Card コンポーネントの引数に型をつけてください。title は必須の string、description はオプショナルな string、variant は 'default' | 'outlined' のユニオン型（デフォルト 'default'）、children は ReactNode です。"
+              title="Figma のプロパティパネルを TypeScript で書こう"
+              description="以下の Figma 設計に基づいて、StatusBadge の interface を完成させてください。label は必須の string、status は 'active' | 'inactive' | 'pending'（必須）、size は 'sm' | 'lg'（省略可、デフォルト 'sm'）です。"
               initialCode={`import { ReactNode } from 'react';
 
 // この interface を完成させてください
-interface CardProps {
-  // ここに型定義を書く
+interface StatusBadgeProps {
+  // Figma のプロパティパネルをコードで表現しよう
 }
 
-function Card({ title, description, variant = 'default', children }: CardProps) {
+function StatusBadge({ label, status, size = 'sm' }: StatusBadgeProps) {
+  const colors = {
+    active: '#16a34a',
+    inactive: '#9ca3af',
+    pending: '#f59e0b',
+  };
+
   return (
-    <div className={variant === 'outlined' ? 'border-2' : 'shadow-md'}>
-      <h2>{title}</h2>
-      {description && <p>{description}</p>}
-      <div>{children}</div>
-    </div>
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: '6px',
+      padding: size === 'lg' ? '6px 14px' : '3px 10px',
+      fontSize: size === 'lg' ? '14px' : '12px',
+      fontWeight: 600, borderRadius: '9999px',
+      backgroundColor: colors[status] + '20',
+      color: colors[status],
+    }}>
+      <span style={{
+        width: '6px', height: '6px', borderRadius: '50%',
+        backgroundColor: colors[status],
+      }} />
+      {label}
+    </span>
   );
 }`}
               answer={`import { ReactNode } from 'react';
 
-interface CardProps {
-  title: string;
-  description?: string;
-  variant?: 'default' | 'outlined';
-  children: ReactNode;
+interface StatusBadgeProps {
+  label: string;
+  status: 'active' | 'inactive' | 'pending';
+  size?: 'sm' | 'lg';
 }
 
-function Card({ title, description, variant = 'default', children }: CardProps) {
+function StatusBadge({ label, status, size = 'sm' }: StatusBadgeProps) {
+  const colors = {
+    active: '#16a34a',
+    inactive: '#9ca3af',
+    pending: '#f59e0b',
+  };
+
   return (
-    <div className={variant === 'outlined' ? 'border-2' : 'shadow-md'}>
-      <h2>{title}</h2>
-      {description && <p>{description}</p>}
-      <div>{children}</div>
-    </div>
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: '6px',
+      padding: size === 'lg' ? '6px 14px' : '3px 10px',
+      fontSize: size === 'lg' ? '14px' : '12px',
+      fontWeight: 600, borderRadius: '9999px',
+      backgroundColor: colors[status] + '20',
+      color: colors[status],
+    }}>
+      <span style={{
+        width: '6px', height: '6px', borderRadius: '50%',
+        backgroundColor: colors[status],
+      }} />
+      {label}
+    </span>
   );
 }`}
               hints={[
-                'title は必須なので ? はつけません。string 型です。',
-                'description は省略可能なので ? をつけます。description?: string',
-                "variant もオプショナルです。ユニオン型で 'default' | 'outlined' と書きます。",
-                'children は ReactNode 型です。import { ReactNode } from "react" が必要です。',
+                'label は必須なので ? をつけません',
+                "status は 3つの選択肢なので 'active' | 'inactive' | 'pending' というユニオン型",
+                'size は省略可能（デフォルト値あり）なので ? をつけます',
               ]}
             />
           </section>
@@ -865,25 +677,25 @@ function Card({ title, description, variant = 'default', children }: CardProps) 
             <h2 className="text-2xl font-bold text-foreground mb-4">まとめ</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg border border-border bg-card">
-                <h3 className="font-bold text-foreground mb-2">覚えておく型</h3>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>- <code>string</code>, <code>number</code>, <code>boolean</code> - 基本型</li>
-                  <li>- <code>string[]</code> - 配列型</li>
-                  <li>- <code>ReactNode</code> - JSX 全般</li>
-                  <li>- <code>'a' | 'b'</code> - ユニオン型（選択肢）</li>
-                  <li>- <code>?</code> - オプショナル（省略可）</li>
-                  <li>- <code>{'Partial<T>'}</code>, <code>{'Pick<T, K>'}</code>, <code>{'Omit<T, K>'}</code> - ユーティリティ型</li>
+                <h3 className="font-bold text-foreground mb-2 text-sm">Figma → TypeScript 対応表</h3>
+                <ul className="text-sm text-muted-foreground space-y-1.5">
+                  <li>テキストプロパティ → <code className="text-xs bg-muted px-1 rounded">string</code></li>
+                  <li>Boolean プロパティ → <code className="text-xs bg-muted px-1 rounded">boolean</code></li>
+                  <li>バリアント → <code className="text-xs bg-muted px-1 rounded">'a' | 'b' | 'c'</code></li>
+                  <li>デフォルト値あり → <code className="text-xs bg-muted px-1 rounded">?</code>（省略可）</li>
+                  <li>子要素（Slot） → <code className="text-xs bg-muted px-1 rounded">ReactNode</code></li>
+                  <li>プロパティパネル全体 → <code className="text-xs bg-muted px-1 rounded">interface</code></li>
                 </ul>
               </div>
               <div className="p-4 rounded-lg border border-border bg-card">
-                <h3 className="font-bold text-foreground mb-2">実践のコツ</h3>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>- Props は interface で定義する</li>
-                  <li>- バリアントはユニオン型で表現</li>
-                  <li>- React.FC は使わない</li>
-                  <li>- まずは型推論に任せ、必要なところだけ書く</li>
-                  <li>- ジェネリクスは useState{'<T>'} で慣れていく</li>
-                  <li>- ユーティリティ型で型の重複を減らす</li>
+                <h3 className="font-bold text-foreground mb-2 text-sm">実践のコツ</h3>
+                <ul className="text-sm text-muted-foreground space-y-1.5">
+                  <li>Props は interface で定義する</li>
+                  <li>バリアントはユニオン型で表現</li>
+                  <li>型推論に任せ、必要なところだけ書く</li>
+                  <li>ジェネリクスは useState{'<T | null>'}(null) で慣れる</li>
+                  <li>React.FC は使わない</li>
+                  <li>迷ったらエディタにマウスホバーで確認</li>
                 </ul>
               </div>
             </div>
@@ -899,14 +711,9 @@ function Card({ title, description, variant = 'default', children }: CardProps) 
                   description: 'React 公式の TypeScript ガイド。Props の型付け、Hooks の型、イベントの型など',
                 },
                 {
-                  title: 'TypeScript Handbook - TypeScript 公式',
+                  title: 'TypeScript Handbook',
                   url: 'https://www.typescriptlang.org/docs/handbook/intro.html',
-                  description: 'TypeScript の公式ハンドブック。基本型からジェネリクスまで体系的に学べる',
-                },
-                {
-                  title: 'Utility Types - TypeScript 公式',
-                  url: 'https://www.typescriptlang.org/docs/handbook/utility-types.html',
-                  description: 'Partial, Pick, Omit, Record など全ユーティリティ型のリファレンス',
+                  description: 'TypeScript 公式ハンドブック。基本型からジェネリクスまで体系的に学べる',
                 },
                 {
                   title: 'React TypeScript Cheatsheet',
@@ -922,20 +729,16 @@ function Card({ title, description, variant = 'default', children }: CardProps) 
             <Faq
               items={[
                 {
-                  question: 'any 型は使ってもいいですか？',
-                  answer: '基本的に避けるべきです。any を使うと TypeScript の型チェックが無効になり、型を使うメリットがなくなります。「型がわからない」ときは unknown を使いましょう。unknown は any と違い、使う前に型チェックが必要なので安全です。ただし、プロトタイプ段階で素早く動かしたいときに一時的に使い、後で正しい型に置き換えるのは現実的なアプローチです。',
+                  question: 'デザイナーも TypeScript を書けるようになるべきですか？',
+                  answer: '読めるようになることが重要です。Props の interface を見れば「このコンポーネントに何を渡せるか」がわかります。Figma のプロパティパネルと同じ情報がコードに書かれているので、デザイナーにとっても実は読みやすい形式です。書くことは必須ではありませんが、読めるとエンジニアとのコミュニケーションが格段にスムーズになります。',
                 },
                 {
-                  question: 'as const とは何ですか？',
-                  answer: 'as const は値をリテラル型として推論させるための記法です。例えば const colors = ["red", "blue"] as const と書くと、型が string[] ではなく readonly ["red", "blue"] になります。これにより "red" | "blue" というユニオン型を値から自動生成できます。デザインシステムのバリアント定義で特に便利です。',
+                  question: 'any 型は使ってもいいですか？',
+                  answer: 'any を使うと TypeScript の型チェックが無効になり、型を使うメリットがなくなります。プロトタイプ段階で一時的に使い、後で正しい型に置き換えるのは現実的なアプローチですが、本番コードでは避けましょう。「型がわからない」ときは unknown を使うのが安全です。',
                 },
                 {
                   question: 'interface と type はどちらを使うべきですか？',
-                  answer: 'React の Props 定義には interface が一般的に推奨されています。理由は: (1) extends で拡張しやすい、(2) エラーメッセージが読みやすい、(3) 宣言のマージができる。一方、ユニオン型（type Status = "active" | "inactive"）やマッピング型は type でしか書けません。チーム内で「Props は interface、その他は type」と統一するのがおすすめです。',
-                },
-                {
-                  question: '型エラーが怖いのですが、どう対処すればいいですか？',
-                  answer: '型エラーは「コードを実行する前にバグを見つけてくれる」味方です。対処法: (1) エラーメッセージを読む - TypeScript のエラーは「期待される型」と「実際の型」を教えてくれます。(2) マウスホバーで型を確認する。(3) 赤線の部分を右クリック → Quick Fix でエディタが修正候補を出してくれることもあります。慣れるまでは時間がかかりますが、型エラーが0になったときの安心感は格別です。',
+                  answer: 'チーム内で統一されていればどちらでもOKです。おすすめは「Props は interface、バリアントの選択肢は type」という使い分けです。interface は extends で拡張しやすく、エラーメッセージも読みやすいメリットがあります。',
                 },
               ]}
             />
