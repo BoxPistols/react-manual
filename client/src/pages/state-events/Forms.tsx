@@ -1065,6 +1065,7 @@ function validate(name: string, email: string, password: string): Errors {
 
   return errors;
 }`}
+              keywords={['errors.name', 'errors.email', 'errors.password', 'return errors']}
               hints={[
                 'まず各フィールドが空でないかを .trim() で確認し、空なら「必須です」のエラーを設定します。',
                 'メール形式のチェックには正規表現 /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ を使えます。',

@@ -966,6 +966,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return state;
   }
 }`}
+              keywords={["case 'add'", "case 'remove'", "case 'updateQuantity'", '.filter(', '.map(']}
               hints={[
                 'add の場合、まず find で既存アイテムを探し、見つかれば map で quantity を +1、見つからなければ配列に追加します。',
                 'remove は filter でアイテムを除外します。',

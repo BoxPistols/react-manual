@@ -891,6 +891,7 @@ function ProductCatalog({ products }: { products: Product[] }) {
     </div>
   );
 }`}
+              keywords={['useMemo(', 'filteredNumbers', '.reduce(', '[numbers, query]']}
               hints={[
                 'useMemo(() => { ... }, [依存値]) の形で filteredNumbers を計算します。依存値は numbers と query です。',
                 'total は filteredNumbers に依存するので、filteredNumbers を依存配列に入れた別の useMemo で計算します。',

@@ -61,10 +61,12 @@ import DesignSystem from "./pages/architecture/DesignSystem";
 import Maintenance from "./pages/architecture/Maintenance";
 import NotFound from "./pages/NotFound";
 import KeyboardNav from "./components/KeyboardNav";
+import { useAutoHeadingIds } from "./hooks/useAutoHeadingIds";
 import { Toaster } from "sonner";
 
 function MainContent({ children }: { children: ReactNode }) {
   const { layoutMode } = useLayout();
+  useAutoHeadingIds();
   return (
     <main className={`flex-1 md:ml-64 w-full ${layoutMode === 'wide' ? 'layout-wide' : ''}`}>
       {children}

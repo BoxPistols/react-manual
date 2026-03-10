@@ -943,6 +943,7 @@ function ResponsiveCard({ children }) {
     </div>
   );
 }`}
+              keywords={['@media (min-width: 768px)', 'padding:', 'borderRadius']}
               hints={[
                 'オブジェクト記法では数値は自動的に px になります（例: padding: 16 → padding: 16px）',
                 'メディアクエリは文字列キーで指定します: \'@media (min-width: 768px)\': { ... }',

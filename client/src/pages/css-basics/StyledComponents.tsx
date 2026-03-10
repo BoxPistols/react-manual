@@ -1068,6 +1068,7 @@ const StyledButton = styled.button<{
     opacity: 0.9;
   }
 \`;`}
+              keywords={['$variant', '$size', 'background-color:', 'padding:']}
               hints={[
                 '${(props) => ...} の中で三項演算子を使って props の値に応じた CSS 値を返します',
                 'props.$variant === "danger" で variant を判定し、背景色を切り替えます',

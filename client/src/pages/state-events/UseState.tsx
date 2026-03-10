@@ -904,6 +904,7 @@ const toggleTodo = (id: number) => {
 const deleteTodo = (id: number) => {
   setTodos((prev) => prev.filter((todo) => todo.id !== id));
 };`}
+              keywords={['setTodos', '...prev', '.map(', '.filter(']}
               hints={[
                 'addTodo: スプレッド構文 [...prev, newTodo] で新しい配列を作りましょう',
                 'toggleTodo: map() で全要素をループし、id が一致するものだけ done を反転',

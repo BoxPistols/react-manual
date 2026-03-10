@@ -990,6 +990,7 @@ const { data, loading } = useFetch('/api/users');
 // 使い方
 // const isMobile = useMediaQuery('(max-width: 768px)');
 // const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');`}
+              keywords={['matchMedia(', 'addEventListener', 'removeEventListener', 'useEffect(']}
               hints={[
                 'window.matchMedia(query) で MediaQueryList オブジェクトを取得できます。',
                 'MediaQueryList の addEventListener("change", handler) で変化を監視します。',

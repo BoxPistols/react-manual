@@ -1010,6 +1010,7 @@ function Badge({ label, color = 'blue', size = 'sm' }: BadgeProps) {
     </span>
   );
 }`}
+              keywords={["color?:", "size?:", "'blue' | 'green' | 'red'", "'sm' | 'md'"]}
               hints={[
                 'color と size にはそれぞれ ? をつけてオプショナルにしましょう',
                 'ユニオン型（"blue" | "green" | "red"）で値を制限します',

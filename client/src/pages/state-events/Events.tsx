@@ -909,6 +909,7 @@ function App() {
     setCount((prev) => Math.max(0, prev - 1));
   }
 };`}
+              keywords={["e.key === 'r'", "e.key === 'ArrowUp'", "e.key === 'ArrowDown'", 'setCount']}
               hints={[
                 'e.key でどのキーが押されたかを判別できます。',
                 'リセットには setCount(0) を使います。',

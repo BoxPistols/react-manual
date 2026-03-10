@@ -629,6 +629,7 @@ export default App`}
             <CodingChallenge
               title="App.tsx を書き換えて自己紹介を表示しよう"
               description="App コンポーネントを書き換えて、自分の名前と好きなことを表示してください。name 変数に自分の名前、hobby 変数に趣味を入れて、JSX の中で波括弧 { } を使って埋め込みましょう。"
+              preview
               initialCode={`function App() {
   const name = ""
   const hobby = ""
@@ -656,6 +657,7 @@ export default App`}
 }
 
 export default App`}
+              keywords={['{name}', '{hobby}']}
               hints={[
                 'name と hobby に文字列を代入しましょう（例: "太郎"、"読書"）',
                 'JSX の中で {name} のように波括弧を使うと変数の値を表示できます',

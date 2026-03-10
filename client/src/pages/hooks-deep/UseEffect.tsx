@@ -871,6 +871,7 @@ const filteredItems = items.filter((item) => item.active);
     </ul>
   );
 }`}
+              keywords={['AbortController', 'fetch(', 'signal:', 'controller.abort()']}
               hints={[
                 'AbortController のインスタンスを作成し、fetch の第2引数に { signal: controller.signal } を渡します。',
                 'クリーンアップ関数で controller.abort() を呼びます。',

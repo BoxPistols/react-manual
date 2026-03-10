@@ -770,6 +770,7 @@ export default App`}
             <CodingChallenge
               title="ProfileCard コンポーネントを作ろう"
               description="名前、役職、スキルリストを表示する ProfileCard コンポーネントを作成してください。変数を使ってデータを定義し、JSX の中で表示しましょう。スキルは配列の map で表示します。"
+              preview
               initialCode={`function ProfileCard() {
   const name = ""
   const role = ""
@@ -814,6 +815,7 @@ export default ProfileCard`}
 }
 
 export default ProfileCard`}
+              keywords={['{name}', '{role}', 'skills.map']}
               hints={[
                 'name、role、skills に値を入れましょう（例: skills = ["Figma", "React"]）',
                 '{name} や {role} で変数の値をJSXの中に埋め込みます',

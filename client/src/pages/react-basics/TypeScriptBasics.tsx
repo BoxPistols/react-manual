@@ -601,6 +601,7 @@ interface InputProps {
             <CodingChallenge
               title="Figma のプロパティパネルを TypeScript で書こう"
               description="以下の Figma 設計に基づいて、StatusBadge の interface を完成させてください。label は必須の string、status は 'active' | 'inactive' | 'pending'（必須）、size は 'sm' | 'lg'（省略可、デフォルト 'sm'）です。"
+              preview
               initialCode={`import { ReactNode } from 'react';
 
 // この interface を完成させてください

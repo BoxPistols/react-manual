@@ -1313,6 +1313,7 @@ export default ProfileCard;`}
   background-color: #eff6ff;
   color: #3b82f6;
 }`}
+              keywords={['.card:hover', 'translateY', 'composes: badge']}
               hints={[
                 'card:hover では transform: translateY(-4px) で要素を上に移動させ、box-shadow を大きくします',
                 'composes: badge; と書くことで .badge クラスのスタイルを .tag に継承できます',

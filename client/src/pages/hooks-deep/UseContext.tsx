@@ -1065,6 +1065,7 @@ export function useLanguage() {
   if (!context) throw new Error('useLanguage は LanguageProvider の中で使ってください');
   return context;
 }`}
+              keywords={['createContext', 'useContext(', 'ThemeContext.Provider', 'LanguageContext.Provider', 'toggleTheme']}
               hints={[
                 'createContext のデフォルト値は undefined にして、カスタム Hook で undefined チェックを行うパターンが安全です。',
                 'Provider の value には、state と更新関数をオブジェクトにまとめて渡します。',

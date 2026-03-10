@@ -1039,6 +1039,7 @@ function Layout() {
   --radius-md: 8px;
   --radius-lg: 12px;
 }`}
+              keywords={['--color-primary', '--spacing-sm', '--radius-sm', '#3b82f6', '#10b981']}
               hints={[
                 'CSS カスタムプロパティは -- で始まります（例: --color-primary: #3b82f6;）',
                 'カテゴリごとにプレフィックスを揃えると管理しやすくなります（--color-*, --spacing-*, --radius-*）',

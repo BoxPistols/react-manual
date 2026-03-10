@@ -897,6 +897,7 @@ function App() {
             <CodingChallenge
               title="条件分岐とリストを含む JSX を書こう"
               description="メンバーリストを表示するコンポーネントを作成してください。members 配列を map で表示し、members が空の場合は「メンバーがいません」と表示するようにしましょう。"
+              preview
               initialCode={`function MemberList() {
   const members = ["田中", "鈴木", "佐藤"]
   const showTitle = true
@@ -935,6 +936,7 @@ export default MemberList`}
 }
 
 export default MemberList`}
+              keywords={['showTitle &&', 'members.length', 'members.map']}
               hints={[
                 '&& 演算子で showTitle が true のときだけ <h2> を表示しましょう',
                 '三項演算子で members.length === 0 の場合と、そうでない場合を分岐させましょう',

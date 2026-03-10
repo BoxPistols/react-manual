@@ -2,14 +2,35 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { transform } from 'sucrase';
 
 /**
+ * import 文と export キーワードを除去し、プレビュー用に整形する
+ */
+function stripModuleSyntax(code: string): string {
+  return code
+    .replace(/^import\s+.*$/gm, '')
+    .replace(/^export\s+default\s+/gm, '')
+    .replace(/^export\s+/gm, '');
+}
+
+/**
+ * コードから最初の PascalCase 関数コンポーネント名を検出する
+ */
+function detectComponentName(code: string): string {
+  const match = code.match(/function\s+([A-Z][A-Za-z0-9]*)/);
+  return match?.[1] ?? 'App';
+}
+
+/**
  * JSX/TSX コードを iframe 用 HTML に変換する
  */
 export function buildPreviewHtml(jsxCode: string, cssCode: string): string {
+  const cleanedCode = stripModuleSyntax(jsxCode);
+  const componentName = detectComponentName(cleanedCode);
+
   let transpiledCode = '';
   let errorMessage = '';
 
   try {
-    const result = transform(jsxCode, {
+    const result = transform(cleanedCode, {
       transforms: ['jsx', 'typescript'],
       jsxRuntime: 'classic',
       production: false,
@@ -40,9 +61,10 @@ ${cssCode}
 <div id="root"></div>
 <script>
 try{
+  var {useState,useEffect,useRef,useCallback,useMemo,useReducer,useContext,createContext}=React;
   ${transpiledCode}
-  if(typeof App!=='undefined'){
-    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  if(typeof ${componentName}!=='undefined'){
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(${componentName}));
   }
 }catch(e){
   document.getElementById('root').innerHTML=

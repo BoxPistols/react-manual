@@ -1094,6 +1094,7 @@ export const card = style({
     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
   },
 });`}
+              keywords={['style({', 'borderRadius', "':hover'"]}
               hints={[
                 'vanilla-extract では CSS プロパティをキャメルケースで書きます（例: border-radius → borderRadius）',
                 '数値はそのまま書くと px として解釈されます（例: padding: 24 → padding: 24px）',

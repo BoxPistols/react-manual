@@ -1169,6 +1169,7 @@ const selectedCategory = 'electronics'; // 'all' | 'electronics' | 'furniture'
 const filteredProducts = selectedCategory === 'all'
   ? products
   : products.filter((product) => product.category === selectedCategory);`}
+              keywords={['filteredProducts', '.filter(', 'selectedCategory']}
               hints={[
                 'selectedCategory が "all" のときは products をそのまま返します。',
                 '.filter() メソッドを使って、product.category が selectedCategory と一致するものだけを抽出します。',
