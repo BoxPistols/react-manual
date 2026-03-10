@@ -457,7 +457,7 @@ function App() {
             <p className="text-muted-foreground mb-3 leading-relaxed">
               「Aか、さもなければB」を表現する方法です。2択の切り替えに最適です。
             </p>
-            <CodeBlock
+            <CodePreview
               code={`function UserGreeting() {
   const isLoggedIn = true
 
@@ -470,10 +470,14 @@ function App() {
       )}
     </div>
   )
-}`}
-              language="tsx"
-              title="三項演算子による条件分岐"
-              showLineNumbers
+}
+
+function App() {
+  return <UserGreeting />
+}
+`}
+              title="三項演算子による条件分岐 → 右がブラウザ表示"
+              previewHeight={80}
             />
 
             <h3 className="text-xl font-bold text-foreground mt-8 mb-4">{'方法2: &&（論理AND）演算子'}</h3>
@@ -599,7 +603,7 @@ function App() {
             </div>
 
             <h3 className="text-xl font-bold text-foreground mt-8 mb-4">より実践的な例: オブジェクト配列のリスト表示</h3>
-            <CodeBlock
+            <CodePreview
               code={`function TeamMembers() {
   const members = [
     { id: 1, name: "田中太郎", role: "デザイナー" },
@@ -619,10 +623,14 @@ function App() {
       </ul>
     </div>
   )
-}`}
-              language="tsx"
-              title="オブジェクト配列のリスト表示"
-              showLineNumbers
+}
+
+function App() {
+  return <TeamMembers />
+}
+`}
+              title="オブジェクト配列のリスト表示 → 右がブラウザ表示"
+              previewHeight={180}
             />
           </section>
 

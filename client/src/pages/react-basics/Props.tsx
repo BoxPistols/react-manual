@@ -232,27 +232,34 @@ const userData = {
               language="tsx"
               title="オブジェクトを Props として渡す"
             />
-            <CodeBlock
-              code={`// 配列を渡す
-function TagList({ tags }: { tags: string[] }) {
+            <CodePreview
+              code={`function TagList({ tags }) {
   return (
-    <div className="flex gap-2">
+    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
       {tags.map((tag) => (
         <span
           key={tag}
-          className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm"
+          style={{
+            padding: '4px 10px',
+            backgroundColor: '#DBEAFE',
+            color: '#1D4ED8',
+            borderRadius: '6px',
+            fontSize: '14px',
+          }}
         >
           {tag}
         </span>
       ))}
     </div>
-  );
+  )
 }
 
-// 使い方
-<TagList tags={['React', 'TypeScript', 'デザイン']} />`}
-              language="tsx"
-              title="配列を Props として渡す"
+function App() {
+  return <TagList tags={['React', 'TypeScript', 'デザイン']} />
+}
+`}
+              title="配列を Props として渡す → 右がブラウザ表示"
+              previewHeight={60}
             />
           </section>
 
@@ -262,34 +269,44 @@ function TagList({ tags }: { tags: string[] }) {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               特別な Props として <code className="text-sm bg-muted px-1.5 py-0.5 rounded">children</code> があります。コンポーネントの開始タグと終了タグの間に書いた内容が children として渡されます。レイアウトやラッパーコンポーネントを作るときに非常に便利です。
             </p>
-            <CodeBlock
-              code={`import { ReactNode } from 'react';
-
-// カードのレイアウトを提供するコンポーネント
-function Card({ children, title }: { children: ReactNode; title: string }) {
+            <CodePreview
+              code={`function Card({ children, title }) {
   return (
-    <div className="border rounded-xl shadow-sm p-6">
-      <h2 className="text-lg font-bold mb-4">{title}</h2>
+    <div style={{
+      border: '1px solid #E5E7EB',
+      borderRadius: '12px',
+      padding: '20px',
+      marginBottom: '12px',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+    }}>
+      <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px' }}>
+        {title}
+      </h3>
       <div>{children}</div>
     </div>
-  );
+  )
 }
 
-// 使い方 - 中身を自由に変えられる
-<Card title="プロフィール">
-  <p>名前: 山田太郎</p>
-  <p>役職: デザイナー</p>
-</Card>
-
-<Card title="スキル">
-  <ul>
-    <li>Figma</li>
-    <li>React</li>
-    <li>TypeScript</li>
-  </ul>
-</Card>`}
-              language="tsx"
-              title="children で柔軟なコンポーネントを作る"
+function App() {
+  return (
+    <div>
+      <Card title="プロフィール">
+        <p style={{ margin: '4px 0' }}>名前: 山田太郎</p>
+        <p style={{ margin: '4px 0' }}>役職: デザイナー</p>
+      </Card>
+      <Card title="スキル">
+        <ul style={{ margin: 0, paddingLeft: '20px' }}>
+          <li>Figma</li>
+          <li>React</li>
+          <li>TypeScript</li>
+        </ul>
+      </Card>
+    </div>
+  )
+}
+`}
+              title="children で柔軟なコンポーネントを作る → 右がブラウザ表示"
+              previewHeight={280}
             />
 
             <p className="text-muted-foreground mb-4 leading-relaxed">

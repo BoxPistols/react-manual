@@ -335,4 +335,9 @@
     border-radius: 2px;
     background: var(--primary);
   }
+
+  /* ワイドレイアウトモード: max-w-4xl を拡張 */
+  .layout-wide .max-w-4xl {
+    max-width: 80rem;
+  }
 }

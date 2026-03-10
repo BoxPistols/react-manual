@@ -200,37 +200,36 @@ export default function CssInJs() {
               コンポーネントを削除すれば、関連するスタイルも自動的に消えます。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="すべてが1ファイルに凝集"
-              code={`import styled from 'styled-components';
-import { useState } from 'react';
-
-// スタイル定義
-const Wrapper = styled.div\`
-  padding: 24px;
-  border-radius: 12px;
-  background: white;
-\`;
-
-const Counter = styled.span<{ $isNegative: boolean }>\`
-  font-size: 3rem;
-  font-weight: bold;
-  color: \${(props) => (props.$isNegative ? '#ef4444' : '#10b981')};
-\`;
-
-// ロジック + マークアップ + スタイルが1つのファイルに
-export default function CounterCard() {
-  const [count, setCount] = useState(0);
+              code={`function App() {
+  var _s = React.useState(0);
+  var count = _s[0];
+  var setCount = _s[1];
 
   return (
-    <Wrapper>
-      <Counter $isNegative={count < 0}>{count}</Counter>
-      <button onClick={() => setCount(count + 1)}>+1</button>
-      <button onClick={() => setCount(count - 1)}>-1</button>
-    </Wrapper>
+    <div style={{ padding: 24, borderRadius: 12, background: 'white' }}>
+      <span style={{
+        fontSize: '3rem', fontWeight: 'bold', display: 'block', marginBottom: 12,
+        color: count < 0 ? '#ef4444' : '#10b981',
+      }}>
+        {count}
+      </span>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button
+          onClick={function() { setCount(count + 1); }}
+          style={{ padding: '8px 16px', border: 'none', borderRadius: 6, background: '#e2e8f0', cursor: 'pointer', fontWeight: 600 }}
+        >+1</button>
+        <button
+          onClick={function() { setCount(count - 1); }}
+          style={{ padding: '8px 16px', border: 'none', borderRadius: 6, background: '#e2e8f0', cursor: 'pointer', fontWeight: 600 }}
+        >-1</button>
+      </div>
+    </div>
   );
 }`}
+              previewHeight={160}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">2. 動的スタイル</h3>

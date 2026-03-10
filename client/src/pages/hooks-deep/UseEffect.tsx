@@ -188,33 +188,44 @@ function App() {
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">パターン 3: 複数の依存値</h3>
-            <CodeBlock
-              language="tsx"
-              title="どちらか一方が変わったら実行"
+            <CodePreview
+              title="どちらか一方が変わったら実行 → 検索・カテゴリを変えてみよう"
+              previewHeight={160}
               code={`function SearchResults() {
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('all');
+  const [query, setQuery] = React.useState('')
+  const [category, setCategory] = React.useState('all')
+  const [log, setLog] = React.useState('')
 
-  useEffect(() => {
-    // query または category が変わったら検索を実行
-    console.log(\`検索: "\${query}" カテゴリ: \${category}\`);
-  }, [query, category]); // ← どちらかが変われば再実行
+  React.useEffect(() => {
+    setLog('検索: "' + query + '" カテゴリ: ' + category)
+  }, [query, category])
 
   return (
-    <div>
-      <input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="検索..."
-      />
-      <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="all">すべて</option>
-        <option value="design">デザイン</option>
-        <option value="code">コード</option>
-      </select>
+    <div style={{ padding: '16px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="検索..."
+          style={{ flex: 1, minWidth: '120px', border: '1px solid #D1D5DB', borderRadius: '6px', padding: '6px 10px', fontSize: '14px' }}
+        />
+        <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ border: '1px solid #D1D5DB', borderRadius: '6px', padding: '6px 8px', fontSize: '14px' }}>
+          <option value="all">すべて</option>
+          <option value="design">デザイン</option>
+          <option value="code">コード</option>
+        </select>
+      </div>
+      <p style={{ fontSize: '13px', color: '#6B7280', backgroundColor: '#F3F4F6', padding: '8px 12px', borderRadius: '6px', fontFamily: 'monospace' }}>
+        {log || '(まだ入力されていません)'}
+      </p>
     </div>
-  );
-}`}
+  )
+}
+
+function App() {
+  return <SearchResults />
+}
+`}
             />
           </section>
 
@@ -294,76 +305,59 @@ function App() {
               useEffect の最も一般的な使い方の一つが、API からデータを取得することです。
               ローディング状態とエラー状態もあわせて管理するパターンを見てみましょう。
             </p>
-            <CodeBlock
-              language="tsx"
-              title="API データ取得の完全なパターン"
-              showLineNumbers
-              code={`import { useState, useEffect } from 'react';
+            <CodePreview
+              title="API データ取得の完全なパターン → 読み込みを確認してみよう"
+              previewHeight={360}
+              code={`function UserList() {
+  const [users, setUsers] = React.useState([])
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState(null)
 
-// 取得するデータの型を定義
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-function UserList() {
-  // 3 つの state でデータ取得を管理
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // async 関数を useEffect 内で定義
+  React.useEffect(() => {
     const fetchUsers = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
+        setLoading(true)
+        setError(null)
         const response = await fetch(
           'https://jsonplaceholder.typicode.com/users'
-        );
-
+        )
         if (!response.ok) {
-          throw new Error('データの取得に失敗しました');
+          throw new Error('データの取得に失敗しました')
         }
-
-        const data: User[] = await response.json();
-        setUsers(data);
+        const data = await response.json()
+        setUsers(data)
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : '不明なエラー'
-        );
+        setError(err instanceof Error ? err.message : '不明なエラー')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
+    fetchUsers()
+  }, [])
 
-    fetchUsers();
-  }, []); // マウント時に1回だけ取得
-
-  // ローディング中
   if (loading) {
-    return <p className="text-gray-500">読み込み中...</p>;
+    return <p style={{ padding: '16px', color: '#6B7280' }}>読み込み中...</p>
   }
-
-  // エラー時
   if (error) {
-    return <p className="text-red-500">エラー: {error}</p>;
+    return <p style={{ padding: '16px', color: '#EF4444' }}>エラー: {error}</p>
   }
 
-  // データ表示
   return (
-    <ul className="space-y-2">
+    <ul style={{ listStyle: 'none', padding: '8px 16px', margin: 0 }}>
       {users.map((user) => (
-        <li key={user.id} className="p-3 border rounded">
-          <p className="font-bold">{user.name}</p>
-          <p className="text-sm text-gray-500">{user.email}</p>
+        <li key={user.id} style={{ padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: '6px', marginBottom: '6px' }}>
+          <p style={{ fontWeight: 'bold', fontSize: '14px', margin: '0 0 2px 0' }}>{user.name}</p>
+          <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>{user.email}</p>
         </li>
       ))}
     </ul>
-  );
-}`}
+  )
+}
+
+function App() {
+  return <UserList />
+}
+`}
             />
 
             <div className="mt-6 mb-6">
@@ -548,83 +542,67 @@ function UserList() {
               依存配列に検索キーワードを入れることで、入力が変わるたびに自動的にデータを再取得できます。
               AbortController を使ったレースコンディション対策も含めた完全版です。
             </p>
-            <CodeBlock
-              language="tsx"
-              title="検索連動のデータ取得（レースコンディション対策済み）"
-              showLineNumbers
-              code={`import { useState, useEffect } from 'react';
+            <CodePreview
+              title="検索連動のデータ取得 → キーワードを入力してみよう"
+              previewHeight={340}
+              code={`function SearchPosts() {
+  const [query, setQuery] = React.useState('')
+  const [posts, setPosts] = React.useState([])
+  const [loading, setLoading] = React.useState(false)
 
-interface Post {
-  id: number;
-  title: string;
-  body: string;
-}
-
-function SearchPosts() {
-  const [query, setQuery] = useState('');
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // 空文字のときは検索しない
+  React.useEffect(() => {
     if (!query.trim()) {
-      setPosts([]);
-      return;
+      setPosts([])
+      return
     }
-
-    // AbortController でリクエストのキャンセルが可能
-    const controller = new AbortController();
-
+    const controller = new AbortController()
     const searchPosts = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
         const res = await fetch(
-          \`https://jsonplaceholder.typicode.com/posts?q=\${query}\`,
+          'https://jsonplaceholder.typicode.com/posts?q=' + query,
           { signal: controller.signal }
-        );
-        const data: Post[] = await res.json();
-        setPosts(data);
+        )
+        const data = await res.json()
+        setPosts(data.slice(0, 5))
       } catch (err) {
-        // キャンセルされた場合はエラーを無視
-        if (err instanceof DOMException && err.name === 'AbortError') {
-          return;
-        }
-        console.error(err);
+        if (err instanceof DOMException && err.name === 'AbortError') return
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-
-    searchPosts();
-
-    // クリーンアップ: 前のリクエストをキャンセル
-    return () => {
-      controller.abort();
-    };
-  }, [query]); // query が変わるたびに再実行
+    }
+    searchPosts()
+    return () => controller.abort()
+  }, [query])
 
   return (
-    <div>
+    <div style={{ padding: '16px' }}>
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="記事を検索..."
-        className="border rounded px-3 py-2 w-full mb-4"
+        placeholder="記事を検索...（例: react, javascript）"
+        style={{ width: '100%', border: '1px solid #D1D5DB', borderRadius: '6px', padding: '8px 12px', fontSize: '14px', marginBottom: '12px' }}
       />
-      {loading && <p>検索中...</p>}
-      <ul className="space-y-2">
+      {loading && <p style={{ fontSize: '13px', color: '#6B7280' }}>検索中...</p>}
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {posts.map((post) => (
-          <li key={post.id} className="p-3 border rounded">
-            <h3 className="font-bold">{post.title}</h3>
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {post.body}
-            </p>
+          <li key={post.id} style={{ padding: '8px 12px', border: '1px solid #E5E7EB', borderRadius: '6px', marginBottom: '6px' }}>
+            <h3 style={{ fontWeight: 'bold', fontSize: '14px', margin: '0 0 4px 0' }}>{post.title}</h3>
+            <p style={{ fontSize: '12px', color: '#6B7280', margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{post.body}</p>
           </li>
         ))}
       </ul>
+      {!loading && query && posts.length === 0 && (
+        <p style={{ fontSize: '13px', color: '#9CA3AF', textAlign: 'center', padding: '16px' }}>結果が見つかりませんでした</p>
+      )}
     </div>
-  );
-}`}
+  )
+}
+
+function App() {
+  return <SearchPosts />
+}
+`}
             />
 
             <div className="mt-6 mb-6">

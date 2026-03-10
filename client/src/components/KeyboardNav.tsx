@@ -1,12 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { ChevronLeft, ChevronRight, Command, ArrowUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   getNextPage,
   getPreviousPage,
   getPageByPath,
-  getNextSectionFirstPage,
-  getPrevSectionFirstPage,
   pages,
 } from '@/lib/navigation';
 
@@ -45,42 +43,6 @@ export default function KeyboardNav() {
         return;
       }
 
-      // ← → ページ送り
-      if (e.key === 'ArrowRight' && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
-        const next = getNextPage(location);
-        if (next) {
-          e.preventDefault();
-          navigate(next.path, `→ ${next.title}`);
-        }
-        return;
-      }
-      if (e.key === 'ArrowLeft' && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
-        const prev = getPreviousPage(location);
-        if (prev) {
-          e.preventDefault();
-          navigate(prev.path, `← ${prev.title}`);
-        }
-        return;
-      }
-
-      // Shift + ← → セクション移動
-      if (e.shiftKey && e.key === 'ArrowRight') {
-        const next = getNextSectionFirstPage(location);
-        if (next) {
-          e.preventDefault();
-          navigate(next.path, `⇒ ${next.title}`);
-        }
-        return;
-      }
-      if (e.shiftKey && e.key === 'ArrowLeft') {
-        const prev = getPrevSectionFirstPage(location);
-        if (prev) {
-          e.preventDefault();
-          navigate(prev.path, `⇐ ${prev.title}`);
-        }
-        return;
-      }
-
       // Home → トップへ戻る
       if (e.key === 'Home' || (e.key === 'ArrowUp' && e.metaKey)) {
         e.preventDefault();
@@ -111,11 +73,10 @@ export default function KeyboardNav() {
           onClick={() => prevPage && navigate(prevPage.path, `← ${prevPage.title}`)}
           disabled={!prevPage}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          title="前のステップ (←)"
+          title="前のステップ"
         >
           <ChevronLeft size={14} />
           <span className="hidden lg:inline max-w-[120px] truncate">{prevPage?.title ?? '---'}</span>
-          <kbd className="ml-1 px-1.5 py-0.5 rounded bg-muted border border-border text-[10px] font-mono">←</kbd>
         </button>
 
         {/* 現在位置 */}
@@ -138,10 +99,9 @@ export default function KeyboardNav() {
           onClick={() => nextPage && navigate(nextPage.path, `→ ${nextPage.title}`)}
           disabled={!nextPage}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          title="次のステップ (→)"
+          title="次のステップ"
         >
           <span className="hidden lg:inline max-w-[120px] truncate">{nextPage?.title ?? '---'}</span>
-          <kbd className="mr-1 px-1.5 py-0.5 rounded bg-muted border border-border text-[10px] font-mono">→</kbd>
           <ChevronRight size={14} />
         </button>
 
@@ -150,11 +110,6 @@ export default function KeyboardNav() {
 
         {/* ショートカット一覧 */}
         <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60">
-          <span className="flex items-center gap-0.5">
-            <kbd className="px-1 py-0.5 rounded bg-muted/60 border border-border/50 font-mono">Shift</kbd>
-            <kbd className="px-1 py-0.5 rounded bg-muted/60 border border-border/50 font-mono">←→</kbd>
-            <span className="ml-0.5">セクション</span>
-          </span>
           <span className="flex items-center gap-0.5">
             <kbd className="px-1 py-0.5 rounded bg-muted/60 border border-border/50 font-mono">{mod}+K</kbd>
             <span className="ml-0.5">検索</span>

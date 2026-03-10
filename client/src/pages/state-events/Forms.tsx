@@ -174,80 +174,66 @@ function UncontrolledInput() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               テキスト系の入力要素は、いずれも同じパターン（value + onChange）で制御します。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`function TextInputs() {
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [bio, setBio] = React.useState('');
 
-function TextInputs() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [bio, setBio] = useState('');
+  const inputStyle = {
+    width: '100%', padding: '8px 12px',
+    border: '1px solid #d1d5db', borderRadius: '8px',
+    fontSize: '14px', outline: 'none',
+  };
+  const labelStyle = { display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '4px' };
 
   return (
-    <div className="p-6 max-w-md space-y-4">
+    <div style={{ padding: '24px', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* 通常のテキスト入力 */}
       <div>
-        <label className="block text-sm font-medium mb-1">名前</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="山田太郎"
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none"
-        />
+        <label style={labelStyle}>名前</label>
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+          placeholder="山田太郎" style={inputStyle} />
       </div>
 
-      {/* メール入力（ブラウザのバリデーションが効く） */}
+      {/* メール入力 */}
       <div>
-        <label className="block text-sm font-medium mb-1">メールアドレス</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="example@email.com"
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none"
-        />
+        <label style={labelStyle}>メールアドレス</label>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+          placeholder="example@email.com" style={inputStyle} />
       </div>
 
       {/* パスワード入力 */}
       <div>
-        <label className="block text-sm font-medium mb-1">パスワード</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="8文字以上"
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none"
-        />
+        <label style={labelStyle}>パスワード</label>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+          placeholder="8文字以上" style={inputStyle} />
         {password.length > 0 && password.length < 8 && (
-          <p className="text-sm text-red-500 mt-1">8文字以上で入力してください</p>
+          <p style={{ fontSize: '13px', color: '#ef4444', marginTop: '4px' }}>8文字以上で入力してください</p>
         )}
       </div>
 
       {/* テキストエリア */}
       <div>
-        <label className="block text-sm font-medium mb-1">
+        <label style={labelStyle}>
           自己紹介
-          <span className="text-gray-400 ml-2">{bio.length}/200</span>
+          <span style={{ color: '#9ca3af', marginLeft: '8px' }}>{bio.length}/200</span>
         </label>
-        <textarea
-          value={bio}
-          onChange={(e) => {
-            if (e.target.value.length <= 200) {
-              setBio(e.target.value);
-            }
-          }}
+        <textarea value={bio}
+          onChange={(e) => { if (e.target.value.length <= 200) setBio(e.target.value); }}
           placeholder="自己紹介を書いてください..."
           rows={4}
-          className="w-full px-3 py-2 border rounded-lg resize-none focus:ring-2 focus:ring-blue-300 outline-none"
-        />
+          style={{ ...inputStyle, resize: 'none' }} />
       </div>
     </div>
   );
-}`}
+}
+
+function App() { return <TextInputs /> }`}
               language="tsx"
               title="テキスト入力のバリエーション"
-              showLineNumbers
+              previewHeight={360}
             />
           </section>
 
@@ -423,78 +409,76 @@ function App() { return <CheckboxRadio /> }`}
             <p className="text-muted-foreground mb-4 leading-relaxed">
               複数の入力をまとめてフォームとして送信する方法です。<code className="text-sm bg-muted px-1.5 py-0.5 rounded">{'<form>'}</code> タグの <code className="text-sm bg-muted px-1.5 py-0.5 rounded">onSubmit</code> でまとめて処理します。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-function SignupForm() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+            <CodePreview
+              code={`function SignupForm() {
+  const [formData, setFormData] = React.useState({
+    username: '', email: '', password: '', confirmPassword: '',
   });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();  // ページ再読み込みを防止
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert('パスワードが一致しません');
       return;
     }
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log('送信データ:', formData);
-    setIsSubmitting(false);
+    setTimeout(() => {
+      alert('送信データ: ' + JSON.stringify(formData, null, 2));
+      setIsSubmitting(false);
+    }, 1500);
   };
 
+  const inputStyle = {
+    width: '100%', padding: '8px 12px',
+    border: '1px solid #d1d5db', borderRadius: '8px',
+    fontSize: '14px', outline: 'none',
+  };
+  const labelStyle = { display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '4px' };
+
   return (
-    <form onSubmit={handleSubmit} className="p-6 max-w-md space-y-4">
-      <h2 className="text-xl font-bold">アカウント作成</h2>
+    <form onSubmit={handleSubmit} style={{ padding: '24px', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>アカウント作成</h2>
       <div>
-        <label className="block text-sm font-medium mb-1">ユーザー名</label>
-        <input
-          type="text" value={formData.username}
+        <label style={labelStyle}>ユーザー名</label>
+        <input type="text" value={formData.username} required
           onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-          required className="w-full px-3 py-2 border rounded-lg"
-        />
+          style={inputStyle} />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">メール</label>
-        <input
-          type="email" value={formData.email}
+        <label style={labelStyle}>メール</label>
+        <input type="email" value={formData.email} required
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required className="w-full px-3 py-2 border rounded-lg"
-        />
+          style={inputStyle} />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">パスワード</label>
-        <input
-          type="password" value={formData.password}
+        <label style={labelStyle}>パスワード</label>
+        <input type="password" value={formData.password} required minLength={8}
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          required minLength={8} className="w-full px-3 py-2 border rounded-lg"
-        />
+          style={inputStyle} />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">パスワード（確認）</label>
-        <input
-          type="password" value={formData.confirmPassword}
+        <label style={labelStyle}>パスワード（確認）</label>
+        <input type="password" value={formData.confirmPassword} required
           onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-          required className="w-full px-3 py-2 border rounded-lg"
-        />
+          style={inputStyle} />
       </div>
-      <button type="submit" disabled={isSubmitting}
-        className={\`w-full py-2 rounded-lg text-white font-medium
-          \${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}\`}
-      >
+      <button type="submit" disabled={isSubmitting} style={{
+        width: '100%', padding: '10px', borderRadius: '8px', border: 'none',
+        color: '#fff', fontWeight: 500, fontSize: '14px',
+        backgroundColor: isSubmitting ? '#9ca3af' : '#3b82f6',
+        cursor: isSubmitting ? 'not-allowed' : 'pointer',
+      }}>
         {isSubmitting ? '送信中...' : 'アカウントを作成'}
       </button>
     </form>
   );
-}`}
+}
+
+function App() { return <SignupForm /> }`}
               language="tsx"
               title="フォーム送信の実装"
-              showLineNumbers
+              previewHeight={380}
             />
           </section>
 
