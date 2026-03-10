@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Copy, Check, Eye, Code2, Maximize2, Minimize2, RotateCcw } from 'lucide-react';
 import { Highlight, themes, type Language } from 'prism-react-renderer';
-import { transform } from 'sucrase';
+import { useBlobUrl, useDebouncedPreview } from '@/lib/preview';
 
 interface CodePreviewProps {
   /** 初期コード文字列 */
@@ -27,54 +27,6 @@ function resolveLanguage(lang: string): Language {
   return languageMap[lang.toLowerCase()] ?? (lang.toLowerCase() as Language);
 }
 
-function buildHtml(jsxCode: string, cssCode: string): string {
-  let transpiledCode = '';
-  let errorMessage = '';
-
-  try {
-    const result = transform(jsxCode, {
-      transforms: ['jsx', 'typescript'],
-      jsxRuntime: 'classic',
-      production: false,
-    });
-    transpiledCode = result.code;
-  } catch (e: unknown) {
-    errorMessage = e instanceof Error ? e.message : String(e);
-  }
-
-  if (errorMessage) {
-    return `<!DOCTYPE html>
-<html><head><meta charset="utf-8">
-<style>body{font-family:system-ui;margin:0;padding:16px;background:#1e1e2e;color:#f38ba8;}
-pre{white-space:pre-wrap;font-size:13px;line-height:1.5;}</style></head>
-<body><pre>${errorMessage.replace(/</g, '&lt;')}</pre></body></html>`;
-  }
-
-  return `<!DOCTYPE html>
-<html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Work Sans',system-ui,sans-serif;padding:16px;background:#fff;color:#1f2937;line-height:1.6;}
-${cssCode}
-</style></head><body>
-<div id="root"></div>
-<script>
-try{
-  ${transpiledCode}
-  if(typeof App!=='undefined'){
-    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-  }
-}catch(e){
-  document.getElementById('root').innerHTML=
-    '<div style="color:#ef4444;padding:16px;font-size:13px;font-family:monospace;">'+
-    '<strong>Error:</strong> '+e.message.replace(/</g,'&lt;')+'</div>';
-}
-</script></body></html>`;
-}
-
 export default function CodePreview({
   code,
   language = 'tsx',
@@ -87,46 +39,23 @@ export default function CodePreview({
   const [copied, setCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<'both' | 'code' | 'preview'>('both');
-  const blobUrlRef = useRef('');
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const [previewHtml, setPreviewHtml] = useState('');
   const highlightRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // code prop が変わったら editableCode をリセット
+  useEffect(() => {
+    setEditableCode(code);
+  }, [code]);
 
   const isModified = editableCode !== code;
   const prismLanguage = resolveLanguage(language);
   const canPreview = language === 'tsx' || language === 'jsx';
   const isHorizontal = layout === 'horizontal';
 
-  // デバウンス付きプレビュー生成
-  const buildPreview = useCallback(() => {
-    if (language === 'css' || language === 'html') {
-      setPreviewHtml('');
-      return;
-    }
-    setPreviewHtml(buildHtml(editableCode, css));
-  }, [editableCode, css, language]);
-
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(buildPreview, 300);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [buildPreview]);
-
-  useEffect(() => { buildPreview(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
-
-  // Blob URL 管理
-  const blobUrl = useMemo(() => {
-    if (!previewHtml) return '';
-    if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
-    const url = URL.createObjectURL(new Blob([previewHtml], { type: 'text/html' }));
-    blobUrlRef.current = url;
-    return url;
-  }, [previewHtml]);
-
-  useEffect(() => {
-    return () => { if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current); };
-  }, []);
+  // デバウンス付きプレビュー生成（共通フック）
+  const previewHtml = useDebouncedPreview(editableCode, css, canPreview);
+  // blob URL 管理（副作用を useEffect で安全に処理）
+  const blobUrl = useBlobUrl(previewHtml);
 
   const handleReset = () => setEditableCode(code);
 
@@ -214,6 +143,7 @@ export default function CodePreview({
       <div className="bg-white flex-1" style={!isExpanded ? { height: previewHeight } : undefined}>
         <iframe
           src={blobUrl}
+          sandbox="allow-scripts"
           title="プレビュー"
           className="w-full h-full border-0"
           style={{ minHeight: isExpanded ? undefined : previewHeight }}

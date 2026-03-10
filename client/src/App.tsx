@@ -77,72 +77,72 @@ function App() {
     <ThemeProvider>
       <PlatformProvider>
         <LayoutProvider>
-        <div className="flex min-h-screen bg-background text-foreground font-sans">
-          <Navigation />
-          <KeyboardNav />
-          <MainContent>
-            <Switch>
-              <Route path="/" component={Home} />
-            <Route path="/intro/setup" component={Setup} />
-            <Route path="/react-basics/hello-react" component={HelloReact} />
-            <Route path="/react-basics/jsx" component={Jsx} />
-            <Route path="/react-basics/components" component={Components} />
-            <Route path="/react-basics/props" component={Props} />
-            <Route path="/react-basics/typescript" component={TypeScriptBasics} />
-            <Route path="/state-events/use-state" component={UseState} />
-            <Route path="/state-events/events" component={Events} />
-            <Route path="/state-events/conditional-list" component={ConditionalList} />
-            <Route path="/state-events/forms" component={Forms} />
-            <Route path="/hooks-deep/use-effect" component={UseEffect} />
-            <Route path="/hooks-deep/use-context" component={UseContext} />
-            <Route path="/hooks-deep/use-reducer" component={UseReducer} />
-            <Route path="/hooks-deep/memo-callback" component={MemoCallback} />
-            <Route path="/hooks-deep/custom-hooks" component={CustomHooks} />
-            <Route path="/css-basics/plain-css" component={PlainCss} />
-            <Route path="/css-basics/css-in-js" component={CssInJs} />
-            <Route path="/css-basics/styled-components" component={StyledComponents} />
-            <Route path="/css-basics/emotion" component={EmotionPage} />
-            <Route path="/css-basics/css-patterns" component={CssPatterns} />
-            <Route path="/tailwind/intro" component={Intro} />
-            <Route path="/tailwind/responsive-dark" component={ResponsiveDark} />
-            <Route path="/tailwind/shadcn" component={Shadcn} />
-            <Route path="/mui/intro" component={MuiIntro} />
-            <Route path="/mui/components" component={MuiComponents} />
-            <Route path="/mui/customization" component={MuiCustomization} />
-            <Route path="/practice-app/api" component={Api} />
-            <Route path="/practice-app/routing" component={Routing} />
-            <Route path="/practice-app/portfolio" component={Portfolio} />
-            <Route path="/nextjs-basics/what-is-nextjs" component={WhatIsNextjs} />
-            <Route path="/nextjs-basics/project-setup" component={ProjectSetup} />
-            <Route path="/nextjs-basics/routing" component={NextRouting} />
-            <Route path="/nextjs-basics/layout" component={Layout} />
-            <Route path="/nextjs-server/rsc" component={Rsc} />
-            <Route path="/nextjs-server/client" component={ClientComponents} />
-            <Route path="/nextjs-server/data-fetching" component={DataFetching} />
-            <Route path="/nextjs-server/loading-error" component={LoadingError} />
-            <Route path="/nextjs-practice/route-handlers" component={RouteHandlers} />
-            <Route path="/nextjs-practice/server-actions" component={ServerActions} />
-            <Route path="/nextjs-practice/middleware" component={Middleware} />
-            <Route path="/nextjs-practice/optimization" component={Optimization} />
-            <Route path="/nextjs-css/tailwind-mui" component={TailwindMui} />
-            <Route path="/nextjs-css/css-modules-sc" component={CssModulesSc} />
-            <Route path="/deploy/vercel" component={Vercel} />
-            <Route path="/deploy/summary" component={Summary} />
-            <Route path="/storybook/intro" component={SbIntro} />
-            <Route path="/storybook/setup" component={SbSetup} />
-            <Route path="/storybook/structure" component={SbStructure} />
-            <Route path="/storybook/css" component={SbCss} />
-            <Route path="/storybook/figma" component={SbFigma} />
-            <Route path="/storybook/advanced" component={SbAdvanced} />
-            <Route path="/architecture/overview" component={ArchOverview} />
-            <Route path="/architecture/design-system" component={DesignSystem} />
-            <Route path="/architecture/maintenance" component={Maintenance} />
-            <Route component={NotFound} />
-          </Switch>
-        </MainContent>
-      </div>
-      <Toaster position="bottom-right" />
-      </LayoutProvider>
+          <div className="flex min-h-screen bg-background text-foreground font-sans">
+            <Navigation />
+            <KeyboardNav />
+            <MainContent>
+              <Switch>
+                <Route path="/" component={Home} />
+                <Route path="/intro/setup" component={Setup} />
+                <Route path="/react-basics/hello-react" component={HelloReact} />
+                <Route path="/react-basics/jsx" component={Jsx} />
+                <Route path="/react-basics/components" component={Components} />
+                <Route path="/react-basics/props" component={Props} />
+                <Route path="/react-basics/typescript" component={TypeScriptBasics} />
+                <Route path="/state-events/use-state" component={UseState} />
+                <Route path="/state-events/events" component={Events} />
+                <Route path="/state-events/conditional-list" component={ConditionalList} />
+                <Route path="/state-events/forms" component={Forms} />
+                <Route path="/hooks-deep/use-effect" component={UseEffect} />
+                <Route path="/hooks-deep/use-context" component={UseContext} />
+                <Route path="/hooks-deep/use-reducer" component={UseReducer} />
+                <Route path="/hooks-deep/memo-callback" component={MemoCallback} />
+                <Route path="/hooks-deep/custom-hooks" component={CustomHooks} />
+                <Route path="/css-basics/plain-css" component={PlainCss} />
+                <Route path="/css-basics/css-in-js" component={CssInJs} />
+                <Route path="/css-basics/styled-components" component={StyledComponents} />
+                <Route path="/css-basics/emotion" component={EmotionPage} />
+                <Route path="/css-basics/css-patterns" component={CssPatterns} />
+                <Route path="/tailwind/intro" component={Intro} />
+                <Route path="/tailwind/responsive-dark" component={ResponsiveDark} />
+                <Route path="/tailwind/shadcn" component={Shadcn} />
+                <Route path="/mui/intro" component={MuiIntro} />
+                <Route path="/mui/components" component={MuiComponents} />
+                <Route path="/mui/customization" component={MuiCustomization} />
+                <Route path="/practice-app/api" component={Api} />
+                <Route path="/practice-app/routing" component={Routing} />
+                <Route path="/practice-app/portfolio" component={Portfolio} />
+                <Route path="/nextjs-basics/what-is-nextjs" component={WhatIsNextjs} />
+                <Route path="/nextjs-basics/project-setup" component={ProjectSetup} />
+                <Route path="/nextjs-basics/routing" component={NextRouting} />
+                <Route path="/nextjs-basics/layout" component={Layout} />
+                <Route path="/nextjs-server/rsc" component={Rsc} />
+                <Route path="/nextjs-server/client" component={ClientComponents} />
+                <Route path="/nextjs-server/data-fetching" component={DataFetching} />
+                <Route path="/nextjs-server/loading-error" component={LoadingError} />
+                <Route path="/nextjs-practice/route-handlers" component={RouteHandlers} />
+                <Route path="/nextjs-practice/server-actions" component={ServerActions} />
+                <Route path="/nextjs-practice/middleware" component={Middleware} />
+                <Route path="/nextjs-practice/optimization" component={Optimization} />
+                <Route path="/nextjs-css/tailwind-mui" component={TailwindMui} />
+                <Route path="/nextjs-css/css-modules-sc" component={CssModulesSc} />
+                <Route path="/deploy/vercel" component={Vercel} />
+                <Route path="/deploy/summary" component={Summary} />
+                <Route path="/storybook/intro" component={SbIntro} />
+                <Route path="/storybook/setup" component={SbSetup} />
+                <Route path="/storybook/structure" component={SbStructure} />
+                <Route path="/storybook/css" component={SbCss} />
+                <Route path="/storybook/figma" component={SbFigma} />
+                <Route path="/storybook/advanced" component={SbAdvanced} />
+                <Route path="/architecture/overview" component={ArchOverview} />
+                <Route path="/architecture/design-system" component={DesignSystem} />
+                <Route path="/architecture/maintenance" component={Maintenance} />
+                <Route component={NotFound} />
+              </Switch>
+            </MainContent>
+          </div>
+          <Toaster position="bottom-right" />
+        </LayoutProvider>
       </PlatformProvider>
     </ThemeProvider>
   );

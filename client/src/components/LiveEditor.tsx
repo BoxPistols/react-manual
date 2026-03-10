@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { transform } from 'sucrase';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw, Maximize2, Minimize2, Eye, Code2 } from 'lucide-react';
+import { buildPreviewHtml, useBlobUrl } from '@/lib/preview';
 
 // --- 型定義 ---
 interface FileTab {
@@ -26,76 +26,6 @@ interface LiveEditorProps {
   autoRun?: boolean;
 }
 
-// --- iframe 用の HTML テンプレート ---
-function buildPreviewHtml(jsxCode: string, cssCode: string): string {
-  let transpiledCode = '';
-  let errorMessage = '';
-
-  try {
-    const result = transform(jsxCode, {
-      transforms: ['jsx', 'typescript'],
-      jsxRuntime: 'classic',
-      production: false,
-    });
-    transpiledCode = result.code;
-  } catch (e: unknown) {
-    errorMessage = e instanceof Error ? e.message : String(e);
-  }
-
-  if (errorMessage) {
-    return `<!DOCTYPE html>
-<html><head><meta charset="utf-8">
-<style>
-  body { font-family: 'Inter', system-ui, sans-serif; margin: 0; padding: 20px; background: #1e1e2e; color: #f38ba8; }
-  pre { white-space: pre-wrap; word-break: break-word; font-size: 13px; line-height: 1.6; }
-  .label { color: #fab387; font-weight: bold; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; }
-</style></head>
-<body>
-  <div class="label">コンパイルエラー</div>
-  <pre>${errorMessage.replace(/</g, '&lt;')}</pre>
-</body></html>`;
-  }
-
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      padding: 16px;
-      background: #ffffff;
-      color: #1f2937;
-      line-height: 1.6;
-    }
-    ${cssCode}
-  </style>
-</head>
-<body>
-  <div id="root"></div>
-  <script>
-    try {
-      ${transpiledCode}
-
-      // App コンポーネントを探してレンダリング
-      if (typeof App !== 'undefined') {
-        ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-      }
-    } catch (e) {
-      document.getElementById('root').innerHTML =
-        '<div style="color:#ef4444;padding:16px;font-size:13px;font-family:monospace;">' +
-        '<strong>ランタイムエラー:</strong><br>' +
-        e.message.replace(/</g, '&lt;') + '</div>';
-    }
-  </script>
-</body>
-</html>`;
-}
-
 // --- メインコンポーネント ---
 export default function LiveEditor({
   title,
@@ -113,7 +43,6 @@ export default function LiveEditor({
   const [viewMode, setViewMode] = useState<'split' | 'code' | 'preview'>('split');
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const blobUrlRef = useRef('');
 
   // プレビューを生成
   const runPreview = useCallback(() => {
@@ -139,19 +68,8 @@ export default function LiveEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const blobUrl = useMemo(() => {
-    if (!previewHtml) return '';
-    if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
-    const url = URL.createObjectURL(new Blob([previewHtml], { type: 'text/html' }));
-    blobUrlRef.current = url;
-    return url;
-  }, [previewHtml]);
-
-  useEffect(() => {
-    return () => {
-      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
-    };
-  }, []);
+  // blob URL 管理（副作用を useEffect で安全に処理）
+  const blobUrl = useBlobUrl(previewHtml);
 
   const handleCodeChange = (value: string) => {
     setFiles((prev) =>
@@ -326,6 +244,7 @@ export default function LiveEditor({
               <iframe
                 ref={iframeRef}
                 src={blobUrl}
+                sandbox="allow-scripts"
                 title="プレビュー"
                 className="w-full h-full border-0"
                 style={{ minHeight: previewHeight }}
