@@ -61,8 +61,8 @@ function buildPreviewHtml(jsxCode: string, cssCode: string): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://unpkg.com/react@19/umd/react.development.js"><\/script>
-  <script src="https://unpkg.com/react-dom@19/umd/react-dom.development.js"><\/script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -312,7 +312,7 @@ export default function LiveEditor({
                 ref={iframeRef}
                 srcDoc={previewHtml}
                 title="プレビュー"
-                sandbox="allow-scripts"
+                sandbox="allow-scripts allow-same-origin"
                 className="w-full h-full border-0"
                 style={{ minHeight: previewHeight }}
               />

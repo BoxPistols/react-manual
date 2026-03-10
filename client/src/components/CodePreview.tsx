@@ -55,8 +55,8 @@ pre{white-space:pre-wrap;font-size:13px;line-height:1.5;}</style></head>
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://unpkg.com/react@19/umd/react.development.js"><\/script>
-<script src="https://unpkg.com/react-dom@19/umd/react-dom.development.js"><\/script>
+<script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Work Sans',system-ui,sans-serif;padding:16px;background:#fff;color:#1f2937;line-height:1.6;}
@@ -211,7 +211,7 @@ export default function CodePreview({
               <iframe
                 srcDoc={previewHtml}
                 title="プレビュー"
-                sandbox="allow-scripts"
+                sandbox="allow-scripts allow-same-origin"
                 className="w-full h-full border-0"
                 style={{ minHeight: previewHeight }}
               />
