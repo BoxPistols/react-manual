@@ -260,42 +260,41 @@ function App() {
               プロパティ名の後に <code className="text-sm bg-muted px-1.5 py-0.5 rounded">?</code> をつけると、その Props は省略可能になります。省略された場合の値は <code className="text-sm bg-muted px-1.5 py-0.5 rounded">undefined</code> です。
             </p>
             <CodePreview
-              code={`function Avatar({ src, alt, size = 48, rounded = true, border = false }) {
+              code={`function Avatar({ name, size = 48, rounded = true, color = '#2563eb' }) {
+  const initials = name.split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase();
   return (
-    <img
-      src={src}
-      alt={alt}
-      style={{
-        width: size,
-        height: size,
-        objectFit: 'cover',
-        borderRadius: rounded ? '50%' : '8px',
-        border: border ? '2px solid #fff' : 'none',
-        boxShadow: border ? '0 1px 3px rgba(0,0,0,0.2)' : 'none',
-      }}
-    />
+    <div style={{
+      width: size, height: size,
+      borderRadius: rounded ? '50%' : '8px',
+      backgroundColor: color,
+      color: '#fff',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: size * 0.4, fontWeight: 700,
+      fontFamily: 'system-ui, sans-serif',
+    }}>
+      {initials}
+    </div>
   );
 }
 
 function App() {
-  const imgUrl = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix';
   return (
     <div style={{ display: 'flex', gap: '16px', alignItems: 'end', flexWrap: 'wrap' }}>
       <div style={{ textAlign: 'center' }}>
-        <Avatar src={imgUrl} alt="デフォルト" />
+        <Avatar name="田中 花子" />
         <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>デフォルト</p>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <Avatar src={imgUrl} alt="大きい" size={64} />
+        <Avatar name="佐藤 太郎" size={64} />
         <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>size=64</p>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <Avatar src={imgUrl} alt="角丸" size={64} rounded={false} />
+        <Avatar name="鈴木 一" size={64} rounded={false} />
         <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>rounded=false</p>
       </div>
-      <div style={{ textAlign: 'center', backgroundColor: '#3b82f6', padding: '8px', borderRadius: '8px' }}>
-        <Avatar src={imgUrl} alt="ボーダー" size={56} border={true} />
-        <p style={{ fontSize: '11px', color: '#fff', marginTop: '4px' }}>border=true</p>
+      <div style={{ textAlign: 'center' }}>
+        <Avatar name="山田 花" size={56} color="#7c3aed" />
+        <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>color指定</p>
       </div>
     </div>
   );
