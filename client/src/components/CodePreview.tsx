@@ -223,48 +223,48 @@ export default function CodePreview({
           <span className="text-[10px] font-mono text-[#cdd6f4]/40 uppercase">{language}</span>
         )}
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5">
         {canPreview && (
           <>
             <button
               onClick={() => setViewMode(viewMode === 'code' ? 'both' : 'code')}
-              className={`p-1 rounded hover:bg-[#313244] transition-colors ${viewMode === 'code' ? 'text-blue-400' : 'text-[#cdd6f4]/40'}`}
+              className={`p-1.5 rounded hover:bg-[#313244] transition-colors ${viewMode === 'code' ? 'text-blue-400' : 'text-[#cdd6f4]/40'}`}
               title="コード"
             >
-              <Code2 size={13} />
+              <Code2 size={16} />
             </button>
             <button
               onClick={() => setViewMode(viewMode === 'preview' ? 'both' : 'preview')}
-              className={`p-1 rounded hover:bg-[#313244] transition-colors ${viewMode === 'preview' ? 'text-blue-400' : 'text-[#cdd6f4]/40'}`}
+              className={`p-1.5 rounded hover:bg-[#313244] transition-colors ${viewMode === 'preview' ? 'text-blue-400' : 'text-[#cdd6f4]/40'}`}
               title="プレビュー"
             >
-              <Eye size={13} />
+              <Eye size={16} />
             </button>
           </>
         )}
         {isModified && (
           <button
             onClick={handleReset}
-            className="p-1 rounded hover:bg-[#313244] text-[#f9e2af] hover:text-[#f9e2af] transition-colors"
+            className="p-1.5 rounded hover:bg-[#313244] text-[#f9e2af] hover:text-[#f9e2af] transition-colors"
             title="リセット"
           >
-            <RotateCcw size={13} />
+            <RotateCcw size={16} />
           </button>
         )}
         <button
           onClick={handleCopy}
-          className="p-1 rounded hover:bg-[#313244] transition-colors"
+          className="p-1.5 rounded hover:bg-[#313244] transition-colors"
           title="コピー"
         >
-          {copied ? <Check size={13} className="text-[#a6e3a1]" /> : <Copy size={13} className="text-[#cdd6f4]/40" />}
+          {copied ? <Check size={16} className="text-[#a6e3a1]" /> : <Copy size={16} className="text-[#cdd6f4]/40" />}
         </button>
         {canPreview && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 rounded hover:bg-[#313244] text-[#cdd6f4]/40 hover:text-[#cdd6f4] transition-colors"
+            className="p-1.5 rounded hover:bg-[#313244] text-[#cdd6f4]/40 hover:text-[#cdd6f4] transition-colors"
             title={isExpanded ? '縮小' : '拡大'}
           >
-            {isExpanded ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
           </button>
         )}
       </div>
