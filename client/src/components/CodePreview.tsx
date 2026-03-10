@@ -1,20 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
-import { Copy, Check, Eye, Code2, Maximize2, Minimize2, RotateCcw } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Copy, Check, Eye, Code2, Maximize2, Minimize2, RotateCcw, GripVertical } from 'lucide-react';
 import { Highlight, themes, type Language } from 'prism-react-renderer';
 import { useBlobUrl, useDebouncedPreview } from '@/lib/preview';
 
 interface CodePreviewProps {
-  /** 初期コード文字列 */
   code: string;
-  /** コードの言語 (tsx, css, html) */
   language?: string;
-  /** タイトル */
   title?: string;
-  /** 追加 CSS */
   css?: string;
-  /** プレビューの高さ */
   previewHeight?: number;
-  /** レイアウト方向 */
   layout?: 'horizontal' | 'vertical';
 }
 
@@ -39,10 +33,12 @@ export default function CodePreview({
   const [copied, setCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<'both' | 'code' | 'preview'>('both');
+  const [splitRatio, setSplitRatio] = useState(50);
   const highlightRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
 
-  // code prop が変わったら editableCode をリセット
   useEffect(() => {
     setEditableCode(code);
   }, [code]);
@@ -52,9 +48,7 @@ export default function CodePreview({
   const canPreview = language === 'tsx' || language === 'jsx';
   const isHorizontal = layout === 'horizontal';
 
-  // デバウンス付きプレビュー生成（共通フック）
   const previewHtml = useDebouncedPreview(editableCode, css, canPreview);
-  // blob URL 管理（副作用を useEffect で安全に処理）
   const blobUrl = useBlobUrl(previewHtml);
 
   const handleReset = () => setEditableCode(code);
@@ -65,7 +59,6 @@ export default function CodePreview({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // textarea ↔ highlight のスクロール同期
   const handleScroll = () => {
     if (highlightRef.current && textareaRef.current) {
       highlightRef.current.scrollTop = textareaRef.current.scrollTop;
@@ -73,7 +66,6 @@ export default function CodePreview({
     }
   };
 
-  // Tab キーでインデント挿入
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -88,26 +80,71 @@ export default function CodePreview({
     }
   };
 
+  // ドラッグリサイズ
+  const handleDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    isDraggingRef.current = true;
+
+    const handleMove = (ev: MouseEvent | TouchEvent) => {
+      if (!isDraggingRef.current || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const clientX = 'touches' in ev ? ev.touches[0].clientX : ev.clientX;
+      const ratio = ((clientX - rect.left) / rect.width) * 100;
+      setSplitRatio(Math.max(20, Math.min(80, ratio)));
+    };
+
+    const handleUp = () => {
+      isDraggingRef.current = false;
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+      document.removeEventListener('touchmove', handleMove);
+      document.removeEventListener('touchend', handleUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleUp);
+    document.addEventListener('touchmove', handleMove);
+    document.addEventListener('touchend', handleUp);
+  }, []);
+
+  // コード行数からエディタ高さを計算
+  const lineCount = editableCode.split('\n').length;
+  const codeContentHeight = Math.max(lineCount * 20.8 + 32, 120); // line-height 1.6 * 13px + padding
+  const editorHeight = isExpanded
+    ? Math.max(codeContentHeight, 400)
+    : Math.min(Math.max(codeContentHeight, previewHeight), isHorizontal ? previewHeight : 600);
+
+  const showCode = viewMode !== 'preview';
+  const showPreview = canPreview && viewMode !== 'code';
+  const showSplit = showCode && showPreview && isHorizontal;
+
   // コードエディタパネル
-  const codePanel = viewMode !== 'preview' ? (
-    <div className={`${viewMode === 'both' && isHorizontal ? (isExpanded ? 'w-1/2' : 'lg:w-1/2') : 'w-full'} flex flex-col min-w-0`}>
-      <div
-        className="relative flex-1"
-        style={!isExpanded ? { height: previewHeight, maxHeight: previewHeight } : { flex: 1 }}
-      >
-        {/* シンタックスハイライト層 */}
+  const codePanel = showCode ? (
+    <div
+      className="flex flex-col min-w-0"
+      style={showSplit ? { width: `${splitRatio}%`, flexShrink: 0 } : undefined}
+    >
+      <div className="relative" style={{ height: editorHeight }}>
+        {/* シンタックスハイライト層（横スクロール対応） */}
         <div
           ref={highlightRef}
-          className="absolute inset-0 overflow-hidden pointer-events-none"
+          className="absolute inset-0 overflow-auto pointer-events-none"
           aria-hidden="true"
         >
           <Highlight theme={themes.vsDark} code={editableCode} language={prismLanguage}>
             {({ tokens, getLineProps, getTokenProps }) => (
-              <pre className="p-4 font-mono text-[13px] leading-[1.6] m-0 bg-[#1e1e2e] min-h-full" style={{ tabSize: 2 }}>
+              <pre
+                className="p-4 font-mono text-[13px] leading-[1.6] m-0 bg-[#1e1e2e] w-fit min-w-full min-h-full"
+                style={{ tabSize: 2 }}
+              >
                 {tokens.map((line, i) => {
                   const lineProps = getLineProps({ line, key: i });
                   return (
-                    <div key={i} {...lineProps}>
+                    <div key={i} {...lineProps} className="whitespace-pre">
                       {line.map((token, key) => (
                         <span key={key} {...getTokenProps({ token, key })} />
                       ))}
@@ -118,7 +155,7 @@ export default function CodePreview({
             )}
           </Highlight>
         </div>
-        {/* 編集可能 textarea 層 */}
+        {/* 編集可能 textarea 層（横スクロール対応） */}
         <textarea
           ref={textareaRef}
           value={editableCode}
@@ -126,27 +163,44 @@ export default function CodePreview({
           onScroll={handleScroll}
           onKeyDown={handleKeyDown}
           spellCheck={false}
-          className="absolute inset-0 w-full h-full p-4 font-mono text-[13px] leading-[1.6] bg-transparent text-transparent caret-white resize-none focus:outline-none selection:bg-blue-500/30 overflow-auto z-10"
+          wrap="off"
+          className="absolute inset-0 w-full h-full p-4 font-mono text-[13px] leading-[1.6] bg-transparent text-transparent caret-white resize-none focus:outline-none selection:bg-blue-500/30 overflow-auto z-10 whitespace-pre"
           style={{ tabSize: 2 }}
         />
       </div>
     </div>
   ) : null;
 
+  // リサイズハンドル
+  const resizeHandle = showSplit ? (
+    <div
+      className="flex items-center justify-center w-2 cursor-col-resize bg-[#313244] hover:bg-[#45475a] transition-colors shrink-0 group"
+      onMouseDown={handleDragStart}
+      onTouchStart={handleDragStart}
+      title="ドラッグして幅を調整"
+    >
+      <GripVertical size={10} className="text-[#585b70] group-hover:text-[#a6adc8]" />
+    </div>
+  ) : null;
+
   // プレビューパネル
-  const previewPanel = canPreview && viewMode !== 'code' ? (
-    <div className={`${viewMode === 'both' && isHorizontal ? (isExpanded ? 'w-1/2 border-l' : 'lg:w-1/2 lg:border-l border-t lg:border-t-0') : 'border-t'} border-[#313244] flex flex-col min-w-0`}>
+  const previewPanel = showPreview ? (
+    <div
+      className={`flex flex-col min-w-0 ${
+        !showSplit ? (showCode ? 'border-t border-[#313244]' : '') : ''
+      }`}
+      style={showSplit ? { width: `${100 - splitRatio}%` } : undefined}
+    >
       <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8fafc] dark:bg-[#1e1e2e] border-b border-border dark:border-[#313244] shrink-0">
         <Eye size={11} className="text-muted-foreground" />
         <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Result</span>
       </div>
-      <div className="bg-white flex-1" style={!isExpanded ? { height: previewHeight } : undefined}>
+      <div className="bg-white flex-1" style={{ height: editorHeight }}>
         <iframe
           src={blobUrl}
           sandbox="allow-scripts"
           title="プレビュー"
           className="w-full h-full border-0"
-          style={{ minHeight: isExpanded ? undefined : previewHeight }}
         />
       </div>
     </div>
@@ -215,38 +269,19 @@ export default function CodePreview({
     </div>
   );
 
-  const mainArea = (
-    <div className={`flex ${isExpanded ? 'flex-1 min-h-0' : ''} ${
-      isHorizontal && viewMode === 'both'
-        ? (isExpanded ? 'flex-row' : 'flex-col lg:flex-row')
-        : 'flex-col'
-    }`}>
-      {codePanel}
-      {previewPanel}
-    </div>
-  );
-
   return (
-    <>
-      {/* 通常表示 */}
-      <div className="rounded-xl overflow-hidden border border-border my-6">
-        {headerBar}
-        {!isExpanded && mainArea}
+    <div
+      ref={containerRef}
+      className="rounded-xl overflow-hidden border border-border my-6"
+    >
+      {headerBar}
+      <div className={`flex ${
+        showSplit ? 'flex-row' : 'flex-col'
+      }`}>
+        {codePanel}
+        {resizeHandle}
+        {previewPanel}
       </div>
-
-      {/* ダイアログ（拡大時） */}
-      {isExpanded && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8" onClick={() => setIsExpanded(false)}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div
-            className="relative w-full max-w-7xl h-[90vh] rounded-xl overflow-hidden border border-[#313244] bg-[#1e1e2e] flex flex-col shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {headerBar}
-            {mainArea}
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }
