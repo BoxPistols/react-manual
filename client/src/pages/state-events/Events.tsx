@@ -307,53 +307,53 @@ function App() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               フォームを送信すると、ブラウザはページを再読み込みしようとします。React アプリではこの動作を防いで、JavaScript で処理を行います。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`function SearchForm() {
+  const [query, setQuery] = React.useState('')
+  const [results, setResults] = React.useState([])
 
-function SearchForm() {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<string[]>([]);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();  // ページ再読み込みを防止！
-
-    if (!query.trim()) return;
-
-    // 実際のアプリでは API を呼ぶ
-    setResults((prev) => [...prev, \`「\${query}」の検索結果\`]);
-    setQuery(''); // 入力をクリア
-  };
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!query.trim()) return
+    setResults((prev) => [...prev, '「' + query + '」の検索結果'])
+    setQuery('')
+  }
 
   return (
-    <div className="p-6 max-w-md">
-      <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="検索ワードを入力..."
-          className="flex-1 px-3 py-2 border rounded-lg"
+          style={{ flex: 1, padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px' }}
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+          style={{ padding: '8px 16px', backgroundColor: '#3B82F6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
         >
           検索
         </button>
       </form>
 
-      <ul className="space-y-2">
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {results.map((result, i) => (
-          <li key={i} className="p-2 bg-gray-50 rounded">
+          <li key={i} style={{ padding: '8px 12px', backgroundColor: '#F9FAFB', borderRadius: '6px', marginBottom: '8px', fontSize: '14px' }}>
             {result}
           </li>
         ))}
       </ul>
     </div>
-  );
-}`}
-              language="tsx"
-              title="onSubmit と preventDefault"
+  )
+}
+
+function App() {
+  return <SearchForm />
+}
+`}
+              title="onSubmit と preventDefault → 検索してみよう"
+              previewHeight={200}
             />
             <InfoBox type="error" title="e.preventDefault() を忘れると...">
               <p>
@@ -368,75 +368,70 @@ function SearchForm() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               リストの各項目に対してイベントを設定するとき、どのアイテムがクリックされたかを知る必要があります。アロー関数で引数を渡しましょう。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-interface Notification {
-  id: number;
-  title: string;
-  read: boolean;
-}
-
-function NotificationList() {
-  const [notifications, setNotifications] = useState<Notification[]>([
+            <CodePreview
+              code={`function NotificationList() {
+  const [notifications, setNotifications] = React.useState([
     { id: 1, title: '新しいメッセージが届きました', read: false },
     { id: 2, title: 'プロジェクトが更新されました', read: false },
     { id: 3, title: 'レビューが完了しました', read: true },
-  ]);
+  ])
 
-  // id を受け取って既読にする
-  const handleMarkAsRead = (id: number) => {
+  const handleMarkAsRead = (id) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-  };
+    )
+  }
 
-  // id を受け取って削除する
-  const handleDelete = (id: number) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
+  const handleDelete = (id) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id))
+  }
 
-  // すべて既読にする
   const handleMarkAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+  }
 
   return (
-    <div className="p-6 max-w-md">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-bold">通知</h2>
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>通知</h2>
         <button
           onClick={handleMarkAllAsRead}
-          className="text-sm text-blue-600 hover:underline"
+          style={{ fontSize: '13px', color: '#2563EB', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
         >
           すべて既読にする
         </button>
       </div>
 
-      <ul className="space-y-2">
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {notifications.map((notification) => (
           <li
             key={notification.id}
-            className={\`p-3 rounded-lg border flex justify-between items-center
-              \${notification.read ? 'bg-white' : 'bg-blue-50 border-blue-200'}\`}
+            style={{
+              padding: '12px',
+              borderRadius: '8px',
+              border: notification.read ? '1px solid #E5E7EB' : '1px solid #BFDBFE',
+              backgroundColor: notification.read ? '#fff' : '#EFF6FF',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '8px',
+            }}
           >
-            <div>
-              <span className={\`text-sm \${notification.read ? 'text-gray-500' : 'font-medium'}\`}>
-                {notification.title}
-              </span>
-            </div>
-            <div className="flex gap-2">
+            <span style={{ fontSize: '14px', fontWeight: notification.read ? 'normal' : '600', color: notification.read ? '#6B7280' : '#111' }}>
+              {notification.title}
+            </span>
+            <div style={{ display: 'flex', gap: '8px' }}>
               {!notification.read && (
                 <button
                   onClick={() => handleMarkAsRead(notification.id)}
-                  className="text-xs text-blue-600 hover:underline"
+                  style={{ fontSize: '12px', color: '#2563EB', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
                 >
                   既読
                 </button>
               )}
               <button
                 onClick={() => handleDelete(notification.id)}
-                className="text-xs text-red-500 hover:underline"
+                style={{ fontSize: '12px', color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
               >
                 削除
               </button>
@@ -445,11 +440,15 @@ function NotificationList() {
         ))}
       </ul>
     </div>
-  );
-}`}
-              language="tsx"
-              title="各アイテムに引数付きイベントハンドラを設定"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <NotificationList />
+}
+`}
+              title="引数付きイベントハンドラ → 操作してみよう"
+              previewHeight={240}
             />
           </section>
 
@@ -459,41 +458,30 @@ function NotificationList() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               キーボード入力を検知して、ショートカットや特定のキー操作に応答できます。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`function KeyboardEvents() {
+  const [log, setLog] = React.useState([])
+  const [input, setInput] = React.useState('')
 
-function KeyboardEvents() {
-  const [log, setLog] = useState<string[]>([]);
-  const [input, setInput] = useState('');
+  const addLog = (message) => {
+    setLog((prev) => [message, ...prev.slice(0, 9)])
+  }
 
-  const addLog = (message: string) => {
-    setLog((prev) => [message, ...prev.slice(0, 9)]); // 最新10件
-  };
-
-  // onKeyDown: キーが押されたとき
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Enter キーで確定
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      addLog(\`確定: "\${input}"\`);
-      setInput('');
+      addLog('確定: "' + input + '"')
+      setInput('')
     }
-
-    // Escape キーでクリア
     if (e.key === 'Escape') {
-      setInput('');
-      addLog('入力をクリアしました');
+      setInput('')
+      addLog('入力をクリアしました')
     }
-
-    // Ctrl/Cmd + Enter で送信
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      addLog('Ctrl+Enter: 送信しました');
-    }
-  };
+  }
 
   return (
-    <div className="p-6 max-w-md space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-1">
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>
           入力してEnterで確定、Escapeでクリア
         </label>
         <input
@@ -502,18 +490,18 @@ function KeyboardEvents() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="テキストを入力..."
-          className="w-full px-3 py-2 border rounded-lg"
+          style={{ width: '100%', padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px', boxSizing: 'border-box' }}
         />
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-4">
-        <p className="text-sm font-medium mb-2">ログ:</p>
+      <div style={{ backgroundColor: '#F9FAFB', borderRadius: '8px', padding: '12px' }}>
+        <p style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', marginTop: 0 }}>ログ:</p>
         {log.length === 0 ? (
-          <p className="text-sm text-gray-400">まだ操作がありません</p>
+          <p style={{ fontSize: '14px', color: '#9CA3AF', margin: 0 }}>まだ操作がありません</p>
         ) : (
-          <ul className="text-sm space-y-1">
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {log.map((entry, i) => (
-              <li key={i} className="text-gray-600">
+              <li key={i} style={{ fontSize: '14px', color: '#4B5563', marginBottom: '4px' }}>
                 {entry}
               </li>
             ))}
@@ -521,10 +509,15 @@ function KeyboardEvents() {
         )}
       </div>
     </div>
-  );
-}`}
-              language="tsx"
-              title="キーボードイベントの処理"
+  )
+}
+
+function App() {
+  return <KeyboardEvents />
+}
+`}
+              title="キーボードイベント → 入力してEnter/Escを試そう"
+              previewHeight={260}
             />
             <InfoBox type="info" title="よく使うキーボードイベント">
               <p>
@@ -553,58 +546,55 @@ function KeyboardEvents() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               DOM イベントには「伝播（propagation）」の仕組みがあります。あるイベントが発生すると、その要素だけでなく親要素にも伝わっていきます。これを<strong>バブリング</strong>と呼びます。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`function BubblingExample() {
+  const [log, setLog] = React.useState([])
 
-function BubblingExample() {
-  const [log, setLog] = useState<string[]>([]);
-
-  const addLog = (message: string) => {
-    setLog((prev) => [message, ...prev.slice(0, 9)]);
-  };
+  const addLog = (message) => {
+    setLog((prev) => [message, ...prev.slice(0, 9)])
+  }
 
   return (
-    <div className="p-6 max-w-md space-y-4">
-      {/* 親要素の onClick */}
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
       <div
         onClick={() => addLog('外側の div がクリックされた')}
-        className="p-6 bg-blue-100 rounded-lg"
+        style={{ padding: '24px', backgroundColor: '#DBEAFE', borderRadius: '8px', cursor: 'pointer', marginBottom: '12px' }}
       >
-        <p className="text-sm mb-2">外側の div</p>
+        <p style={{ fontSize: '14px', marginBottom: '8px', marginTop: 0 }}>外側の div</p>
 
-        {/* 中間要素の onClick */}
         <div
           onClick={() => addLog('内側の div がクリックされた')}
-          className="p-4 bg-green-100 rounded-lg"
+          style={{ padding: '16px', backgroundColor: '#DCFCE7', borderRadius: '8px', cursor: 'pointer' }}
         >
-          <p className="text-sm mb-2">内側の div</p>
+          <p style={{ fontSize: '14px', marginBottom: '8px', marginTop: 0 }}>内側の div</p>
 
-          {/* ボタンの onClick */}
           <button
             onClick={() => addLog('ボタンがクリックされた')}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg"
+            style={{ padding: '8px 16px', backgroundColor: '#EF4444', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
           >
             ボタン
           </button>
         </div>
       </div>
 
-      {/* ボタンをクリックすると、3つ全部のハンドラが実行される！ */}
-      {/* ボタン → 内側div → 外側div の順（バブリング） */}
-
-      <div className="bg-gray-50 rounded-lg p-3">
-        <p className="text-sm font-medium mb-1">イベントログ:</p>
-        <ul className="text-xs space-y-0.5">
+      <div style={{ backgroundColor: '#F9FAFB', borderRadius: '8px', padding: '12px' }}>
+        <p style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px', marginTop: 0 }}>イベントログ:</p>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {log.map((entry, i) => (
-            <li key={i} className="text-gray-600">{entry}</li>
+            <li key={i} style={{ fontSize: '12px', color: '#4B5563', marginBottom: '2px' }}>{entry}</li>
           ))}
         </ul>
       </div>
     </div>
-  );
-}`}
-              language="tsx"
-              title="イベントバブリングの挙動"
+  )
+}
+
+function App() {
+  return <BubblingExample />
+}
+`}
+              title="イベントバブリング → ボタンをクリックしてログを確認"
+              previewHeight={300}
             />
 
             <p className="text-muted-foreground my-4 leading-relaxed">
@@ -780,10 +770,8 @@ function ScrollTracker() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               ここまでのイベント処理を組み合わせた、実用的なカラーピッカーを作ります。クリック、入力、キーボードイベントを組み合わせています。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-const PRESET_COLORS = [
+            <CodePreview
+              code={`var PRESET_COLORS = [
   { name: 'レッド', hex: '#EF4444' },
   { name: 'オレンジ', hex: '#F97316' },
   { name: 'アンバー', hex: '#F59E0B' },
@@ -792,150 +780,110 @@ const PRESET_COLORS = [
   { name: 'インディゴ', hex: '#6366F1' },
   { name: 'パープル', hex: '#A855F7' },
   { name: 'ピンク', hex: '#EC4899' },
-];
+]
 
 function ColorPicker() {
-  const [selectedColor, setSelectedColor] = useState('#3B82F6');
-  const [customHex, setCustomHex] = useState('#3B82F6');
-  const [copiedMessage, setCopiedMessage] = useState('');
-  const [savedColors, setSavedColors] = useState<string[]>([]);
+  const [selectedColor, setSelectedColor] = React.useState('#3B82F6')
+  const [customHex, setCustomHex] = React.useState('#3B82F6')
+  const [copiedMessage, setCopiedMessage] = React.useState('')
+  const [savedColors, setSavedColors] = React.useState([])
 
-  // プリセット色をクリック
-  const handlePresetClick = (hex: string) => {
-    setSelectedColor(hex);
-    setCustomHex(hex);
-  };
+  const handlePresetClick = (hex) => {
+    setSelectedColor(hex)
+    setCustomHex(hex)
+  }
 
-  // カスタムHEX入力
-  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setCustomHex(value);
-    // 有効なHEXコードなら反映
+  const handleHexChange = (e) => {
+    var value = e.target.value
+    setCustomHex(value)
     if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-      setSelectedColor(value);
+      setSelectedColor(value)
     }
-  };
+  }
 
-  // Enter で色を確定
-  const handleHexKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && /^#[0-9A-Fa-f]{6}$/.test(customHex)) {
-      handleSaveColor();
-    }
-  };
-
-  // 色をコピー
-  const handleCopyColor = () => {
-    navigator.clipboard.writeText(selectedColor);
-    setCopiedMessage('コピーしました！');
-    setTimeout(() => setCopiedMessage(''), 2000);
-  };
-
-  // 色を保存
   const handleSaveColor = () => {
     if (!savedColors.includes(selectedColor)) {
-      setSavedColors((prev) => [...prev, selectedColor]);
+      setSavedColors((prev) => [...prev, selectedColor])
     }
-  };
+  }
 
-  // 保存した色を削除
-  const handleRemoveSaved = (color: string) => {
-    setSavedColors((prev) => prev.filter((c) => c !== color));
-  };
+  const handleHexKeyDown = (e) => {
+    if (e.key === 'Enter' && /^#[0-9A-Fa-f]{6}$/.test(customHex)) {
+      handleSaveColor()
+    }
+  }
+
+  const handleCopyColor = () => {
+    navigator.clipboard.writeText(selectedColor)
+    setCopiedMessage('コピーしました！')
+    setTimeout(() => setCopiedMessage(''), 2000)
+  }
+
+  const handleRemoveSaved = (color) => {
+    setSavedColors((prev) => prev.filter((c) => c !== color))
+  }
 
   return (
-    <div className="p-6 max-w-md mx-auto space-y-6">
-      <h2 className="text-xl font-bold">カラーピッカー</h2>
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
+      <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginTop: 0, marginBottom: '16px' }}>カラーピッカー</h2>
 
-      {/* プレビュー */}
-      <div
-        className="w-full h-32 rounded-xl shadow-inner transition-colors duration-300"
-        style={{ backgroundColor: selectedColor }}
-      />
+      <div style={{ width: '100%', height: '100px', borderRadius: '12px', backgroundColor: selectedColor, transition: 'background-color 0.3s', marginBottom: '16px', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)' }} />
 
-      {/* カラーコード表示 */}
-      <div className="flex items-center gap-2">
-        <code className="text-lg font-mono font-bold">{selectedColor}</code>
-        <button
-          onClick={handleCopyColor}
-          className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
-        >
-          コピー
-        </button>
-        <button
-          onClick={handleSaveColor}
-          className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-        >
-          保存
-        </button>
-        {copiedMessage && (
-          <span className="text-sm text-green-600">{copiedMessage}</span>
-        )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+        <code style={{ fontSize: '16px', fontFamily: 'monospace', fontWeight: 'bold' }}>{selectedColor}</code>
+        <button onClick={handleCopyColor} style={{ padding: '4px 12px', fontSize: '13px', backgroundColor: '#F3F4F6', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>コピー</button>
+        <button onClick={handleSaveColor} style={{ padding: '4px 12px', fontSize: '13px', backgroundColor: '#DBEAFE', color: '#1D4ED8', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>保存</button>
+        {copiedMessage && <span style={{ fontSize: '13px', color: '#16A34A' }}>{copiedMessage}</span>}
       </div>
 
-      {/* プリセット色 */}
-      <div>
-        <p className="text-sm font-medium mb-2">プリセット</p>
-        <div className="grid grid-cols-8 gap-2">
+      <div style={{ marginBottom: '16px' }}>
+        <p style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', marginTop: 0 }}>プリセット</p>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {PRESET_COLORS.map((color) => (
             <button
               key={color.hex}
               onClick={() => handlePresetClick(color.hex)}
               title={color.name}
-              className={\`w-8 h-8 rounded-full transition-transform hover:scale-110
-                \${selectedColor === color.hex ? 'ring-2 ring-offset-2 ring-blue-500' : ''}\`}
-              style={{ backgroundColor: color.hex }}
+              style={{
+                width: '32px', height: '32px', borderRadius: '50%', border: selectedColor === color.hex ? '3px solid #3B82F6' : '2px solid transparent',
+                backgroundColor: color.hex, cursor: 'pointer', outline: 'none', padding: 0,
+              }}
             />
           ))}
         </div>
       </div>
 
-      {/* カスタム入力 */}
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          カスタム HEX（Enter で保存）
-        </label>
-        <input
-          type="text"
-          value={customHex}
-          onChange={handleHexChange}
-          onKeyDown={handleHexKeyDown}
-          placeholder="#FF5733"
-          maxLength={7}
-          className="w-full px-3 py-2 border rounded-lg font-mono"
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>カスタム HEX（Enter で保存）</label>
+        <input type="text" value={customHex} onChange={handleHexChange} onKeyDown={handleHexKeyDown} placeholder="#FF5733" maxLength={7}
+          style={{ width: '100%', padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px', fontFamily: 'monospace', boxSizing: 'border-box' }}
         />
       </div>
 
-      {/* 保存した色 */}
       {savedColors.length > 0 && (
         <div>
-          <p className="text-sm font-medium mb-2">
-            保存した色（{savedColors.length}）
-          </p>
-          <div className="flex flex-wrap gap-2">
+          <p style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', marginTop: 0 }}>保存した色（{savedColors.length}）</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {savedColors.map((color) => (
-              <div key={color} className="flex items-center gap-1 bg-gray-50 rounded-full px-2 py-1">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: color }}
-                />
-                <span className="text-xs font-mono">{color}</span>
-                <button
-                  onClick={() => handleRemoveSaved(color)}
-                  className="text-gray-400 hover:text-red-500 text-xs ml-1"
-                >
-                  &times;
-                </button>
+              <div key={color} style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#F9FAFB', borderRadius: '999px', padding: '4px 8px' }}>
+                <div style={{ width: '16px', height: '16px', borderRadius: '50%', backgroundColor: color }} />
+                <span style={{ fontSize: '12px', fontFamily: 'monospace' }}>{color}</span>
+                <button onClick={() => handleRemoveSaved(color)} style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', marginLeft: '2px', padding: 0 }}>&times;</button>
               </div>
             ))}
           </div>
         </div>
       )}
     </div>
-  );
-}`}
-              language="tsx"
-              title="カラーピッカー - 複数のイベントを組み合わせた実践例"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <ColorPicker />
+}
+`}
+              title="カラーピッカー → 色を選択・保存してみよう"
+              previewHeight={480}
             />
           </section>
 

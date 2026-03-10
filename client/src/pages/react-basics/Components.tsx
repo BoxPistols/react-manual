@@ -493,26 +493,28 @@ import { HomeIcon, UserIcon } from './icons'`}
               最終的にページ全体を構成します。Figma でも同じですよね。
             </p>
 
-            <CodeBlock
-              code={`// src/components/Avatar.tsx
+            <CodePreview
+              code={`// Avatar コンポーネント
 function Avatar() {
   return (
-    <img
-      src="https://via.placeholder.com/48"
-      alt="ユーザーアバター"
-      style={{ width: 48, height: 48, borderRadius: '50%' }}
-    />
+    <div style={{
+      width: 48,
+      height: 48,
+      borderRadius: '50%',
+      backgroundColor: '#E5E7EB',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#6B7280',
+      fontSize: '14px',
+      fontWeight: 'bold',
+    }}>
+      T
+    </div>
   )
 }
-export default Avatar`}
-              language="tsx"
-              title="src/components/Avatar.tsx"
-              showLineNumbers
-            />
 
-            <div className="mt-4">
-              <CodeBlock
-                code={`// src/components/UserInfo.tsx
+// UserInfo コンポーネント
 function UserInfo() {
   return (
     <div>
@@ -523,19 +525,8 @@ function UserInfo() {
     </div>
   )
 }
-export default UserInfo`}
-                language="tsx"
-                title="src/components/UserInfo.tsx"
-                showLineNumbers
-              />
-            </div>
 
-            <div className="mt-4">
-              <CodeBlock
-                code={`// src/components/ProfileCard.tsx
-import Avatar from './Avatar'
-import UserInfo from './UserInfo'
-
+// ProfileCard = Avatar + UserInfo の組み合わせ
 function ProfileCard() {
   return (
     <div style={{
@@ -545,30 +536,19 @@ function ProfileCard() {
       padding: '20px',
       borderRadius: '12px',
       border: '1px solid #E5E7EB',
-      maxWidth: '320px',
     }}>
       <Avatar />
       <UserInfo />
     </div>
   )
 }
-export default ProfileCard`}
-                language="tsx"
-                title="src/components/ProfileCard.tsx"
-                showLineNumbers
-              />
-            </div>
 
-            <div className="mt-4">
-              <CodeBlock
-                code={`// src/App.tsx
-import ProfileCard from './components/ProfileCard'
-
+// App で ProfileCard を3つ並べる
 function App() {
   return (
-    <div style={{ padding: '40px' }}>
-      <h1>チームメンバー</h1>
-      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+    <div>
+      <h2 style={{ marginBottom: '16px' }}>チームメンバー</h2>
+      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
         <ProfileCard />
         <ProfileCard />
         <ProfileCard />
@@ -576,13 +556,10 @@ function App() {
     </div>
   )
 }
-
-export default App`}
-                language="tsx"
-                title="src/App.tsx"
-                showLineNumbers
-              />
-            </div>
+`}
+              title="コンポーネントの組み合わせ → 右がブラウザ表示"
+              previewHeight={220}
+            />
 
             <p className="text-muted-foreground mt-4 leading-relaxed">
               <code className="bg-muted px-1 py-0.5 rounded text-xs">Avatar</code> と

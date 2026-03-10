@@ -139,15 +139,13 @@ const [items, setItems] = useState<string[]>([]);`}
             <p className="text-muted-foreground mb-4 leading-relaxed">
               テキスト入力フィールドと連携するのは useState の最も一般的な使い方の一つです。入力が変わるたびに state を更新し、リアルタイムに表示に反映します。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-function NamePreview() {
-  const [name, setName] = useState('');
+            <CodePreview
+              code={`function NamePreview() {
+  const [name, setName] = React.useState('')
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <label className="block mb-2 text-sm font-medium">
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
+      <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
         お名前を入力してください
       </label>
       <input
@@ -155,24 +153,28 @@ function NamePreview() {
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="山田太郎"
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none"
+        style={{ width: '100%', padding: '8px 16px', border: '1px solid #D1D5DB', borderRadius: '8px', outline: 'none', boxSizing: 'border-box' }}
       />
 
-      {/* リアルタイムプレビュー */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <p className="text-sm text-gray-500">プレビュー:</p>
-        <p className="text-2xl font-bold mt-1">
-          {name ? \`こんにちは、\${name}さん！\` : 'お名前を入力してください'}
+      <div style={{ marginTop: '16px', padding: '16px', backgroundColor: '#F9FAFB', borderRadius: '8px' }}>
+        <p style={{ fontSize: '13px', color: '#6B7280', margin: 0 }}>プレビュー:</p>
+        <p style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '4px', marginBottom: '0' }}>
+          {name ? 'こんにちは、' + name + 'さん！' : 'お名前を入力してください'}
         </p>
-        <p className="text-sm text-gray-400 mt-2">
+        <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '8px', marginBottom: 0 }}>
           {name.length} 文字入力済み
         </p>
       </div>
     </div>
-  );
-}`}
-              language="tsx"
-              title="テキスト入力とリアルタイムプレビュー"
+  )
+}
+
+function App() {
+  return <NamePreview />
+}
+`}
+              title="テキスト入力とリアルタイムプレビュー → 名前を入力してみよう"
+              previewHeight={220}
             />
           </section>
 
@@ -457,86 +459,61 @@ function TodoApp() {
               オブジェクトの state も、配列と同様に「新しいオブジェクトを作る」ことが重要です。ネストしたオブジェクトの更新は少しコツが要ります。
             </p>
 
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-interface FormData {
-  name: string;
-  email: string;
-  department: string;
-  agreeToTerms: boolean;
-}
-
-function ProfileForm() {
-  const [formData, setFormData] = useState<FormData>({
+            <CodePreview
+              code={`function ProfileForm() {
+  const [formData, setFormData] = React.useState({
     name: '',
     email: '',
     department: 'design',
     agreeToTerms: false,
-  });
+  })
 
-  // 汎用的な更新関数
-  const updateField = (field: keyof FormData, value: string | boolean) => {
-    setFormData({
-      ...formData,       // 既存のデータをコピー
-      [field]: value,    // 指定したフィールドだけ更新
-    });
-  };
+  const updateField = (field, value) => {
+    setFormData({ ...formData, [field]: value })
+  }
+
+  var inputStyle = { width: '100%', padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px', boxSizing: 'border-box' }
+  var labelStyle = { display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '4px' }
 
   return (
-    <div className="p-6 max-w-md mx-auto space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-1">名前</label>
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) => updateField('name', e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg"
-        />
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>名前</label>
+        <input type="text" value={formData.name} onChange={(e) => updateField('name', e.target.value)} style={inputStyle} />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">メール</label>
-        <input
-          type="email"
-          value={formData.email}
-          onChange={(e) => updateField('email', e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg"
-        />
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>メール</label>
+        <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)} style={inputStyle} />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">部署</label>
-        <select
-          value={formData.department}
-          onChange={(e) => updateField('department', e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg"
-        >
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>部署</label>
+        <select value={formData.department} onChange={(e) => updateField('department', e.target.value)} style={inputStyle}>
           <option value="design">デザイン部</option>
           <option value="engineering">エンジニアリング部</option>
           <option value="marketing">マーケティング部</option>
         </select>
       </div>
 
-      <label className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={formData.agreeToTerms}
-          onChange={(e) => updateField('agreeToTerms', e.target.checked)}
-        />
-        <span className="text-sm">利用規約に同意する</span>
+      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+        <input type="checkbox" checked={formData.agreeToTerms} onChange={(e) => updateField('agreeToTerms', e.target.checked)} />
+        <span style={{ fontSize: '14px' }}>利用規約に同意する</span>
       </label>
 
-      {/* 現在の state を表示（デバッグ用） */}
-      <pre className="mt-4 p-3 bg-gray-100 rounded-lg text-xs overflow-auto">
+      <pre style={{ marginTop: '12px', padding: '12px', backgroundColor: '#F3F4F6', borderRadius: '8px', fontSize: '12px', overflow: 'auto', whiteSpace: 'pre-wrap' }}>
         {JSON.stringify(formData, null, 2)}
       </pre>
     </div>
-  );
-}`}
-              language="tsx"
-              title="オブジェクトの state でフォームデータを管理"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <ProfileForm />
+}
+`}
+              title="オブジェクトの state でフォーム管理 → 入力してみよう"
+              previewHeight={380}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">ネストしたオブジェクトの更新</h3>
@@ -700,86 +677,69 @@ function UserDashboard() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               ここまで学んだ配列の操作パターンをすべて使った、完成度の高い Todo リストを作りましょう。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`function TodoList() {
+  const [todos, setTodos] = React.useState([])
+  const [input, setInput] = React.useState('')
 
-interface Todo {
-  id: number;
-  text: string;
-  done: boolean;
-}
-
-function TodoList() {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [input, setInput] = useState('');
-
-  // 追加: スプレッド構文で新しい配列を作る
   const addTodo = () => {
-    if (!input.trim()) return;
-    const newTodo: Todo = {
-      id: Date.now(),
-      text: input,
-      done: false,
-    };
-    setTodos((prev) => [...prev, newTodo]);
-    setInput('');
-  };
+    if (!input.trim()) return
+    var newTodo = { id: Date.now(), text: input, done: false }
+    setTodos((prev) => [...prev, newTodo])
+    setInput('')
+  }
 
-  // 完了/未完了の切り替え: map で新しい配列を作る
-  const toggleTodo = (id: number) => {
+  const toggleTodo = (id) => {
     setTodos((prev) =>
       prev.map((todo) =>
         todo.id === id ? { ...todo, done: !todo.done } : todo
       )
-    );
-  };
+    )
+  }
 
-  // 削除: filter で新しい配列を作る
-  const deleteTodo = (id: number) => {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-  };
+  const deleteTodo = (id) => {
+    setTodos((prev) => prev.filter((todo) => todo.id !== id))
+  }
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Todo リスト</h2>
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
+      <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginTop: 0, marginBottom: '12px' }}>Todo リスト</h2>
 
-      {/* 入力フォーム */}
-      <div className="flex gap-2 mb-4">
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && addTodo()}
           placeholder="新しいタスク..."
-          className="flex-1 px-3 py-2 border rounded-lg"
+          style={{ flex: 1, padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px' }}
         />
         <button
           onClick={addTodo}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          style={{ padding: '8px 16px', backgroundColor: '#3B82F6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
         >
           追加
         </button>
       </div>
 
-      {/* リスト表示 */}
-      <ul className="space-y-2">
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {todos.map((todo) => (
           <li
             key={todo.id}
-            className="flex items-center gap-3 p-3 border rounded-lg"
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', border: '1px solid #E5E7EB', borderRadius: '8px', marginBottom: '8px' }}
           >
             <input
               type="checkbox"
               checked={todo.done}
               onChange={() => toggleTodo(todo.id)}
-              className="w-5 h-5"
+              style={{ width: '20px', height: '20px' }}
             />
-            <span className={\`flex-1 \${todo.done ? 'line-through text-gray-400' : ''}\`}>
+            <span style={{ flex: 1, textDecoration: todo.done ? 'line-through' : 'none', color: todo.done ? '#9CA3AF' : '#111' }}>
               {todo.text}
             </span>
             <button
               onClick={() => deleteTodo(todo.id)}
-              className="text-red-500 hover:text-red-700 text-sm"
+              style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}
             >
               削除
             </button>
@@ -787,16 +747,19 @@ function TodoList() {
         ))}
       </ul>
 
-      {/* 統計 */}
-      <p className="mt-4 text-sm text-gray-500">
+      <p style={{ marginTop: '12px', fontSize: '13px', color: '#6B7280' }}>
         {todos.filter((t) => t.done).length} / {todos.length} 完了
       </p>
     </div>
-  );
-}`}
-              language="tsx"
-              title="Todo リスト - 配列の state を完全に使いこなす"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <TodoList />
+}
+`}
+              title="Todo リスト → タスクを追加・完了・削除してみよう"
+              previewHeight={300}
             />
           </section>
 
@@ -818,49 +781,50 @@ function TodoList() {
                 </p>
               </div>
             </InfoBox>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-// 子コンポーネント: props で値を受け取るだけ
-function DisplayCount({ count, label }: { count: number; label: string }) {
+            <CodePreview
+              code={`function DisplayCount({ count, label }) {
   return (
-    <div className="p-4 bg-gray-50 rounded-lg text-center">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="text-3xl font-bold">{count}</p>
+    <div style={{ padding: '16px', backgroundColor: '#F9FAFB', borderRadius: '8px', textAlign: 'center' }}>
+      <p style={{ fontSize: '13px', color: '#6B7280', margin: 0 }}>{label}</p>
+      <p style={{ fontSize: '28px', fontWeight: 'bold', margin: '4px 0 0' }}>{count}</p>
     </div>
-  );
+  )
 }
 
-// 親コンポーネント: state を管理し、子に props として渡す
 function Dashboard() {
-  const [visitors, setVisitors] = useState(0);
-  const [sales, setSales] = useState(0);
+  const [visitors, setVisitors] = React.useState(0)
+  const [sales, setSales] = React.useState(0)
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+    <div style={{ padding: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
         <DisplayCount count={visitors} label="訪問者数" />
         <DisplayCount count={sales} label="売上件数" />
       </div>
-      <div className="flex gap-2">
+      <div style={{ display: 'flex', gap: '8px' }}>
         <button
           onClick={() => setVisitors((prev) => prev + 1)}
-          className="px-3 py-1 bg-blue-500 text-white rounded"
+          style={{ padding: '6px 12px', backgroundColor: '#3B82F6', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' }}
         >
           訪問者 +1
         </button>
         <button
           onClick={() => setSales((prev) => prev + 1)}
-          className="px-3 py-1 bg-green-500 text-white rounded"
+          style={{ padding: '6px 12px', backgroundColor: '#22C55E', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' }}
         >
           売上 +1
         </button>
       </div>
     </div>
-  );
-}`}
-              language="tsx"
-              title="親の state を子に props で渡すパターン"
+  )
+}
+
+function App() {
+  return <Dashboard />
+}
+`}
+              title="親の state を子に props で渡す → ボタンをクリックしてみよう"
+              previewHeight={160}
             />
           </section>
 

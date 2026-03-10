@@ -82,29 +82,62 @@ function App() {
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-8 mb-3">方法2: && 演算子（表示するかしないか）</h3>
-            <CodeBlock
-              code={`function Notification({ count }: { count: number }) {
+            <CodePreview
+              code={`function Notification({ count }) {
   return (
-    <div className="relative">
-      <button className="p-2 rounded-lg hover:bg-gray-100">
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      <button style={{
+        padding: '8px 16px',
+        borderRadius: '8px',
+        border: '1px solid #E5E7EB',
+        backgroundColor: 'white',
+        cursor: 'pointer',
+        fontSize: '14px',
+      }}>
         通知
       </button>
 
       {/* count が 0 より大きいときだけバッジを表示 */}
       {count > 0 && (
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+        <span style={{
+          position: 'absolute',
+          top: '-4px',
+          right: '-4px',
+          backgroundColor: '#EF4444',
+          color: 'white',
+          fontSize: '11px',
+          width: '20px',
+          height: '20px',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 'bold',
+        }}>
           {count}
         </span>
       )}
     </div>
-  );
+  )
 }
 
-// 使い方
-<Notification count={3} />  // バッジあり
-<Notification count={0} />  // バッジなし`}
-              language="tsx"
+function App() {
+  return (
+    <div style={{ display: 'flex', gap: '32px', padding: '16px', alignItems: 'center' }}>
+      <div>
+        <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '8px' }}>count=3（バッジあり）</p>
+        <Notification count={3} />
+      </div>
+      <div>
+        <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '8px' }}>count=0（バッジなし）</p>
+        <Notification count={0} />
+      </div>
+    </div>
+  )
+}
+`}
               title="&& 演算子: 条件を満たすときだけ表示"
+              previewHeight={80}
             />
             <InfoBox type="warning" title="&& の注意点: 0 が表示される問題">
               <p>
@@ -179,87 +212,83 @@ function DataView({ status, data, errorMessage }: DataViewProps) {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               タブ UI は条件分岐の代表的なパターンです。state でアクティブなタブを管理し、対応するコンテンツを表示します。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-type TabId = 'overview' | 'features' | 'pricing';
-
-interface Tab {
-  id: TabId;
-  label: string;
-}
-
-const TABS: Tab[] = [
+            <CodePreview
+              code={`const TABS = [
   { id: 'overview', label: '概要' },
   { id: 'features', label: '機能' },
   { id: 'pricing', label: '料金' },
-];
+]
 
 function TabPanel() {
-  const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [activeTab, setActiveTab] = React.useState('overview')
 
-  // タブに対応するコンテンツを返す関数
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
         return (
-          <div className="space-y-3">
-            <h3 className="text-lg font-bold">プロダクト概要</h3>
-            <p className="text-gray-600">
+          <div>
+            <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '8px' }}>プロダクト概要</h3>
+            <p style={{ color: '#4B5563', fontSize: '14px' }}>
               このプロダクトは、チームのコラボレーションを効率化するツールです。
             </p>
           </div>
-        );
+        )
       case 'features':
         return (
-          <div className="space-y-3">
-            <h3 className="text-lg font-bold">主な機能</h3>
-            <ul className="space-y-2 text-gray-600">
-              <li>- リアルタイムコラボレーション</li>
-              <li>- タスク管理</li>
+          <div>
+            <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '8px' }}>主な機能</h3>
+            <ul style={{ color: '#4B5563', fontSize: '14px', listStyle: 'none', padding: 0, margin: 0 }}>
+              <li style={{ marginBottom: '4px' }}>- リアルタイムコラボレーション</li>
+              <li style={{ marginBottom: '4px' }}>- タスク管理</li>
               <li>- ファイル共有</li>
             </ul>
           </div>
-        );
+        )
       case 'pricing':
         return (
-          <div className="space-y-3">
-            <h3 className="text-lg font-bold">料金プラン</h3>
-            <p className="text-gray-600">月額 ¥980 から</p>
+          <div>
+            <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '8px' }}>料金プラン</h3>
+            <p style={{ color: '#4B5563', fontSize: '14px' }}>月額 ¥980 から</p>
           </div>
-        );
+        )
     }
-  };
+  }
 
   return (
-    <div className="max-w-lg">
-      {/* タブヘッダー */}
-      <div className="flex border-b">
+    <div style={{ maxWidth: '400px' }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid #E5E7EB' }}>
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={\`px-4 py-2 text-sm font-medium border-b-2 transition-colors
-              \${activeTab === tab.id
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-              }\`}
+            style={{
+              padding: '8px 16px',
+              fontSize: '14px',
+              fontWeight: '500',
+              border: 'none',
+              borderBottom: activeTab === tab.id ? '2px solid #3B82F6' : '2px solid transparent',
+              color: activeTab === tab.id ? '#2563EB' : '#6B7280',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+            }}
           >
             {tab.label}
           </button>
         ))}
       </div>
-
-      {/* タブコンテンツ */}
-      <div className="p-4">
+      <div style={{ padding: '16px' }}>
         {renderContent()}
       </div>
     </div>
-  );
-}`}
-              language="tsx"
-              title="タブ切り替え UI"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <TabPanel />
+}
+`}
+              title="タブ切り替え UI → タブをクリックしてみよう"
+              previewHeight={180}
             />
           </section>
 
@@ -335,91 +364,126 @@ function App() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               ステッパーは「現在のステップに応じて表示を切り替える」パターンです。フォームのウィザードや設定画面でよく使われます。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
-
-const STEPS = ['基本情報', '詳細設定', '確認'] as const;
+            <CodePreview
+              code={`const STEPS = ['基本情報', '詳細設定', '確認']
 
 function Stepper() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = React.useState(0)
 
   const handleNext = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1));
-  };
+    setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1))
+  }
 
   const handlePrev = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 0));
-  };
+    setCurrentStep((prev) => Math.max(prev - 1, 0))
+  }
 
   return (
-    <div className="max-w-lg p-6">
+    <div style={{ maxWidth: '420px', padding: '16px' }}>
       {/* ステップインジケーター */}
-      <div className="flex items-center mb-8">
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
         {STEPS.map((step, i) => (
-          <div key={step} className="flex items-center">
-            <div className={\`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold
-              \${i <= currentStep
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-500'
-              }\`}
-            >
+          <div key={step} style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              fontSize: '13px',
+              fontWeight: 'bold',
+              backgroundColor: i <= currentStep ? '#3B82F6' : '#E5E7EB',
+              color: i <= currentStep ? 'white' : '#6B7280',
+            }}>
               {i + 1}
             </div>
-            <span className={\`ml-2 text-sm \${i <= currentStep ? 'text-blue-600 font-medium' : 'text-gray-400'}\`}>
+            <span style={{
+              marginLeft: '6px',
+              fontSize: '13px',
+              color: i <= currentStep ? '#2563EB' : '#9CA3AF',
+              fontWeight: i <= currentStep ? '500' : 'normal',
+            }}>
               {step}
             </span>
             {i < STEPS.length - 1 && (
-              <div className={\`mx-4 h-0.5 w-12 \${i < currentStep ? 'bg-blue-500' : 'bg-gray-200'}\`} />
+              <div style={{
+                margin: '0 12px',
+                height: '2px',
+                width: '32px',
+                backgroundColor: i < currentStep ? '#3B82F6' : '#E5E7EB',
+              }} />
             )}
           </div>
         ))}
       </div>
 
       {/* ステップごとのコンテンツ */}
-      <div className="min-h-[120px] p-4 border rounded-lg mb-4">
+      <div style={{ minHeight: '80px', padding: '16px', border: '1px solid #E5E7EB', borderRadius: '8px', marginBottom: '16px' }}>
         {currentStep === 0 && (
           <div>
-            <h3 className="font-bold mb-2">基本情報を入力</h3>
-            <p className="text-sm text-gray-500">名前やメールアドレスを入力してください。</p>
+            <h3 style={{ fontWeight: 'bold', marginBottom: '4px', fontSize: '15px' }}>基本情報を入力</h3>
+            <p style={{ fontSize: '13px', color: '#6B7280' }}>名前やメールアドレスを入力してください。</p>
           </div>
         )}
         {currentStep === 1 && (
           <div>
-            <h3 className="font-bold mb-2">詳細設定</h3>
-            <p className="text-sm text-gray-500">通知設定やプランを選択してください。</p>
+            <h3 style={{ fontWeight: 'bold', marginBottom: '4px', fontSize: '15px' }}>詳細設定</h3>
+            <p style={{ fontSize: '13px', color: '#6B7280' }}>通知設定やプランを選択してください。</p>
           </div>
         )}
         {currentStep === 2 && (
           <div>
-            <h3 className="font-bold mb-2">内容を確認</h3>
-            <p className="text-sm text-gray-500">入力内容を確認して送信してください。</p>
+            <h3 style={{ fontWeight: 'bold', marginBottom: '4px', fontSize: '15px' }}>内容を確認</h3>
+            <p style={{ fontSize: '13px', color: '#6B7280' }}>入力内容を確認して送信してください。</p>
           </div>
         )}
       </div>
 
       {/* ナビゲーションボタン */}
-      <div className="flex justify-between">
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button
           onClick={handlePrev}
           disabled={currentStep === 0}
-          className="px-4 py-2 text-sm border rounded-lg disabled:opacity-30"
+          style={{
+            padding: '6px 16px',
+            fontSize: '13px',
+            border: '1px solid #E5E7EB',
+            borderRadius: '8px',
+            backgroundColor: 'white',
+            cursor: currentStep === 0 ? 'default' : 'pointer',
+            opacity: currentStep === 0 ? 0.3 : 1,
+          }}
         >
           戻る
         </button>
         <button
           onClick={handleNext}
           disabled={currentStep === STEPS.length - 1}
-          className="px-4 py-2 text-sm bg-blue-500 text-white rounded-lg disabled:opacity-30"
+          style={{
+            padding: '6px 16px',
+            fontSize: '13px',
+            border: 'none',
+            borderRadius: '8px',
+            backgroundColor: '#3B82F6',
+            color: 'white',
+            cursor: currentStep === STEPS.length - 1 ? 'default' : 'pointer',
+            opacity: currentStep === STEPS.length - 1 ? 0.3 : 1,
+          }}
         >
           {currentStep === STEPS.length - 1 ? '送信' : '次へ'}
         </button>
       </div>
     </div>
-  );
-}`}
-              language="tsx"
-              title="ステッパー（マルチステップ）UI"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <Stepper />
+}
+`}
+              title="ステッパー（マルチステップ）UI → 「次へ」をクリックしてみよう"
+              previewHeight={220}
             />
           </section>
 
@@ -443,47 +507,61 @@ function Stepper() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               配列データをリストとして表示するには、<code className="text-sm bg-muted px-1.5 py-0.5 rounded">.map()</code> メソッドを使います。配列の各要素を JSX に変換して表示します。
             </p>
-            <CodeBlock
-              code={`interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-}
-
-function ProductList() {
-  const products: Product[] = [
-    { id: 1, name: 'デザインブック', price: 2980, image: '/book.jpg', category: '書籍' },
-    { id: 2, name: 'ワイヤレスマウス', price: 4500, image: '/mouse.jpg', category: 'デバイス' },
-    { id: 3, name: 'モニターライト', price: 6800, image: '/light.jpg', category: 'デバイス' },
-  ];
+            <CodePreview
+              code={`function ProductList() {
+  const products = [
+    { id: 1, name: 'デザインブック', price: 2980, emoji: '\u{1F4D6}', category: '書籍' },
+    { id: 2, name: 'ワイヤレスマウス', price: 4500, emoji: '\u{1F5B1}', category: 'デバイス' },
+    { id: 3, name: 'モニターライト', price: 6800, emoji: '\u{1F4A1}', category: 'デバイス' },
+  ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+    <div style={{ display: 'flex', gap: '12px', padding: '16px', flexWrap: 'wrap' }}>
       {products.map((product) => (
-        <div key={product.id} className="border rounded-xl overflow-hidden shadow-sm">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-40 object-cover"
-          />
-          <div className="p-4">
-            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+        <div key={product.id} style={{
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          width: '140px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+        }}>
+          <div style={{
+            height: '80px',
+            backgroundColor: '#F9FAFB',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '32px',
+          }}>
+            {product.emoji}
+          </div>
+          <div style={{ padding: '10px' }}>
+            <span style={{
+              fontSize: '11px',
+              color: '#6B7280',
+              backgroundColor: '#F3F4F6',
+              padding: '1px 6px',
+              borderRadius: '4px',
+            }}>
               {product.category}
             </span>
-            <h3 className="font-bold mt-2">{product.name}</h3>
-            <p className="text-lg font-bold text-blue-600 mt-1">
-              &yen;{product.price.toLocaleString()}
+            <h3 style={{ fontWeight: 'bold', fontSize: '13px', marginTop: '6px' }}>{product.name}</h3>
+            <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#2563EB', marginTop: '4px' }}>
+              \u00A5{product.price.toLocaleString()}
             </p>
           </div>
         </div>
       ))}
     </div>
-  );
-}`}
-              language="tsx"
+  )
+}
+
+function App() {
+  return <ProductList />
+}
+`}
               title="配列データをカードリストとして表示"
+              previewHeight={200}
             />
           </section>
 
@@ -533,64 +611,80 @@ const menuItems = ['ホーム', '製品', '会社概要'];
             <p className="text-muted-foreground mb-4 leading-relaxed">
               key は React にとって要素の「身分証明書」です。key が変わると、React はその要素を完全に破棄して新しく作り直します。この仕組みを理解すると、key を活用したテクニックも使えるようになります。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`// key を使ってコンポーネントをリセットする
 
-// key を使ってコンポーネントをリセットする
-
-function EditableProfile({ userId }: { userId: number }) {
-  // このコンポーネントの state はユーザーごとにリセットしたい
-  const [name, setName] = useState('');
-  const [bio, setBio] = useState('');
+function EditableProfile({ userId }) {
+  const [name, setName] = React.useState('')
+  const [bio, setBio] = React.useState('')
 
   return (
-    <div className="space-y-2">
+    <div>
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="名前"
-        className="w-full px-3 py-2 border rounded-lg"
+        placeholder="名前を入力..."
+        style={{ display: 'block', width: '100%', padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px', fontSize: '14px', marginBottom: '8px', boxSizing: 'border-box' }}
       />
       <textarea
         value={bio}
         onChange={(e) => setBio(e.target.value)}
-        placeholder="自己紹介"
-        className="w-full px-3 py-2 border rounded-lg"
+        placeholder="自己紹介を入力..."
+        style={{ display: 'block', width: '100%', padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px', fontSize: '14px', resize: 'vertical', minHeight: '60px', boxSizing: 'border-box' }}
       />
-      <p className="text-xs text-gray-400">ユーザーID: {userId}</p>
+      <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '4px' }}>ユーザーID: {userId}</p>
     </div>
-  );
+  )
 }
 
 function UserSwitcher() {
-  const [selectedUserId, setSelectedUserId] = useState(1);
+  const [selectedUserId, setSelectedUserId] = React.useState(1)
+
+  const buttons = [
+    { id: 1, label: 'ユーザー1', color: '#3B82F6' },
+    { id: 2, label: 'ユーザー2', color: '#22C55E' },
+    { id: 3, label: 'ユーザー3', color: '#A855F7' },
+  ]
 
   return (
-    <div className="p-6 max-w-md space-y-4">
-      <div className="flex gap-2">
-        <button onClick={() => setSelectedUserId(1)} className="px-3 py-1 bg-blue-500 text-white rounded">
-          ユーザー1
-        </button>
-        <button onClick={() => setSelectedUserId(2)} className="px-3 py-1 bg-green-500 text-white rounded">
-          ユーザー2
-        </button>
-        <button onClick={() => setSelectedUserId(3)} className="px-3 py-1 bg-purple-500 text-white rounded">
-          ユーザー3
-        </button>
+    <div style={{ padding: '16px', maxWidth: '360px' }}>
+      <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '8px' }}>
+        入力してからユーザーを切り替えると state がリセットされます
+      </p>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+        {buttons.map((btn) => (
+          <button
+            key={btn.id}
+            onClick={() => setSelectedUserId(btn.id)}
+            style={{
+              padding: '4px 12px',
+              backgroundColor: selectedUserId === btn.id ? btn.color : '#E5E7EB',
+              color: selectedUserId === btn.id ? 'white' : '#4B5563',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '13px',
+              cursor: 'pointer',
+            }}
+          >
+            {btn.label}
+          </button>
+        ))}
       </div>
 
       {/* key を userId にすることで、ユーザーが変わるたびに
           EditableProfile の state が自動的にリセットされる */}
       <EditableProfile key={selectedUserId} userId={selectedUserId} />
-
-      {/* key がないと、ユーザーを切り替えても前の入力値が残ってしまう！ */}
     </div>
-  );
-}`}
-              language="tsx"
-              title="key を活用してコンポーネントの state をリセット"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <UserSwitcher />
+}
+`}
+              title="key を活用してコンポーネントの state をリセット → 入力してからユーザーを切り替えてみよう"
+              previewHeight={260}
             />
             <InfoBox type="warning" title="key とパフォーマンスの関係">
               <p>
@@ -598,66 +692,89 @@ function UserSwitcher() {
               </p>
             </InfoBox>
 
-            <CodeBlock
+            <CodePreview
               code={`// index を key にした場合の問題を具体的に見てみる
 
-import { useState } from 'react';
-
 function IndexKeyProblem() {
-  const [items, setItems] = useState(['りんご', 'バナナ', 'みかん']);
-  const [newItem, setNewItem] = useState('');
+  const [items, setItems] = React.useState(['りんご', 'バナナ', 'みかん'])
+  const [newItem, setNewItem] = React.useState('')
 
-  // 先頭に追加すると...
   const handleAddToTop = () => {
     if (newItem.trim()) {
-      setItems([newItem, ...items]); // 先頭に追加
-      setNewItem('');
+      setItems([newItem, ...items])
+      setNewItem('')
     }
-  };
+  }
+
+  const listItemStyle = {
+    display: 'flex',
+    gap: '8px',
+    alignItems: 'center',
+    marginBottom: '6px',
+  }
+
+  const inputStyle = {
+    padding: '4px 8px',
+    border: '1px solid #D1D5DB',
+    borderRadius: '4px',
+    fontSize: '13px',
+  }
 
   return (
-    <div className="p-6 max-w-md space-y-4">
-      <div className="flex gap-2">
+    <div style={{ padding: '16px', maxWidth: '400px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
         <input
           type="text"
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
           placeholder="フルーツ名"
-          className="flex-1 px-3 py-2 border rounded-lg"
+          style={{ flex: 1, padding: '6px 12px', border: '1px solid #D1D5DB', borderRadius: '8px', fontSize: '14px' }}
         />
-        <button onClick={handleAddToTop} className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+        <button
+          onClick={handleAddToTop}
+          style={{ padding: '6px 12px', backgroundColor: '#3B82F6', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+        >
           先頭に追加
         </button>
       </div>
 
-      {/* NG: index を key にすると、先頭に追加した際に
-          既存の要素の input の値がズレてしまう */}
-      <h4 className="font-bold text-red-500">NG: key={'{index}'}</h4>
-      <ul className="space-y-2">
+      <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '8px' }}>
+        各行のメモ欄に何か入力してから「先頭に追加」してみてください
+      </p>
+
+      <h4 style={{ fontWeight: 'bold', color: '#EF4444', fontSize: '14px', marginBottom: '6px' }}>
+        NG: key=index（メモがズレる）
+      </h4>
+      <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
         {items.map((item, index) => (
-          <li key={index} className="flex gap-2 items-center">
-            <span className="text-sm">{item}</span>
-            <input className="px-2 py-1 border rounded text-sm" placeholder="メモ" />
+          <li key={index} style={listItemStyle}>
+            <span style={{ fontSize: '13px', minWidth: '60px' }}>{item}</span>
+            <input style={inputStyle} placeholder="メモ" />
           </li>
         ))}
       </ul>
 
-      {/* OK: 値自体を key にする（実際は id が望ましい） */}
-      <h4 className="font-bold text-green-500 mt-6">OK: key={'{item}'}</h4>
-      <ul className="space-y-2">
+      <h4 style={{ fontWeight: 'bold', color: '#22C55E', fontSize: '14px', marginBottom: '6px' }}>
+        OK: key=item（メモが正しく追従する）
+      </h4>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {items.map((item) => (
-          <li key={item} className="flex gap-2 items-center">
-            <span className="text-sm">{item}</span>
-            <input className="px-2 py-1 border rounded text-sm" placeholder="メモ" />
+          <li key={item} style={listItemStyle}>
+            <span style={{ fontSize: '13px', minWidth: '60px' }}>{item}</span>
+            <input style={inputStyle} placeholder="メモ" />
           </li>
         ))}
       </ul>
     </div>
-  );
-}`}
-              language="tsx"
-              title="index を key にした場合の具体的な問題"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <IndexKeyProblem />
+}
+`}
+              title="index を key にした場合の具体的な問題 → メモを入力してから追加してみよう"
+              previewHeight={400}
             />
           </section>
 
@@ -782,61 +899,106 @@ function App() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               リストが空のときに何も表示されないと、ユーザーは「読み込み中？」「エラー？」と混乱します。適切な空の状態メッセージを表示しましょう。
             </p>
-            <CodeBlock
-              code={`interface EmptyStateProps {
-  title: string;
-  description?: string;
-  actionLabel?: string;
-  onAction?: () => void;
-}
-
-function EmptyState({ title, description, actionLabel, onAction }: EmptyStateProps) {
+            <CodePreview
+              code={`function EmptyState({ title, description, actionLabel, onAction }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-        <span className="text-2xl text-gray-400">&#x1F4ED;</span>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '32px 16px',
+      textAlign: 'center',
+    }}>
+      <div style={{
+        width: '56px',
+        height: '56px',
+        backgroundColor: '#F3F4F6',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '12px',
+        fontSize: '24px',
+      }}>
+        \u{1F4ED}
       </div>
-      <h3 className="text-lg font-medium text-gray-700">{title}</h3>
+      <h3 style={{ fontSize: '16px', fontWeight: '500', color: '#374151' }}>{title}</h3>
       {description && (
-        <p className="mt-1 text-sm text-gray-400 max-w-xs">{description}</p>
+        <p style={{ marginTop: '4px', fontSize: '13px', color: '#9CA3AF', maxWidth: '240px' }}>
+          {description}
+        </p>
       )}
       {actionLabel && onAction && (
         <button
           onClick={onAction}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          style={{
+            marginTop: '12px',
+            padding: '6px 16px',
+            backgroundColor: '#3B82F6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '13px',
+            cursor: 'pointer',
+          }}
         >
           {actionLabel}
         </button>
       )}
     </div>
-  );
+  )
 }
 
-// 使い方
 function BookmarkList() {
-  const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [bookmarks, setBookmarks] = React.useState([])
+
+  const addSample = () => {
+    setBookmarks(['React入門ガイド', 'TypeScript実践', 'CSS設計パターン'])
+  }
 
   if (bookmarks.length === 0) {
     return (
       <EmptyState
         title="ブックマークがありません"
         description="気になる記事をブックマークすると、ここに表示されます"
-        actionLabel="記事を探す"
-        onAction={() => console.log('記事一覧へ')}
+        actionLabel="サンプルを追加"
+        onAction={addSample}
       />
-    );
+    )
   }
 
   return (
-    <ul>
-      {bookmarks.map((bookmark) => (
-        <li key={bookmark}>{bookmark}</li>
-      ))}
-    </ul>
-  );
-}`}
-              language="tsx"
-              title="再利用可能な EmptyState コンポーネント"
+    <div style={{ padding: '16px' }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        {bookmarks.map((bookmark) => (
+          <li key={bookmark} style={{
+            padding: '8px 12px',
+            border: '1px solid #E5E7EB',
+            borderRadius: '6px',
+            marginBottom: '6px',
+            fontSize: '14px',
+          }}>
+            {bookmark}
+          </li>
+        ))}
+      </ul>
+      <button
+        onClick={() => setBookmarks([])}
+        style={{ marginTop: '8px', fontSize: '12px', color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+      >
+        リセット
+      </button>
+    </div>
+  )
+}
+
+function App() {
+  return <BookmarkList />
+}
+`}
+              title="再利用可能な EmptyState コンポーネント → 「サンプルを追加」をクリックしてみよう"
+              previewHeight={220}
             />
           </section>
 
@@ -846,143 +1008,118 @@ function BookmarkList() {
             <p className="text-muted-foreground mb-4 leading-relaxed">
               条件分岐、リスト表示、フィルタリング、空の状態を組み合わせた実用的なギャラリーコンポーネントです。
             </p>
-            <CodeBlock
-              code={`import { useState } from 'react';
+            <CodePreview
+              code={`const CATEGORIES = [
+  { value: 'all', label: 'すべて' },
+  { value: 'web', label: 'Web' },
+  { value: 'mobile', label: 'モバイル' },
+  { value: 'branding', label: 'ブランディング' },
+  { value: 'illustration', label: 'イラスト' },
+]
 
-interface DesignWork {
-  id: number;
-  title: string;
-  category: 'web' | 'mobile' | 'branding' | 'illustration';
-  image: string;
-  featured: boolean;
-}
-
-const CATEGORIES = [
-  { value: 'all' as const, label: 'すべて' },
-  { value: 'web' as const, label: 'Web' },
-  { value: 'mobile' as const, label: 'モバイル' },
-  { value: 'branding' as const, label: 'ブランディング' },
-  { value: 'illustration' as const, label: 'イラスト' },
-];
-
-const WORKS: DesignWork[] = [
-  { id: 1, title: 'ECサイトリデザイン', category: 'web', image: '/works/ec.jpg', featured: true },
-  { id: 2, title: '天気アプリUI', category: 'mobile', image: '/works/weather.jpg', featured: false },
-  { id: 3, title: 'カフェロゴデザイン', category: 'branding', image: '/works/cafe.jpg', featured: true },
-  { id: 4, title: 'ダッシュボード', category: 'web', image: '/works/dashboard.jpg', featured: false },
-  { id: 5, title: 'フィットネスアプリ', category: 'mobile', image: '/works/fitness.jpg', featured: true },
-  { id: 6, title: 'キャラクターデザイン', category: 'illustration', image: '/works/character.jpg', featured: false },
-];
-
-type FilterCategory = 'all' | DesignWork['category'];
+const WORKS = [
+  { id: 1, title: 'ECサイトリデザイン', category: 'web', emoji: '\u{1F6D2}', featured: true },
+  { id: 2, title: '天気アプリUI', category: 'mobile', emoji: '\u{26C5}', featured: false },
+  { id: 3, title: 'カフェロゴデザイン', category: 'branding', emoji: '\u{2615}', featured: true },
+  { id: 4, title: 'ダッシュボード', category: 'web', emoji: '\u{1F4CA}', featured: false },
+  { id: 5, title: 'フィットネスアプリ', category: 'mobile', emoji: '\u{1F3CB}', featured: true },
+  { id: 6, title: 'キャラクターデザイン', category: 'illustration', emoji: '\u{1F3A8}', featured: false },
+]
 
 function DesignGallery() {
-  const [activeCategory, setActiveCategory] = useState<FilterCategory>('all');
-  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = React.useState('all')
+  const [showFeaturedOnly, setShowFeaturedOnly] = React.useState(false)
+  const [searchQuery, setSearchQuery] = React.useState('')
 
-  // 複数条件でフィルタリング
   const filteredWorks = WORKS.filter((work) => {
-    // カテゴリフィルタ
-    if (activeCategory !== 'all' && work.category !== activeCategory) {
-      return false;
-    }
-    // 注目作品フィルタ
-    if (showFeaturedOnly && !work.featured) {
-      return false;
-    }
-    // 検索フィルタ
-    if (searchQuery && !work.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    return true;
-  });
+    if (activeCategory !== 'all' && work.category !== activeCategory) return false
+    if (showFeaturedOnly && !work.featured) return false
+    if (searchQuery && !work.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
+    return true
+  })
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">デザインギャラリー</h1>
+    <div style={{ padding: '16px' }}>
+      <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>デザインギャラリー</h2>
 
-      {/* 検索バー */}
       <input
         type="text"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="作品名で検索..."
-        className="w-full px-4 py-2 border rounded-lg mb-4"
+        style={{ width: '100%', padding: '6px 12px', border: '1px solid #D1D5DB', borderRadius: '8px', marginBottom: '10px', fontSize: '13px', boxSizing: 'border-box' }}
       />
 
-      {/* フィルターコントロール */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="flex gap-2">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setActiveCategory(cat.value)}
-              className={\`px-3 py-1.5 rounded-full text-sm font-medium transition-colors
-                \${activeCategory === cat.value
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }\`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
-        <label className="flex items-center gap-2 ml-auto">
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat.value}
+            onClick={() => setActiveCategory(cat.value)}
+            style={{
+              padding: '3px 10px',
+              borderRadius: '999px',
+              fontSize: '12px',
+              fontWeight: '500',
+              border: 'none',
+              cursor: 'pointer',
+              backgroundColor: activeCategory === cat.value ? '#3B82F6' : '#F3F4F6',
+              color: activeCategory === cat.value ? 'white' : '#4B5563',
+            }}
+          >
+            {cat.label}
+          </button>
+        ))}
+        <label style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: 'auto', fontSize: '12px' }}>
           <input
             type="checkbox"
             checked={showFeaturedOnly}
             onChange={(e) => setShowFeaturedOnly(e.target.checked)}
-            className="w-4 h-4"
           />
-          <span className="text-sm">注目作品のみ</span>
+          注目のみ
         </label>
       </div>
 
-      {/* ギャラリー or 空の状態 */}
       {filteredWorks.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-400 text-lg">条件に一致する作品がありません</p>
+        <div style={{ textAlign: 'center', padding: '24px 0' }}>
+          <p style={{ color: '#9CA3AF', fontSize: '14px' }}>条件に一致する作品がありません</p>
           <button
-            onClick={() => {
-              setActiveCategory('all');
-              setShowFeaturedOnly(false);
-              setSearchQuery('');
-            }}
-            className="mt-3 text-sm text-blue-600 hover:underline"
+            onClick={() => { setActiveCategory('all'); setShowFeaturedOnly(false); setSearchQuery('') }}
+            style={{ marginTop: '8px', fontSize: '12px', color: '#2563EB', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
           >
             フィルターをリセット
           </button>
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-500 mb-4">
+          <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '8px' }}>
             {filteredWorks.length} 件の作品
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
             {filteredWorks.map((work) => (
-              <div
-                key={work.id}
-                className="group border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="relative">
-                  <img
-                    src={work.image}
-                    alt={work.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+              <div key={work.id} style={{ border: '1px solid #E5E7EB', borderRadius: '10px', overflow: 'hidden' }}>
+                <div style={{ position: 'relative', height: '60px', backgroundColor: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>
+                  {work.emoji}
                   {work.featured && (
-                    <span className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full">
+                    <span style={{
+                      position: 'absolute',
+                      top: '4px',
+                      right: '4px',
+                      backgroundColor: '#FBBF24',
+                      color: '#78350F',
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                      padding: '1px 6px',
+                      borderRadius: '999px',
+                    }}>
                       注目
                     </span>
                   )}
                 </div>
-                <div className="p-4">
-                  <span className="text-xs text-gray-500 uppercase">
+                <div style={{ padding: '8px' }}>
+                  <span style={{ fontSize: '10px', color: '#6B7280', textTransform: 'uppercase' }}>
                     {CATEGORIES.find((c) => c.value === work.category)?.label}
                   </span>
-                  <h3 className="font-bold mt-1">{work.title}</h3>
+                  <h3 style={{ fontWeight: 'bold', fontSize: '12px', marginTop: '2px' }}>{work.title}</h3>
                 </div>
               </div>
             ))}
@@ -990,11 +1127,15 @@ function DesignGallery() {
         </>
       )}
     </div>
-  );
-}`}
-              language="tsx"
-              title="フィルタ付きカードギャラリー - 実践例"
-              showLineNumbers
+  )
+}
+
+function App() {
+  return <DesignGallery />
+}
+`}
+              title="フィルタ付きカードギャラリー → 検索・フィルタを試してみよう"
+              previewHeight={380}
             />
           </section>
 
