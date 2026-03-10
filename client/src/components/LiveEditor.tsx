@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { transform } from 'sucrase';
 import { Play, RotateCcw, Maximize2, Minimize2, Eye, Code2 } from 'lucide-react';
 
@@ -61,8 +61,8 @@ function buildPreviewHtml(jsxCode: string, cssCode: string): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -91,7 +91,7 @@ function buildPreviewHtml(jsxCode: string, cssCode: string): string {
         '<strong>ランタイムエラー:</strong><br>' +
         e.message.replace(/</g, '&lt;') + '</div>';
     }
-  <\/script>
+  </script>
 </body>
 </html>`;
 }
@@ -113,6 +113,7 @@ export default function LiveEditor({
   const [viewMode, setViewMode] = useState<'split' | 'code' | 'preview'>('split');
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const blobUrlRef = useRef('');
 
   // プレビューを生成
   const runPreview = useCallback(() => {
@@ -136,6 +137,20 @@ export default function LiveEditor({
   useEffect(() => {
     runPreview();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const blobUrl = useMemo(() => {
+    if (!previewHtml) return '';
+    if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+    const url = URL.createObjectURL(new Blob([previewHtml], { type: 'text/html' }));
+    blobUrlRef.current = url;
+    return url;
+  }, [previewHtml]);
+
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+    };
   }, []);
 
   const handleCodeChange = (value: string) => {
@@ -310,9 +325,8 @@ export default function LiveEditor({
             <div className="flex-1 bg-white" style={!isFullscreen ? { height: previewHeight } : undefined}>
               <iframe
                 ref={iframeRef}
-                srcDoc={previewHtml}
+                src={blobUrl}
                 title="プレビュー"
-                sandbox="allow-scripts allow-same-origin"
                 className="w-full h-full border-0"
                 style={{ minHeight: previewHeight }}
               />

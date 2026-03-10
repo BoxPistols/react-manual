@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Copy, Check, Eye, Code2, Maximize2, Minimize2 } from 'lucide-react';
 import { Highlight, themes, type Language } from 'prism-react-renderer';
 import { transform } from 'sucrase';
@@ -55,8 +55,8 @@ pre{white-space:pre-wrap;font-size:13px;line-height:1.5;}</style></head>
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Work Sans',system-ui,sans-serif;padding:16px;background:#fff;color:#1f2937;line-height:1.6;}
@@ -74,7 +74,7 @@ try{
     '<div style="color:#ef4444;padding:16px;font-size:13px;font-family:monospace;">'+
     '<strong>Error:</strong> '+e.message.replace(/</g,'&lt;')+'</div>';
 }
-<\/script></body></html>`;
+</script></body></html>`;
 }
 
 export default function CodePreview({
@@ -89,11 +89,26 @@ export default function CodePreview({
   const [copied, setCopied] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewMode, setViewMode] = useState<'both' | 'code' | 'preview'>('both');
+  const blobUrlRef = useRef('');
 
   const previewHtml = useMemo(() => {
     if (language === 'css' || language === 'html') return '';
     return buildHtml(code, css);
   }, [code, css, language]);
+
+  const blobUrl = useMemo(() => {
+    if (!previewHtml) return '';
+    if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+    const url = URL.createObjectURL(new Blob([previewHtml], { type: 'text/html' }));
+    blobUrlRef.current = url;
+    return url;
+  }, [previewHtml]);
+
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+    };
+  }, []);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -209,9 +224,8 @@ export default function CodePreview({
             </div>
             <div className="bg-white" style={!isFullscreen ? { height: previewHeight } : { flex: 1 }}>
               <iframe
-                srcDoc={previewHtml}
+                src={blobUrl}
                 title="プレビュー"
-                sandbox="allow-scripts allow-same-origin"
                 className="w-full h-full border-0"
                 style={{ minHeight: previewHeight }}
               />
