@@ -128,35 +128,55 @@ export default defineConfig({
               デザイントークンとして非常に合理的な体系です。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="パディングとマージン"
-              code={`// パディング（内側の余白）
-<div className="p-4">全方向 16px</div>
-<div className="px-6">左右 24px</div>
-<div className="py-2">上下 8px</div>
-<div className="pt-8">上だけ 32px</div>
-
-// マージン（外側の余白）
-<div className="m-4">全方向 16px</div>
-<div className="mx-auto">左右 auto（中央揃え）</div>
-<div className="mb-6">下だけ 24px</div>
-
-// よく使うスペーシング値
-// 0 = 0px,  1 = 4px,  2 = 8px,   3 = 12px
-// 4 = 16px, 5 = 20px, 6 = 24px,  8 = 32px
-// 10 = 40px, 12 = 48px, 16 = 64px, 20 = 80px`}
+              previewHeight={340}
+              code={`function App() {
+  const box = (label, style) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+      <div style={{ background: '#dbeafe', borderRadius: 4, ...style }}>
+        <div style={{ background: '#eff6ff', borderRadius: 2, padding: '4px 8px', fontSize: 13 }}>{label}</div>
+      </div>
+      <code style={{ color: '#6b7280', fontSize: 12 }}>{Object.entries(style).map(([k,v]) => k + ': ' + v).join(', ')}</code>
+    </div>
+  );
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <strong style={{ fontSize: 13, color: '#374151' }}>パディング（内側の余白）</strong>
+      {box('p-4: 全方向 16px', { padding: 16 })}
+      {box('px-6: 左右 24px', { paddingLeft: 24, paddingRight: 24 })}
+      {box('py-2: 上下 8px', { paddingTop: 8, paddingBottom: 8 })}
+      {box('pt-8: 上だけ 32px', { paddingTop: 32 })}
+      <strong style={{ fontSize: 13, color: '#374151', marginTop: 4 }}>マージン（外側の余白）</strong>
+      {box('m-4: 全方向 16px', { margin: 16 })}
+      {box('mx-auto: 左右 auto', { marginLeft: 'auto', marginRight: 'auto' })}
+      {box('mb-6: 下だけ 24px', { marginBottom: 24 })}
+    </div>
+  );
+}`}
             />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="幅と高さ"
-              code={`<div className="w-full">幅 100%</div>
-<div className="w-1/2">幅 50%</div>
-<div className="w-64">幅 256px</div>
-<div className="h-screen">高さ 100vh</div>
-<div className="min-h-screen">最小高さ 100vh</div>
-<div className="max-w-4xl">最大幅 896px</div>`}
+              previewHeight={200}
+              code={`function App() {
+  const row = (label, style) => (
+    <div style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ background: '#dbeafe', borderRadius: 4, padding: '4px 8px', textAlign: 'center', ...style }}>{label}</div>
+      <code style={{ color: '#6b7280', fontSize: 11 }}>{Object.entries(style).map(([k,v]) => k + ': ' + v).join(', ')}</code>
+    </div>
+  );
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {row('w-full: 幅 100%', { width: '100%' })}
+      {row('w-1/2: 幅 50%', { width: '50%' })}
+      {row('w-64: 幅 256px', { width: 256 })}
+      {row('max-w-4xl: 最大幅 896px', { maxWidth: 896, width: '100%' })}
+    </div>
+  );
+}`}
             />
           </section>
 
@@ -209,38 +229,37 @@ export default defineConfig({
               文字サイズ、太さ、行間、文字揃えなど、テキストに関するユーティリティを見ていきましょう。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="テキストのスタイリング"
-              code={`// フォントサイズ
-<p className="text-xs">12px - 極小テキスト</p>
-<p className="text-sm">14px - 小さいテキスト</p>
-<p className="text-base">16px - 標準テキスト</p>
-<p className="text-lg">18px - 少し大きめ</p>
-<p className="text-xl">20px - 大きめ</p>
-<p className="text-2xl">24px - 見出し</p>
-<p className="text-4xl">36px - 大見出し</p>
+              previewHeight={420}
+              code={`function App() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <strong style={{ fontSize: 13, color: '#374151' }}>フォントサイズ</strong>
+      <p style={{ fontSize: 12, margin: 0 }}>text-xs: 12px - 極小テキスト</p>
+      <p style={{ fontSize: 14, margin: 0 }}>text-sm: 14px - 小さいテキスト</p>
+      <p style={{ fontSize: 16, margin: 0 }}>text-base: 16px - 標準テキスト</p>
+      <p style={{ fontSize: 18, margin: 0 }}>text-lg: 18px - 少し大きめ</p>
+      <p style={{ fontSize: 20, margin: 0 }}>text-xl: 20px - 大きめ</p>
+      <p style={{ fontSize: 24, margin: 0 }}>text-2xl: 24px - 見出し</p>
+      <p style={{ fontSize: 36, margin: 0 }}>text-4xl: 36px - 大見出し</p>
 
-// フォントウェイト
-<p className="font-normal">普通（400）</p>
-<p className="font-medium">ミディアム（500）</p>
-<p className="font-semibold">セミボールド（600）</p>
-<p className="font-bold">ボールド（700）</p>
-<p className="font-extrabold">エクストラボールド（800）</p>
+      <strong style={{ fontSize: 13, color: '#374151', marginTop: 8 }}>フォントウェイト</strong>
+      <p style={{ fontWeight: 400, margin: 0 }}>font-normal: 普通（400）</p>
+      <p style={{ fontWeight: 500, margin: 0 }}>font-medium: ミディアム（500）</p>
+      <p style={{ fontWeight: 600, margin: 0 }}>font-semibold: セミボールド（600）</p>
+      <p style={{ fontWeight: 700, margin: 0 }}>font-bold: ボールド（700）</p>
+      <p style={{ fontWeight: 800, margin: 0 }}>font-extrabold: エクストラボールド（800）</p>
 
-// 行間・文字間
-<p className="leading-tight">行間 狭い（1.25）</p>
-<p className="leading-relaxed">行間 広め（1.625）</p>
-<p className="tracking-wide">文字間 広め</p>
-
-// テキスト配置
-<p className="text-center">中央揃え</p>
-<p className="text-right">右揃え</p>
-
-// テキスト装飾
-<p className="underline">下線</p>
-<p className="line-through">取り消し線</p>
-<p className="truncate">長いテキストを省略...</p>`}
+      <strong style={{ fontSize: 13, color: '#374151', marginTop: 8 }}>テキスト装飾・配置</strong>
+      <p style={{ textDecoration: 'underline', margin: 0 }}>underline: 下線</p>
+      <p style={{ textDecoration: 'line-through', margin: 0 }}>line-through: 取り消し線</p>
+      <p style={{ textAlign: 'center', margin: 0 }}>text-center: 中央揃え</p>
+      <p style={{ textAlign: 'right', margin: 0 }}>text-right: 右揃え</p>
+    </div>
+  );
+}`}
             />
           </section>
 
@@ -283,28 +302,35 @@ export default defineConfig({
 
             <div className="mt-4" />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="Grid レイアウト"
-              code={`// 3カラムグリッド
-<div className="grid grid-cols-3 gap-4">
-  <div className="bg-gray-100 p-4">1</div>
-  <div className="bg-gray-100 p-4">2</div>
-  <div className="bg-gray-100 p-4">3</div>
-</div>
+              previewHeight={240}
+              code={`function App() {
+  const cell = { background: '#f3f4f6', padding: 16, borderRadius: 4, textAlign: 'center', fontSize: 14 };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* 3カラムグリッド */}
+      <div>
+        <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 8px', color: '#374151' }}>3カラムグリッド (grid-cols-3 gap-4)</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          <div style={cell}>1</div>
+          <div style={cell}>2</div>
+          <div style={cell}>3</div>
+        </div>
+      </div>
 
-// レスポンシブ対応のグリッド
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  <div>カード 1</div>
-  <div>カード 2</div>
-  <div>カード 3</div>
-</div>
-
-// 特定のカラムを広くする
-<div className="grid grid-cols-4 gap-4">
-  <div className="col-span-3">メインコンテンツ（3/4）</div>
-  <div className="col-span-1">サイドバー（1/4）</div>
-</div>`}
+      {/* メイン + サイドバー */}
+      <div>
+        <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 8px', color: '#374151' }}>メイン + サイドバー (grid-cols-4)</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: 16 }}>
+          <div style={{ ...cell, background: '#dbeafe' }}>メインコンテンツ（3/4）</div>
+          <div style={{ ...cell, background: '#e0e7ff' }}>サイドバー（1/4）</div>
+        </div>
+      </div>
+    </div>
+  );
+}`}
             />
           </section>
 

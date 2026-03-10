@@ -411,97 +411,39 @@ function SxPropExamples() {
               ここまでの基本コンポーネントを組み合わせて、シンプルなウェルカムページを作ってみましょう。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="WelcomePage.tsx"
-              showLineNumbers
-              code={`import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import CodeIcon from '@mui/icons-material/Code';
+              previewHeight={340}
+              code={`function App() {
+  const btnContained = { background: '#1976d2', color: '#fff', border: 'none', borderRadius: 4, padding: '10px 24px', fontSize: 15, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8 };
+  const btnOutlined = { background: 'transparent', color: '#1976d2', border: '1px solid #1976d2', borderRadius: 4, padding: '9px 23px', fontSize: 15, fontWeight: 500, cursor: 'pointer' };
 
-export default function WelcomePage() {
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        bgcolor: 'background.default',
-      }}
-    >
-      <Container maxWidth="md">
-        <Box sx={{ textAlign: 'center' }}>
-          {/* アイコン */}
-          <Box
-            sx={{
-              display: 'inline-flex',
-              p: 2,
-              borderRadius: '50%',
-              bgcolor: 'primary.main',
-              color: 'primary.contrastText',
-              mb: 3,
-            }}
-          >
-            <CodeIcon sx={{ fontSize: 40 }} />
-          </Box>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300, background: '#fafafa', fontFamily: 'Roboto, sans-serif' }}>
+      <div style={{ textAlign: 'center', maxWidth: 500 }}>
+        {/* アイコン */}
+        <div style={{ display: 'inline-flex', padding: 16, borderRadius: '50%', background: '#1976d2', color: '#fff', marginBottom: 24, fontSize: 28, fontWeight: 700 }}>
+          {'</>'}
+        </div>
 
-          {/* タイトル */}
-          <Typography
-            variant="h2"
-            component="h1"
-            sx={{
-              fontWeight: 800,
-              mb: 2,
-              fontSize: { xs: '2rem', md: '3rem' },
-            }}
-          >
-            React アプリへようこそ
-          </Typography>
+        {/* タイトル */}
+        <h1 style={{ fontSize: 36, fontWeight: 800, margin: '0 0 12px', color: '#1a1a2e' }}>
+          React アプリへようこそ
+        </h1>
 
-          {/* 説明文 */}
-          <Typography
-            variant="body1"
-            color="text.secondary"
-            sx={{
-              mb: 4,
-              maxWidth: 500,
-              mx: 'auto',
-              fontSize: { xs: '1rem', md: '1.125rem' },
-              lineHeight: 1.8,
-            }}
-          >
-            MUI を使って美しく機能的な UI を構築しましょう。
-            Material Design のガイドラインに沿った、
-            一貫性のあるデザインを簡単に実現できます。
-          </Typography>
+        {/* 説明文 */}
+        <p style={{ fontSize: 16, color: '#666', lineHeight: 1.8, margin: '0 auto 28px', maxWidth: 460 }}>
+          MUI を使って美しく機能的な UI を構築しましょう。Material Design のガイドラインに沿った、一貫性のあるデザインを簡単に実現できます。
+        </p>
 
-          {/* ボタン */}
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={2}
-            justifyContent="center"
-          >
-            <Button
-              variant="contained"
-              size="large"
-              endIcon={<ArrowForwardIcon />}
-            >
-              はじめる
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-            >
-              ドキュメントを読む
-            </Button>
-          </Stack>
-        </Box>
-      </Container>
-    </Box>
+        {/* ボタン */}
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button style={btnContained}>はじめる →</button>
+          <button style={btnOutlined}>ドキュメントを読む</button>
+        </div>
+      </div>
+    </div>
   );
 }`}
             />

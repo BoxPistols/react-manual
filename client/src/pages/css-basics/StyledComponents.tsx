@@ -203,132 +203,73 @@ export default defineConfig({
               v6 では、DOM に渡さない props には <code className="bg-muted px-1.5 py-0.5 rounded text-sm">$</code> 接頭辞（transient props）を使います。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="動的スタイルの基本"
-              code={`import styled from 'styled-components';
-
-// $primary は DOM に渡されない（transient prop）
-const Button = styled.button<{ $primary?: boolean }>\`
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  /* props に基づいてスタイルを切り替え */
-  background-color: \${(props) => (props.$primary ? '#3b82f6' : 'transparent')};
-  color: \${(props) => (props.$primary ? 'white' : '#3b82f6')};
-  border: 2px solid #3b82f6;
-
-  &:hover {
-    background-color: \${(props) => (props.$primary ? '#2563eb' : '#eff6ff')};
+              code={`function App() {
+  function Button({ primary, children }) {
+    return (
+      <button style={{
+        padding: '10px 20px', borderRadius: 6, fontWeight: 600,
+        cursor: 'pointer', transition: 'all 0.2s ease',
+        backgroundColor: primary ? '#3b82f6' : 'transparent',
+        color: primary ? 'white' : '#3b82f6',
+        border: '2px solid #3b82f6', marginRight: 8,
+      }}>
+        {children}
+      </button>
+    );
   }
-\`;
 
-// 使用例
-function App() {
   return (
     <div>
-      <Button $primary>プライマリ</Button>
+      <Button primary>プライマリ</Button>
       <Button>アウトライン</Button>
     </div>
   );
 }`}
+              previewHeight={80}
             />
 
             <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">複数の props を使う例</h3>
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="サイズとバリアントの組み合わせ"
-              code={`import styled, { css } from 'styled-components';
+              code={`function App() {
+  var variants = {
+    primary: { backgroundColor: '#3b82f6', color: 'white', border: 'none' },
+    secondary: { backgroundColor: '#6b7280', color: 'white', border: 'none' },
+    outline: { backgroundColor: 'transparent', color: '#3b82f6', border: '2px solid #3b82f6' },
+    ghost: { backgroundColor: 'transparent', color: '#374151', border: 'none' },
+  };
+  var sizes = {
+    sm: { padding: '6px 12px', fontSize: '0.75rem' },
+    md: { padding: '10px 20px', fontSize: '0.875rem' },
+    lg: { padding: '14px 28px', fontSize: '1rem' },
+  };
 
-type Variant = 'primary' | 'secondary' | 'outline' | 'ghost';
-type Size = 'sm' | 'md' | 'lg';
-
-interface StyledButtonProps {
-  $variant?: Variant;
-  $size?: Size;
-  $fullWidth?: boolean;
-}
-
-const variantStyles: Record<Variant, ReturnType<typeof css>> = {
-  primary: css\`
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    &:hover { background-color: #2563eb; }
-  \`,
-  secondary: css\`
-    background-color: #6b7280;
-    color: white;
-    border: none;
-    &:hover { background-color: #4b5563; }
-  \`,
-  outline: css\`
-    background-color: transparent;
-    color: #3b82f6;
-    border: 2px solid #3b82f6;
-    &:hover { background-color: #eff6ff; }
-  \`,
-  ghost: css\`
-    background-color: transparent;
-    color: #374151;
-    border: none;
-    &:hover { background-color: #f3f4f6; }
-  \`,
-};
-
-const sizeStyles: Record<Size, ReturnType<typeof css>> = {
-  sm: css\`
-    padding: 6px 12px;
-    font-size: 0.75rem;
-  \`,
-  md: css\`
-    padding: 10px 20px;
-    font-size: 0.875rem;
-  \`,
-  lg: css\`
-    padding: 14px 28px;
-    font-size: 1rem;
-  \`,
-};
-
-const StyledButton = styled.button<StyledButtonProps>\`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: \${(props) => (props.$fullWidth ? '100%' : 'auto')};
-
-  /* variant スタイルを適用 */
-  \${(props) => variantStyles[props.$variant || 'primary']}
-
-  /* size スタイルを適用 */
-  \${(props) => sizeStyles[props.$size || 'md']}
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  function StyledButton({ variant, size, fullWidth, children }) {
+    var v = variant || 'primary';
+    var s = size || 'md';
+    var style = Object.assign({
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      gap: 8, borderRadius: 8, fontWeight: 600, cursor: 'pointer',
+      transition: 'all 0.2s ease', width: fullWidth ? '100%' : 'auto',
+    }, variants[v], sizes[s]);
+    return React.createElement('button', { style: style }, children);
   }
-\`;
 
-// 使用例
-function App() {
   return (
-    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-      <StyledButton $variant="primary" $size="sm">小さいボタン</StyledButton>
-      <StyledButton $variant="secondary" $size="md">中ボタン</StyledButton>
-      <StyledButton $variant="outline" $size="lg">大きいアウトライン</StyledButton>
-      <StyledButton $variant="ghost">ゴースト</StyledButton>
-      <StyledButton $variant="primary" $fullWidth>全幅ボタン</StyledButton>
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <StyledButton variant="primary" size="sm">小さいボタン</StyledButton>
+      <StyledButton variant="secondary" size="md">中ボタン</StyledButton>
+      <StyledButton variant="outline" size="lg">大きいアウトライン</StyledButton>
+      <StyledButton variant="ghost">ゴースト</StyledButton>
+      <StyledButton variant="primary" fullWidth>全幅ボタン</StyledButton>
     </div>
   );
 }`}
+              previewHeight={120}
             />
 
             <InfoBox type="warning" title="$ 接頭辞を忘れずに">

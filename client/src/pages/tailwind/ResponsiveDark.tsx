@@ -82,39 +82,35 @@ export default function ResponsiveDark() {
 
             <div className="mt-4" />
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="レスポンシブなナビゲーション"
-              code={`function Header() {
-  const [isOpen, setIsOpen] = useState(false);
+              previewHeight={200}
+              code={`function App() {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const linkStyle = { color: '#4b5563', textDecoration: 'none', fontSize: 14 };
 
   return (
-    <header className="bg-white shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold">MyApp</h1>
-
-        {/* モバイル: ハンバーガーメニュー */}
+    <header style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ maxWidth: 600, margin: '0 auto', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>MyApp</h1>
         <button
-          className="md:hidden p-2"
           onClick={() => setIsOpen(!isOpen)}
+          style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 10px', fontSize: 18, cursor: 'pointer' }}
         >
           ☰
         </button>
-
-        {/* PC: 横並びナビ */}
-        <nav className="hidden md:flex gap-6">
-          <a href="/" className="text-gray-600 hover:text-gray-900">ホーム</a>
-          <a href="/about" className="text-gray-600 hover:text-gray-900">概要</a>
-          <a href="/contact" className="text-gray-600 hover:text-gray-900">お問い合わせ</a>
+        <nav style={{ display: 'flex', gap: 24 }}>
+          <a href="#" style={linkStyle}>ホーム</a>
+          <a href="#" style={linkStyle}>概要</a>
+          <a href="#" style={linkStyle}>お問い合わせ</a>
         </nav>
       </div>
-
-      {/* モバイルメニュー */}
       {isOpen && (
-        <nav className="md:hidden px-4 pb-4 space-y-2">
-          <a href="/" className="block py-2 text-gray-600">ホーム</a>
-          <a href="/about" className="block py-2 text-gray-600">概要</a>
-          <a href="/contact" className="block py-2 text-gray-600">お問い合わせ</a>
+        <nav style={{ padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <a href="#" style={{ ...linkStyle, display: 'block', padding: '8px 0' }}>ホーム</a>
+          <a href="#" style={{ ...linkStyle, display: 'block', padding: '8px 0' }}>概要</a>
+          <a href="#" style={{ ...linkStyle, display: 'block', padding: '8px 0' }}>お問い合わせ</a>
         </nav>
       )}
     </header>
@@ -392,93 +388,53 @@ function ThemeToggle() {
               ここまで学んだレスポンシブ、ダークモード、アニメーションを組み合わせた実践的な例を作りましょう。
             </p>
 
-            <CodeBlock
+            <CodePreview
               language="tsx"
               title="ProfilePage.tsx"
-              showLineNumbers
-              code={`interface Skill {
-  name: string;
-  level: number; // 0-100
-}
+              previewHeight={420}
+              code={`function App() {
+  const skills = [
+    { name: 'React', level: 90 },
+    { name: 'TypeScript', level: 85 },
+    { name: 'Figma', level: 80 },
+    { name: 'Tailwind CSS', level: 75 },
+  ];
 
-interface ProfileProps {
-  name: string;
-  role: string;
-  avatar: string;
-  bio: string;
-  skills: Skill[];
-}
-
-export default function ProfilePage({
-  name, role, avatar, bio, skills,
-}: ProfileProps) {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900
-                    transition-colors duration-300">
-      {/* ヘッダーセクション */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-12 md:py-20">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row
-                        items-center gap-6 md:gap-10">
-          <img
-            src={avatar}
-            alt={name}
-            className="w-24 h-24 md:w-32 md:h-32 rounded-full
-                       border-4 border-white/30 shadow-xl"
-          />
-          <div className="text-center md:text-left">
-            <h1 className="text-2xl md:text-4xl font-extrabold text-white">
-              {name}
-            </h1>
-            <p className="text-blue-100 text-lg mt-1">{role}</p>
-          </div>
+    <div style={{ fontFamily: 'sans-serif', borderRadius: 12, overflow: 'hidden', border: '1px solid #e5e7eb' }}>
+      {/* ヘッダー */}
+      <div style={{ background: 'linear-gradient(to right, #3b82f6, #7c3aed)', padding: '32px 24px', display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: '3px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, color: '#fff' }}>
+          T
+        </div>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#fff' }}>田中 太郎</h1>
+          <p style={{ margin: '4px 0 0', color: '#dbeafe', fontSize: 16 }}>フロントエンドエンジニア</p>
         </div>
       </div>
 
-      {/* メインコンテンツ */}
-      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12
-                      grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* 自己紹介 */}
-        <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-xl
-                          shadow-sm p-6 md:p-8">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              自己紹介
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              {bio}
-            </p>
-          </div>
+      {/* コンテンツ */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, padding: 20, background: '#f9fafb' }}>
+        <div style={{ background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <h2 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700 }}>自己紹介</h2>
+          <p style={{ margin: 0, color: '#4b5563', lineHeight: 1.7, fontSize: 14 }}>
+            5年以上の Web 開発経験を持つフロントエンドエンジニアです。React と TypeScript を使った開発を専門としています。
+          </p>
         </div>
-
-        {/* スキル */}
-        <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-gray-800 rounded-xl
-                          shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              スキル
-            </h2>
-            <div className="space-y-4">
-              {skills.map((skill) => (
-                <div key={skill.name}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-700 dark:text-gray-300">
-                      {skill.name}
-                    </span>
-                    <span className="text-gray-500 dark:text-gray-400">
-                      {skill.level}%
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-gray-200 dark:bg-gray-700
-                                  rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-blue-500 rounded-full
-                                 transition-all duration-500 ease-out"
-                      style={{ width: \`\${skill.level}%\` }}
-                    />
-                  </div>
+        <div style={{ background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <h2 style={{ margin: '0 0 12px', fontSize: 18, fontWeight: 700 }}>スキル</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {skills.map(s => (
+              <div key={s.name}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
+                  <span style={{ color: '#374151' }}>{s.name}</span>
+                  <span style={{ color: '#6b7280' }}>{s.level}%</span>
                 </div>
-              ))}
-            </div>
+                <div style={{ width: '100%', height: 8, background: '#e5e7eb', borderRadius: 9999, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: s.level + '%', background: '#3b82f6', borderRadius: 9999, transition: 'width 0.5s ease-out' }} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
