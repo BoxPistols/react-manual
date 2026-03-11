@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, HelpCircle, Settings, Bookmark } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 import {
   getNextPage,
   getPreviousPage,
@@ -12,6 +13,7 @@ export default function KeyboardNav() {
   const [location, setLocation] = useLocation();
   const [showToast, setShowToast] = useState<string | null>(null);
   const [isMac, setIsMac] = useState(true);
+  const { toggleTheme } = useTheme();
 
   useEffect(() => {
     setIsMac(navigator.userAgent.includes('Mac'));
@@ -43,6 +45,13 @@ export default function KeyboardNav() {
         return;
       }
 
+      // Cmd/Ctrl + Shift + D → ダークモード切替
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'd' || e.key === 'D')) {
+        e.preventDefault();
+        toggleTheme();
+        return;
+      }
+
       // Cmd/Ctrl + ← → ページ送り
       if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowRight') {
         const next = getNextPage(location);
@@ -71,7 +80,7 @@ export default function KeyboardNav() {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [location, navigate]);
+  }, [location, navigate, toggleTheme]);
 
   const mod = isMac ? '⌘' : 'Ctrl';
 
@@ -91,7 +100,7 @@ export default function KeyboardNav() {
           onClick={() => prevPage && navigate(prevPage.path, `← ${prevPage.title}`)}
           disabled={!prevPage}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          title={`前のステップ (${isMac ? '⌘' : 'Ctrl'}+←)`}
+          title={`前のステップ (${mod}+←)`}
         >
           <ChevronLeft size={14} />
           <span className="hidden lg:inline max-w-[120px] truncate">{prevPage?.title ?? '---'}</span>
@@ -117,7 +126,7 @@ export default function KeyboardNav() {
           onClick={() => nextPage && navigate(nextPage.path, `→ ${nextPage.title}`)}
           disabled={!nextPage}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          title={`次のステップ (${isMac ? '⌘' : 'Ctrl'}+→)`}
+          title={`次のステップ (${mod}+→)`}
         >
           <span className="hidden lg:inline max-w-[120px] truncate">{nextPage?.title ?? '---'}</span>
           <ChevronRight size={14} />
@@ -136,6 +145,27 @@ export default function KeyboardNav() {
             <kbd className="px-1 py-0.5 rounded bg-muted/60 border border-border/50 font-mono">{mod}+K</kbd>
             <span className="ml-0.5">検索</span>
           </span>
+        </div>
+
+        {/* 区切り */}
+        <div className="h-4 w-px bg-border mx-1" />
+
+        {/* ユーティリティボタン */}
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => document.dispatchEvent(new CustomEvent('open-settings'))}
+            className="p-1.5 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-colors"
+            title={`設定 (${mod}+,)`}
+          >
+            <Settings size={14} />
+          </button>
+          <button
+            onClick={() => document.dispatchEvent(new CustomEvent('open-help'))}
+            className="p-1.5 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-colors"
+            title="ヘルプ (?)"
+          >
+            <HelpCircle size={14} />
+          </button>
         </div>
       </div>
     </>

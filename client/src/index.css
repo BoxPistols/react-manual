@@ -338,6 +338,17 @@
 
 }
 
+/* フォントサイズ設定 */
+html.font-small {
+  font-size: 14px;
+}
+html.font-medium {
+  font-size: 16px;
+}
+html.font-large {
+  font-size: 18px;
+}
+
 /* ワイドレイアウトモード: @layer 外で詳細度を確保し Tailwind ユーティリティを上書き */
 .layout-wide .max-w-4xl {
   max-width: 80rem;

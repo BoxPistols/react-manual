@@ -1,6 +1,8 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bookmark, BookmarkCheck } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { getNextPage, getPreviousPage, getPageByPath, pages } from '@/lib/navigation';
+import { useBookmarks } from '@/hooks/useBookmarks';
+import PageNotes from './PageNotes';
 
 export default function PageNavigation() {
   const [location] = useLocation();
@@ -8,9 +10,27 @@ export default function PageNavigation() {
   const prevPage = getPreviousPage(location);
   const nextPage = getNextPage(location);
   const totalSteps = pages.length;
+  const { isBookmarked, toggle } = useBookmarks();
+  const bookmarked = isBookmarked(location);
 
   return (
     <div className="mt-16 pt-8 border-t border-border">
+      {/* ブックマーク & メモ */}
+      <div className="mb-6 flex items-center gap-3">
+        <button
+          onClick={() => toggle(location)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+            bookmarked
+              ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700'
+              : 'bg-muted/50 text-muted-foreground hover:bg-muted border border-border'
+          }`}
+        >
+          {bookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+          {bookmarked ? 'ブックマーク済み' : 'ブックマークする'}
+        </button>
+      </div>
+
+      <PageNotes path={location} />
       {/* プログレスバー */}
       {currentPage && (
         <div className="mb-6">

@@ -61,6 +61,8 @@ import DesignSystem from "./pages/architecture/DesignSystem";
 import Maintenance from "./pages/architecture/Maintenance";
 import NotFound from "./pages/NotFound";
 import KeyboardNav from "./components/KeyboardNav";
+import HelpModal from "./components/HelpModal";
+import SettingsPopup from "./components/SettingsPopup";
 import { useAutoHeadingIds } from "./hooks/useAutoHeadingIds";
 import { Toaster } from "sonner";
 
@@ -143,6 +145,8 @@ function App() {
               </Switch>
             </MainContent>
           </div>
+          <HelpModal />
+          <SettingsPopup />
           <Toaster position="bottom-right" />
         </LayoutProvider>
       </PlatformProvider>

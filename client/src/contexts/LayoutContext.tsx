@@ -4,6 +4,7 @@ type LayoutMode = 'normal' | 'wide';
 
 interface LayoutContextType {
   layoutMode: LayoutMode;
+  setLayoutMode: (mode: LayoutMode) => void;
   toggleLayout: () => void;
 }
 
@@ -24,7 +25,7 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <LayoutContext.Provider value={{ layoutMode, toggleLayout }}>
+    <LayoutContext.Provider value={{ layoutMode, setLayoutMode, toggleLayout }}>
       {children}
     </LayoutContext.Provider>
   );

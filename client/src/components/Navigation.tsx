@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
-import { ChevronDown, Menu, X, Search, Sun, Moon, Columns2, Maximize } from 'lucide-react';
+import { ChevronDown, Menu, X, Search, Sun, Moon, Columns2, Maximize, Bookmark, BookmarkCheck, Settings, HelpCircle } from 'lucide-react';
 import { pages, sections, getPageByPath, getSectionPages } from '@/lib/navigation';
 import { searchIndex } from '@/lib/searchIndex';
 import { toSlug } from '@/hooks/useAutoHeadingIds';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLayout } from '@/contexts/LayoutContext';
+import { useBookmarks } from '@/hooks/useBookmarks';
 
 const navSections = sections.map((s) => ({
   ...s,
@@ -21,6 +22,7 @@ export default function Navigation() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { theme, toggleTheme } = useTheme();
   const { layoutMode, toggleLayout } = useLayout();
+  const { bookmarks, toggle: toggleBookmark, isBookmarked } = useBookmarks();
   const [location] = useLocation();
 
   const currentPage = useMemo(() => getPageByPath(location), [location]);
@@ -90,25 +92,65 @@ export default function Navigation() {
             />
           </div>
 
-          {/* ダークモード切替 + レイアウト切替 */}
-          <div className="flex gap-2 mb-4">
+          {/* ツールバー */}
+          <div className="flex gap-1.5 mb-4">
             <button
               onClick={toggleTheme}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
-              title={theme === 'dark' ? 'ライトモード' : 'ダークモード'}
+              className="flex-1 flex items-center justify-center gap-1 px-2 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+              title={theme === 'dark' ? 'ライトモード (⌘+Shift+D)' : 'ダークモード (⌘+Shift+D)'}
             >
-              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-              <span className="text-xs">{theme === 'dark' ? 'ライト' : 'ダーク'}</span>
+              {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
             <button
               onClick={toggleLayout}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+              className="flex-1 flex items-center justify-center gap-1 px-2 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
               title={layoutMode === 'normal' ? 'ワイドモード' : '通常モード'}
             >
-              {layoutMode === 'normal' ? <Maximize size={16} /> : <Columns2 size={16} />}
-              <span className="text-xs">{layoutMode === 'normal' ? 'ワイド' : '通常'}</span>
+              {layoutMode === 'normal' ? <Maximize size={15} /> : <Columns2 size={15} />}
+            </button>
+            <button
+              onClick={() => document.dispatchEvent(new CustomEvent('open-settings'))}
+              className="flex-1 flex items-center justify-center px-2 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+              title="設定 (⌘+,)"
+            >
+              <Settings size={15} />
+            </button>
+            <button
+              onClick={() => document.dispatchEvent(new CustomEvent('open-help'))}
+              className="flex-1 flex items-center justify-center px-2 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+              title="ヘルプ (?)"
+            >
+              <HelpCircle size={15} />
             </button>
           </div>
+
+          {/* ブックマーク */}
+          {!hasSearch && bookmarks.length > 0 && (
+            <div className="mb-3 pb-3 border-b border-sidebar-border">
+              <p className="px-4 py-1 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                <Bookmark size={12} />
+                ブックマーク
+              </p>
+              {bookmarks.map((bPath) => {
+                const p = getPageByPath(bPath);
+                if (!p) return null;
+                return (
+                  <Link
+                    key={bPath}
+                    href={bPath}
+                    onClick={() => setIsOpen(false)}
+                    className={`block px-4 py-1.5 text-sm transition-colors ${
+                      location === bPath
+                        ? 'text-primary font-medium'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                    } rounded-lg`}
+                  >
+                    {p.title}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
 
           {/* 検索結果 */}
           {hasSearch ? (
