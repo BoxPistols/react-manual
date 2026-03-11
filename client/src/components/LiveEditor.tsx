@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, RotateCcw, Maximize2, Minimize2, Eye, Code2 } from 'lucide-react';
 import { buildPreviewHtml, useBlobUrl } from '@/lib/preview';
+import { useTheme } from '@/contexts/ThemeContext';
 
 // --- 型定義 ---
 interface FileTab {
@@ -36,6 +37,7 @@ export default function LiveEditor({
   steps,
   autoRun = true,
 }: LiveEditorProps) {
+  const { theme } = useTheme();
   const [files, setFiles] = useState<FileTab[]>(initialFiles);
   const [activeTab, setActiveTab] = useState(0);
   const [previewHtml, setPreviewHtml] = useState('');
@@ -48,9 +50,9 @@ export default function LiveEditor({
   const runPreview = useCallback(() => {
     const jsxFile = files.find((f) => f.language === 'tsx') ?? files[0];
     const cssFile = files.find((f) => f.language === 'css');
-    const html = buildPreviewHtml(jsxFile.code, cssFile?.code ?? '');
+    const html = buildPreviewHtml(jsxFile.code, cssFile?.code ?? '', theme === 'dark');
     setPreviewHtml(html);
-  }, [files]);
+  }, [files, theme]);
 
   // 自動実行（デバウンス付き）
   useEffect(() => {
@@ -214,7 +216,7 @@ export default function LiveEditor({
                 value={activeFile.code}
                 onChange={(e) => handleCodeChange(e.target.value)}
                 spellCheck={false}
-                className="w-full h-full min-h-[200px] p-4 font-mono text-sm leading-relaxed bg-transparent text-[#cdd6f4] resize-none focus:outline-none"
+                className="w-full h-full min-h-[200px] py-4 px-5 font-mono text-sm leading-relaxed bg-transparent text-[#cdd6f4] resize-none focus:outline-none"
                 style={
                   !isFullscreen ? { height: previewHeight + 40 } : undefined
                 }
@@ -240,7 +242,7 @@ export default function LiveEditor({
             </div>
 
             {/* iframe */}
-            <div className="flex-1 bg-white" style={!isFullscreen ? { height: previewHeight } : undefined}>
+            <div className="flex-1 bg-white dark:bg-[#1e1e2e]" style={!isFullscreen ? { height: previewHeight } : undefined}>
               <iframe
                 ref={iframeRef}
                 src={blobUrl}

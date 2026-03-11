@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Code2, CheckCircle2, Lightbulb, RotateCcw, Eye, EyeOff } from 'lucide-react';
 import { useBlobUrl, buildPreviewHtml } from '@/lib/preview';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface CodingChallengeProps {
   title: string;
@@ -75,6 +76,8 @@ export default function CodingChallenge({
   preview = false,
   css = '',
 }: CodingChallengeProps) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [code, setCode] = useState(initialCode);
   const [showAnswer, setShowAnswer] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -88,14 +91,14 @@ export default function CodingChallenge({
     if (!preview) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      setPreviewHtml(buildPreviewHtml(code, css));
+      setPreviewHtml(buildPreviewHtml(code, css, isDark));
     }, 400);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [code, css, preview]);
+  }, [code, css, preview, isDark]);
 
   // 初回プレビュー
   useEffect(() => {
-    if (preview) setPreviewHtml(buildPreviewHtml(code, css));
+    if (preview) setPreviewHtml(buildPreviewHtml(code, css, isDark));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -154,7 +157,7 @@ export default function CodingChallenge({
             }}
             spellCheck={false}
             wrap="off"
-            className="w-full p-4 font-mono text-sm leading-relaxed bg-transparent text-[#cdd6f4] resize-none focus:outline-none min-h-[160px] overflow-auto whitespace-pre"
+            className="w-full py-4 px-5 font-mono text-sm leading-relaxed bg-transparent text-[#cdd6f4] resize-none focus:outline-none min-h-[160px] overflow-auto whitespace-pre"
             rows={Math.max(6, code.split('\n').length + 1)}
           />
         </div>
@@ -166,7 +169,7 @@ export default function CodingChallenge({
               <Eye size={12} className="text-muted-foreground" />
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Result</span>
             </div>
-            <div className="bg-white flex-1 min-h-[160px]">
+            <div className="bg-white dark:bg-[#1e1e2e] flex-1 min-h-[160px]">
               <iframe
                 src={blobUrl}
                 sandbox="allow-scripts"

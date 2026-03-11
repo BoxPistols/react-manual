@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Copy, Check, Eye, Code2, Maximize2, Minimize2, RotateCcw, GripVertical } from 'lucide-react';
 import { Highlight, themes, type Language } from 'prism-react-renderer';
 import { useBlobUrl, useDebouncedPreview } from '@/lib/preview';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface CodePreviewProps {
   code: string;
@@ -43,12 +44,13 @@ export default function CodePreview({
     setEditableCode(code);
   }, [code]);
 
+  const { theme } = useTheme();
   const isModified = editableCode !== code;
   const prismLanguage = resolveLanguage(language);
   const canPreview = language === 'tsx' || language === 'jsx';
   const isHorizontal = layout === 'horizontal';
 
-  const previewHtml = useDebouncedPreview(editableCode, css, canPreview);
+  const previewHtml = useDebouncedPreview(editableCode, css, canPreview, 300, theme === 'dark');
   const blobUrl = useBlobUrl(previewHtml);
 
   const handleReset = () => setEditableCode(code);
@@ -138,7 +140,7 @@ export default function CodePreview({
           <Highlight theme={themes.vsDark} code={editableCode} language={prismLanguage}>
             {({ tokens, getLineProps, getTokenProps }) => (
               <pre
-                className="p-4 font-mono text-[13px] leading-[1.6] m-0 bg-[#1e1e2e] w-fit min-w-full min-h-full"
+                className="py-4 px-5 font-mono text-[13px] leading-[1.6] m-0 bg-[#1e1e2e] w-fit min-w-full min-h-full"
                 style={{ tabSize: 2 }}
               >
                 {tokens.map((line, i) => {
@@ -164,7 +166,7 @@ export default function CodePreview({
           onKeyDown={handleKeyDown}
           spellCheck={false}
           wrap="off"
-          className="absolute inset-0 w-full h-full p-4 font-mono text-[13px] leading-[1.6] bg-transparent text-transparent caret-white resize-none focus:outline-none selection:bg-blue-500/30 overflow-auto z-10 whitespace-pre"
+          className="absolute inset-0 w-full h-full py-4 px-5 font-mono text-[13px] leading-[1.6] bg-transparent text-transparent caret-white resize-none focus:outline-none selection:bg-blue-500/30 overflow-auto z-10 whitespace-pre"
           style={{ tabSize: 2 }}
         />
       </div>
@@ -195,7 +197,7 @@ export default function CodePreview({
         <Eye size={11} className="text-muted-foreground" />
         <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Result</span>
       </div>
-      <div className="bg-white flex-1 relative" style={{ height: editorHeight }}>
+      <div className="bg-white dark:bg-[#1e1e2e] flex-1 relative" style={{ height: editorHeight }}>
         <iframe
           src={blobUrl}
           sandbox="allow-scripts"

@@ -22,7 +22,7 @@ function detectComponentName(code: string): string {
 /**
  * JSX/TSX コードを iframe 用 HTML に変換する
  */
-export function buildPreviewHtml(jsxCode: string, cssCode: string): string {
+export function buildPreviewHtml(jsxCode: string, cssCode: string, isDark = false): string {
   const cleanedCode = stripModuleSyntax(jsxCode);
   const componentName = detectComponentName(cleanedCode);
 
@@ -55,7 +55,7 @@ pre{white-space:pre-wrap;font-size:13px;line-height:1.5;}</style></head>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Work Sans',system-ui,sans-serif;padding:16px;background:#fff;color:#1f2937;line-height:1.6;}
+body{font-family:'Work Sans',system-ui,sans-serif;padding:20px;background:${isDark ? '#1e1e2e' : '#fff'};color:${isDark ? '#cdd6f4' : '#1f2937'};line-height:1.6;}
 ${cssCode}
 </style></head><body>
 <div id="root"></div>
@@ -116,6 +116,7 @@ export function useDebouncedPreview(
   css: string,
   canPreview: boolean,
   delay = 300,
+  isDark = false,
 ): string {
   const [previewHtml, setPreviewHtml] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -125,8 +126,8 @@ export function useDebouncedPreview(
       setPreviewHtml('');
       return;
     }
-    setPreviewHtml(buildPreviewHtml(code, css));
-  }, [code, css, canPreview]);
+    setPreviewHtml(buildPreviewHtml(code, css, isDark));
+  }, [code, css, canPreview, isDark]);
 
   // 初回即時実行
   useEffect(() => {
