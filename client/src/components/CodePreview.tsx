@@ -31,7 +31,7 @@ export default function CodePreview({
 }: CodePreviewProps) {
   const [editableCode, setEditableCode] = useState(code);
   const [copied, setCopied] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [viewMode, setViewMode] = useState<'both' | 'code' | 'preview'>('both');
   const [splitRatio, setSplitRatio] = useState(50);
   const [isDragging, setIsDragging] = useState(false);

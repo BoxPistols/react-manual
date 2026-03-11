@@ -1,4 +1,4 @@
-import { BookOpen, Code2, Layers, Palette, Rocket, Server, Layout, Sparkles, Zap, ArrowRight, Keyboard, Search, Settings } from 'lucide-react';
+import { BookOpen, Code2, Layers, Palette, Rocket, Server, Layout, Sparkles, Zap, ArrowRight, Keyboard, Search, Settings, Eye, Copy, Maximize2, RotateCcw, GripVertical, CheckCircle2, Lightbulb } from 'lucide-react';
 import { Link } from 'wouter';
 import PageNavigation from '@/components/PageNavigation';
 
@@ -209,31 +209,139 @@ export default function Home() {
       <div className="max-w-4xl mx-auto px-4 md:px-8 pt-16 pb-8">
         <section>
           <h2 className="text-3xl font-bold text-foreground mb-8 section-accent">このガイドの使い方</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+
+          {/* ライブエディタの使い方（フル幅） */}
+          <div className="rounded-xl border border-border bg-card p-6 card-hover mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                <Code2 size={20} className="text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">ライブエディタの使い方</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+              各ページのコードブロックは<strong className="text-foreground">直接編集可能</strong>です。コードを変更すると右側のプレビューがリアルタイムで更新されます。
+            </p>
+
+            {/* ツールバー再現 */}
+            <div className="rounded-lg border border-[#313244] bg-[#181825] px-4 py-2.5 mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#f38ba8]" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#f9e2af]" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#a6e3a1]" />
+                </div>
+                <span className="text-xs text-[#cdd6f4]/50 ml-1">タイトル</span>
+                <span className="text-[10px] font-mono text-[#cdd6f4]/30 uppercase">tsx</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[#cdd6f4]/40">
+                <Code2 size={14} />
+                <Eye size={14} />
+                <Copy size={14} />
+                <Maximize2 size={14} />
+              </div>
+            </div>
+
+            {/* ボタン説明 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-sm mb-4">
+              <div className="flex items-start gap-2.5">
+                <Code2 size={15} className="text-blue-500 mt-0.5 shrink-0" />
+                <span className="text-muted-foreground"><strong className="text-foreground">&lt;/&gt; コード</strong> — コードのみ表示に切替</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Eye size={15} className="text-blue-500 mt-0.5 shrink-0" />
+                <span className="text-muted-foreground"><strong className="text-foreground">プレビュー</strong> — プレビューのみ表示に切替</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Copy size={15} className="text-blue-500 mt-0.5 shrink-0" />
+                <span className="text-muted-foreground"><strong className="text-foreground">コピー</strong> — コードをクリップボードにコピー</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <RotateCcw size={15} className="text-amber-500 mt-0.5 shrink-0" />
+                <span className="text-muted-foreground"><strong className="text-foreground">リセット</strong> — コード変更時に表示、元に戻す</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Maximize2 size={15} className="text-blue-500 mt-0.5 shrink-0" />
+                <span className="text-muted-foreground"><strong className="text-foreground">拡大/縮小</strong> — エディタの表示サイズを切替</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <GripVertical size={15} className="text-blue-500 mt-0.5 shrink-0" />
+                <span className="text-muted-foreground"><strong className="text-foreground">ドラッグハンドル</strong> — コード/プレビューの幅を調整</span>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                <strong>エディタ内ショートカット:</strong>{' '}
+                <kbd className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-xs font-mono border border-blue-300 dark:border-blue-700">Tab</kbd> でインデント挿入、
+                コードは横スクロールに対応しています。
+              </p>
+            </div>
+          </div>
+
+          {/* コーディングチャレンジの使い方（フル幅） */}
+          <div className="rounded-xl border-2 border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/10 p-6 card-hover mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
+                <CheckCircle2 size={20} className="text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">コーディングチャレンジの使い方</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+              各ページ下部にある<strong className="text-foreground">緑色のエリア</strong>がコーディングチャレンジです。お題に沿ってコードを書き、採点やヒントを活用しながら学習を進められます。
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+              <div className="flex items-start gap-2.5">
+                <div className="px-2 py-0.5 rounded bg-emerald-600 text-white text-xs font-medium shrink-0 mt-0.5">チェック</div>
+                <span className="text-muted-foreground">コードを採点します。キーワードベースの緩い判定で、完全一致でなくても正解になります</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-xs font-medium shrink-0 mt-0.5">
+                  <Lightbulb size={10} />ヒント
+                </div>
+                <span className="text-muted-foreground">段階的にヒントを表示。複数のヒントがある場合は「次のヒント」で順番に表示されます</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded border border-border text-muted-foreground text-xs font-medium shrink-0 mt-0.5">
+                  <Eye size={10} />模範解答
+                </div>
+                <span className="text-muted-foreground">模範解答のコードを表示/非表示できます。自分のコードと見比べて学習しましょう</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded text-muted-foreground text-xs font-medium shrink-0 mt-0.5">
+                  <RotateCcw size={10} />リセット
+                </div>
+                <span className="text-muted-foreground">コードを初期状態に戻します。採点結果やヒント表示もリセットされます</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
             {/* キーボードショートカット */}
             <div className="rounded-xl border border-border bg-card p-6 card-hover">
               <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center mb-4">
                 <Keyboard size={20} className="text-violet-600 dark:text-violet-400" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-3">キーボードショートカット</h3>
-              <ul className="text-sm text-muted-foreground space-y-2.5 leading-relaxed">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  <span><kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border">&larr;</kbd> <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border">&rarr;</kbd> : 前後のページに移動</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  <span><kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border">Shift</kbd> + <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border">&larr;</kbd> <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border">&rarr;</kbd> : 前後のセクションに移動</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  <span><kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border">Cmd/Ctrl</kbd> + <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border">K</kbd> : 検索にフォーカス</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  <span><kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border">Home</kbd> : ページトップにスクロール</span>
-                </li>
-              </ul>
+              <h3 className="text-base font-bold text-foreground mb-3">ページナビゲーション</h3>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border shrink-0">&larr;</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border shrink-0">&rarr;</kbd>
+                  <span>前後のページ</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border shrink-0">Shift+&larr;&rarr;</kbd>
+                  <span>前後のセクション</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border shrink-0">Cmd/Ctrl+K</kbd>
+                  <span>検索にフォーカス</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono border border-border shrink-0">Home</kbd>
+                  <span>ページトップ</span>
+                </div>
+              </div>
             </div>
 
             {/* キーワード検索 */}
@@ -241,20 +349,11 @@ export default function Home() {
               <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center mb-4">
                 <Search size={20} className="text-sky-600 dark:text-sky-400" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-3">キーワード検索</h3>
-              <ul className="text-sm text-muted-foreground space-y-2.5 leading-relaxed">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  サイドバーの検索欄にキーワードを入力
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  ページタイトルだけでなく、H2 見出しのキーワードでも検索可能
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  検索結果の「#」付きサブアイテムをクリックすると、該当箇所にスクロール＆ハイライト表示
-                </li>
+              <h3 className="text-base font-bold text-foreground mb-3">キーワード検索</h3>
+              <ul className="text-sm text-muted-foreground space-y-2 leading-relaxed">
+                <li>サイドバーの検索欄にキーワードを入力</li>
+                <li>ページタイトル + H2 見出しで検索可能</li>
+                <li><span className="font-mono text-foreground">#</span> 付きサブアイテムクリックで該当箇所にスクロール＆ハイライト</li>
               </ul>
             </div>
 
@@ -263,46 +362,11 @@ export default function Home() {
               <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mb-4">
                 <Settings size={20} className="text-amber-600 dark:text-amber-400" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-3">画面設定</h3>
-              <ul className="text-sm text-muted-foreground space-y-2.5 leading-relaxed">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  ダークモード / ライトモード切替（サイドバー上部）
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  ワイドモード / 通常モード切替
-                </li>
-              </ul>
-            </div>
-
-            {/* コーディングチャレンジ */}
-            <div className="rounded-xl border border-border bg-card p-6 card-hover">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mb-4">
-                <Code2 size={20} className="text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <h3 className="text-lg font-bold text-foreground mb-3">コーディングチャレンジ</h3>
-              <ul className="text-sm text-muted-foreground space-y-2.5 leading-relaxed">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  各ページにインタラクティブなコードエディターがあります
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  左側にコード入力、右側にライブプレビュー表示
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  「チェック」ボタンで採点（キーワードベースの緩い判定）
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  「ヒント」「模範解答」ボタンで段階的にサポート
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">-</span>
-                  「リセット」で初期状態に戻せます
-                </li>
+              <h3 className="text-base font-bold text-foreground mb-3">画面設定</h3>
+              <ul className="text-sm text-muted-foreground space-y-2 leading-relaxed">
+                <li>ダークモード / ライトモード切替</li>
+                <li>ワイドモード / 通常モード切替</li>
+                <li>サイドバー上部のアイコンから変更</li>
               </ul>
             </div>
           </div>
